@@ -7,7 +7,6 @@ function Character() {
 Character.prototype.init = function (size) {
     this.size = size;
 };
-
 //character shot-----------------------------------------------
 function CharaShot() {
     this.position = new Point();
