@@ -7,36 +7,94 @@ function Character() {
 Character.prototype.init = function (size) {
     this.size = size;
 };
-//character shot-----------------------------------------------
-function CharaShot() {
+// CharaShot0-------------------------
+function CharaShot0() {
     this.position = new Point();
+    this.vector = new Point();
     this.size = 0;
-    this.speedx = 0;
-    this.speedy = 0;
+    this.speed = 0;
     this.alive = false;
 }
 
-CharaShot.prototype.set = function (p, size, speedx, speedy) {
+CharaShot0.prototype.set = function (p, vector, size, speed) {
     this.position.x = p.x;
     this.position.y = p.y;
     this.size = size;
-    this.speedx = speedx;
-    this.speedy = speedy;
+    this.speed = speed;
+    this.vector = vector;
     this.alive = true;
 };
-
-CharaShot.prototype.move = function () {
-    this.position.y -= this.speedy;
-    this.position.x -= this.speedx;
-    if (this.position.y <= 0)
+CharaShot0.prototype.move = function () {
+    this.position.x += this.vector.x * this.speed;
+    this.position.y += this.vector.y * this.speed;
+    if (
+        this.position.x < -this.size ||
+        this.position.y < -this.size ||
+        this.position.x > this.size + screenCanvas.width ||
+        this.position.y > this.size + screenCanvas.height
+    ) {
         this.alive = false;
-    else if (screenCanvas.height <= this.position.y)
-        this.alive = false
-    else if (this.position.x <= 0)
-        this.alive = false;
-    else if (screenCanvas.width <= this.position.x)
-        this.alive = false
+    }
 };
+// CharaShot1-------------------------
+function CharaShot1() {
+    this.position = new Point();
+    this.vector = new Point();
+    this.size = 0;
+    this.speed = 0;
+    this.alive = false;
+}
+
+CharaShot1.prototype.set = function (p, vector, size, speed) {
+    this.position.x = p.x;
+    this.position.y = p.y;
+    this.size = size;
+    this.speed = speed;
+    this.vector = vector;
+    this.alive = true;
+};
+CharaShot1.prototype.move = function () {
+    this.position.x += this.vector.x * this.speed;
+    this.position.y += this.vector.y * this.speed;
+    if (
+        this.position.x < -this.size ||
+        this.position.y < -this.size ||
+        this.position.x > this.size + screenCanvas.width ||
+        this.position.y > this.size + screenCanvas.height
+    ) {
+        this.alive = false;
+    }
+};
+// CharaShot2-------------------------
+function CharaShot2() {
+    this.position = new Point();
+    this.vector = new Point();
+    this.size = 0;
+    this.speed = 0;
+    this.alive = false;
+}
+
+CharaShot2.prototype.set = function (p, vector, size, speed) {
+    this.position.x = p.x;
+    this.position.y = p.y;
+    this.size = size;
+    this.speed = speed;
+    this.vector = vector;
+    this.alive = true;
+};
+CharaShot2.prototype.move = function () {
+    this.position.x += this.vector.x * this.speed;
+    this.position.y += this.vector.y * this.speed;
+    if (
+        this.position.x < -this.size ||
+        this.position.y < -this.size ||
+        this.position.x > this.size + screenCanvas.width ||
+        this.position.y > this.size + screenCanvas.height
+    ) {
+        this.alive = false;
+    }
+};
+
 // - enemy-------------------------------------------------------------
 function Enemy() {
     this.position = new Point();

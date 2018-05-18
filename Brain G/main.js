@@ -1,6 +1,5 @@
 // - global -------------------------------------------------------------------
 var screenCanvas;
-var screenCanvas;
 var run = true;
 var fps = 100 / 100;
 var mouse = new Point();
@@ -19,17 +18,22 @@ var invincible = false;
 // - const --------------------------------------------------------------------
 //Charactor
 var C_color = 'rgba(255,255,255,1)';
-var C_scolor = 'rgba(255,255,255, 1)';
+var C_scolor = 'rgba(255,0,0,0.8)';
+var C_s2color = 'rgba(255,209,42,1)';
 var C_smaxcount = 10000;
 var C_hp = 10;
 var C_sabhp = 5;
 var C_attack = 5;
 var C_defence = 3;
-var C_speed = 1;
+var C_speed;
 var C_outsize = 0;
 var C_hpgage = 70;
 var C_sabhpgagecolor = 'rgba(52,87,119,1)';
 var C_worldx, C_worldy;
+var space = false;
+var C_shot0v = { x: undefined, y: undefined };
+var C_shot1v = { x: undefined, y: undefined };
+var C_shot2v = { x: undefined, y: undefined };
 //Charactor sab
 var CS_color = 'rgba(0,0,0,1)';
 var CS_1 = {
@@ -69,12 +73,12 @@ var B_color = 'rgba(35, 71, 130,0.8)';
 var B_scolor = 'rgba(255,255,0,1)';
 var B_smaxcount = 10000;
 //Size---------------------
-var width = 0;
-var height = 0;
+var width, height;
 //Key---------------------
 var up, down, right, left, not;
 var key0, key1, key2, key3, key4, key5, key6, key7, key8, key9, keyplus, keyminus;
 var keyq = true;
+var keyw, keys;
 //Cheat----------------------
 var CC_pass = false;
 var CC_passc = undefined;
@@ -97,7 +101,7 @@ window.onload = function () {
   else document.getElementById("log").remove();
   var img = new Image();
   img.src = "back9.bmp";
-  var a, b, c, d, e, f;
+  var a, b, c, d, e, f, g, h;
   var p = new Point(); {
     width = document.documentElement.clientWidth - 2;
     height = document.documentElement.clientHeight - 2;
@@ -129,9 +133,17 @@ window.onload = function () {
   // - ショット用インスタンス-------------------------------  
   bossCount = 0;
 
-  C_shot = new Array(C_smaxcount);
-  for (c = 0; c < C_shot.length; c++)
-    C_shot[c] = new CharaShot();
+  C_shot0 = new Array(C_smaxcount);
+  for (c = 0; c < C_shot0.length; c++)
+    C_shot0[c] = new CharaShot0();
+
+  C_shot1 = new Array(C_smaxcount);
+  for (g = 0; g < C_shot1.length; g++)
+    C_shot1[g] = new CharaShot1();
+
+  C_shot2 = new Array(C_smaxcount);
+  for (h = 0; h < C_shot2.length; h++)
+    C_shot2[h] = new CharaShot2();
 
   E_shot = new Array(E_smaxcount);
   for (d = 0; d < E_shot.length; d++)
@@ -151,7 +163,7 @@ window.onload = function () {
   };
   //sytem main-----------------------------------------------------------------
   isLogEnable = false;
-  //CC_pass = true;
+  CC_pass = true;
   //function---------------------------------------------------------------------------------------
   (function () {
     if (isLogEnable) document.getElementById("log").classList.remove("hide");
@@ -161,14 +173,20 @@ window.onload = function () {
     //sytem main---------------------------------------------------------------
     ctx.clearRect(0, 0, screenCanvas.width, screenCanvas.height);
     ctx.globalCompositeOperation = "source-over";
-    ctx.globalAlpha = .5;
-    ctx.drawImage(img, 0, 0, screenCanvas.width, screenCanvas.width);
+    ctx.globalAlpha = .6;//944,1336
+    if (screenCanvas.height >= screenCanvas.width * 1336 / 944) {
+      ctx.drawImage(img, 0, 0, screenCanvas.height * 944 / 1336, screenCanvas.height); //944:1336=x:sch  1336*x=944*sch  x=944*sch/1336
+    } else {
+      ctx.drawImage(img, 0, 0, screenCanvas.width, screenCanvas.width * 1336 / 944); //944:1336=scw:y  944*y=1336*scw  y=scw*1336/944
+    }
     ctx.globalAlpha = 1;
+    counter++;
     status(score);
-    C_draw(charactor);
-    CS_draw(CS_1, CS_2, CS_3, CS_4);
     C_hpdraw(C_sabhp);
     changecolor(CC_pass);
+    C_sdraw();
+    C_draw(charactor);
+    CS_draw(CS_1, CS_2, CS_3, CS_4);
     //Cheat----------------------------------------------------------
     if (not) {
       if (key0) {
@@ -212,13 +230,6 @@ window.onload = function () {
           fCC_12 = false;
         };
       };
-      /*if (key2 && key3) {
-        if (!fCC_23) {
-          fCC_23 = true;
-        } else {
-          fCC_23 = false;
-        };
-      };*/
       if (key4 && key5) {
         if (!CC_45) {
           fCC_45 = true;
@@ -317,10 +328,77 @@ window.onload = function () {
       CS_4.x = CS_late.x + CS_far * world;
       CS_4.y = CS_late.y - CS_far * world;
     };
-    if (fire) {
+    if (space) {
       CS_far = 35 * world;
     } else {
       CS_far = 25 * world;
+    };
+    if (C_sabhp > 2) {
+      C_shot0v = { x: 0 * world, y: -1 * world };
+      C_shot1v = { x: 0 * world, y: -1 * world };
+      C_shot2v = { x: 0 * world, y: -1 * world };
+      if (keyw) {
+        C_shot1v = { x: -0.05 * world, y: -0.7 * world };
+        C_shot2v = { x: 0.05 * world, y: -0.7 * world };
+      } else if (keys) {
+        C_shot1v = { x: 0.1 * world, y: -0.7 * world };
+        C_shot2v = { x: -0.1 * world, y: -0.7 * world };
+      }
+    }
+    if (space) {
+      if (C_sabhp > 2) {
+        if (counter % 15 == 0) {
+          let Vectors = [{
+            x: C_shot0v.x,
+            y: C_shot0v.y,
+            size: 4 * world,
+            speed: 8 * world
+          }];
+          let vectorCounter = 0;
+          for (c = 0; c < C_smaxcount; c++) {
+            if (!C_shot0[c].alive) {
+              C_shot0[c].set(charactor.position, Vectors[vectorCounter], Vectors[vectorCounter].size || 5 * world, Vectors[vectorCounter].speed || 3 * world);
+              vectorCounter++;
+              if (vectorCounter >= Vectors.length) break;
+            }
+          }
+          //console.log("a");            
+        }
+        if (counter % 15 == 0) {
+          let Vectors = [{
+            x: C_shot1v.x,
+            y: C_shot1v.y,
+            size: 2.5 * world,
+            speed: 8 * world
+          }];
+          let vectorCounter = 0;
+          for (g = 0; g < C_smaxcount; g++) {
+            if (!C_shot1[g].alive) {
+              C_shot1[g].set(CS_1, Vectors[vectorCounter], Vectors[vectorCounter].size || 5 * world, Vectors[vectorCounter].speed || 3 * world);
+              vectorCounter++;
+              if (vectorCounter >= Vectors.length) break;
+            }
+          }
+          //console.log("a");            
+        }
+        if (counter % 15 == 0) {
+          let Vectors = [{
+            x: C_shot2v.x,
+            y: C_shot2v.y,
+            size: 2.5 * world,
+            speed: 8 * world
+          }];
+          let vectorCounter = 0;
+          for (h = 0; h < C_smaxcount; h++) {
+            if (!C_shot2[h].alive) {
+              C_shot2[h].set(CS_2, Vectors[vectorCounter], Vectors[vectorCounter].size || 5 * world, Vectors[vectorCounter].speed || 3 * world);
+              vectorCounter++;
+              if (vectorCounter >= Vectors.length) break;
+            }
+          }
+          //console.log("a");            
+        }
+      }
     };
     //enemy----------------------------------------------------------
     //End main-----------------------------------------------------------------
@@ -368,6 +446,8 @@ function CC_23() {
   if (L_main == 1) {
     log.setGroup("main")
     log("main", screenCanvas.width, screenCanvas.height);
+  } else if (L_main == 2) {
+    log.setGroup("main2")
   };
 };
 
@@ -377,13 +457,13 @@ function C_draw(charactor) {
   ctx.closePath();
   ctx.fillStyle = C_color;
   ctx.fill();
-  ctx.strokeStyle = 'rgba(0,0,0,1)';
+  ctx.strokeStyle = CS_color;
   ctx.stroke();
 
   ctx.beginPath();
   ctx.arc(charactor.position.x, charactor.position.y, charactor.size, 0, Math.PI * 2, false)
   ctx.closePath();
-  ctx.fillStyle = 'rgba(0,0,0,1)';
+  ctx.fillStyle = CS_color;
   ctx.fill();
 }
 
@@ -397,9 +477,55 @@ function CS_draw(CS_1, CS_2, CS_3, CS_4) {
   ctx.moveTo(CS_4.x, CS_4.y);
   ctx.arc(CS_4.x, CS_4.y, CS_size, 0, Math.PI * 2, false)
   ctx.closePath();
-  ctx.strokeStyle = 'rgba(255,255,255,1)';
+  ctx.strokeStyle = CS_color;
   ctx.stroke();
   ctx.fillStyle = CS_color;
+  ctx.fill();
+}
+
+function C_sdraw() {
+  ctx.fillStyle = C_s2color;
+  ctx.beginPath();
+  for (g = 0; g < C_smaxcount; g++) {
+    if (C_shot1[g].alive) {
+      C_shot1[g].move();
+      ctx.arc(
+        C_shot1[g].position.x,
+        C_shot1[g].position.y,
+        C_shot1[g].size,
+        0, Math.PI * 2, false
+      );
+      ctx.closePath();
+    }
+  }
+  for (h = 0; h < C_smaxcount; h++) {
+    if (C_shot2[h].alive) {
+      C_shot2[h].move();
+      ctx.arc(
+        C_shot2[h].position.x,
+        C_shot2[h].position.y,
+        C_shot2[h].size,
+        0, Math.PI * 2, false
+      );
+      ctx.closePath();
+    }
+  }
+  ctx.fill();
+
+  ctx.fillStyle = C_scolor;
+  ctx.beginPath();
+  for (c = 0; c < C_smaxcount; c++) {
+    if (C_shot0[c].alive) {
+      C_shot0[c].move();
+      ctx.arc(
+        C_shot0[c].position.x,
+        C_shot0[c].position.y,
+        C_shot0[c].size,
+        0, Math.PI * 2, false
+      );
+      ctx.closePath();
+    }
+  }
   ctx.fill();
 }
 
@@ -407,7 +533,7 @@ function C_hpdraw(C_sabhp) {
   if (keyq) {
     ctx.globalAlpha = 1;
   } else {
-    ctx.globalAlpha = .3;
+    ctx.globalAlpha = .1;
   }
   ctx.beginPath();
   ctx.moveTo(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world);
@@ -431,7 +557,7 @@ function status(score) {
   ctx.beginPath();
   ctx.textAlign = "right";
   ctx.font = fontsize * world + "px 'Rounded Mplus 1c', 'Open Sans', 'Noto Sans Japanese', 'Yu Gothic', 'Meiryo UI', sans-serif";
-  ctx.fillText("Score : " + score, screenCanvas.width - (fontsize / 3) * world /*- fontsize * world * ((String(score).length + 8) / 2)*/ , screenCanvas.height - (fontsize / 3) * world);
+  ctx.fillText("Score : " + score, screenCanvas.width - (fontsize / 3) * world /*- fontsize * world * ((String(score).length + 8) / 2)*/, screenCanvas.height - (fontsize / 3) * world);
   ctx.closePath();
 }
 
@@ -447,6 +573,7 @@ function keyDown(event) {
   }
   //console.log(ck);
 
+  if (ck === 32) { space = true; };
   if (ck === 37) {
     left = true;
   };
@@ -502,6 +629,8 @@ function keyDown(event) {
       keyq = false;
     };
   };
+  if (ck === 87) { keyw = true; };
+  if (ck === 83) { keys = true; };
   if (ck == 107) {
     if (fCC_23) {
       if (L_main == 3) {
@@ -533,6 +662,7 @@ function keyDown(event) {
 
 function keyUp(event) {
   var ck = event.keyCode;
+  if (ck === 32) { space = false; };
   if (ck === 37) {
     left = false;
   };
@@ -580,6 +710,8 @@ function keyUp(event) {
   if (ck === 105) {
     key9 = false;
   };
+  if (ck === 87) { keyw = false; };
+  if (ck === 83) { keys = false; };
 }
 
 function ShowGameover(text) {
