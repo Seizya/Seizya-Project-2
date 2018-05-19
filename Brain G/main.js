@@ -30,7 +30,7 @@ var C_outsize = 0;
 var C_hpgage = 70;
 var C_sabhpgagecolor = 'rgba(52,87,119,1)';
 var C_worldx, C_worldy;
-var space = false;
+var keyspace = false;
 var C_shot0v = { x: undefined, y: undefined };
 var C_shot1v = { x: undefined, y: undefined };
 var C_shot2v = { x: undefined, y: undefined };
@@ -78,7 +78,7 @@ var width, height;
 var up, down, right, left, not;
 var key0, key1, key2, key3, key4, key5, key6, key7, key8, key9, keyplus, keyminus;
 var keyq = true;
-var keyw, keys;
+var keyw, keys, keyshift;
 //Cheat----------------------
 var CC_pass = false;
 var CC_passc = undefined;
@@ -328,7 +328,7 @@ window.onload = function () {
       CS_4.x = CS_late.x + CS_far * world;
       CS_4.y = CS_late.y - CS_far * world;
     };
-    if (space) {
+    if (keyspace) {
       CS_far = 35 * world;
     } else {
       CS_far = 25 * world;
@@ -345,7 +345,7 @@ window.onload = function () {
         C_shot2v = { x: -0.1 * world, y: -0.7 * world };
       }
     }
-    if (space) {
+    if (keyspace) {
       if (C_sabhp > 2) {
         if (counter % 15 == 0) {
           let Vectors = [{
@@ -573,7 +573,8 @@ function keyDown(event) {
   }
   //console.log(ck);
 
-  if (ck === 32) { space = true; };
+  if (ck === 32) { keyspace = true; };
+  if (ck === 16) { keyshift = true; };
   if (ck === 37) {
     left = true;
   };
@@ -662,7 +663,8 @@ function keyDown(event) {
 
 function keyUp(event) {
   var ck = event.keyCode;
-  if (ck === 32) { space = false; };
+  if (ck === 32) { keyspace = false; };
+  if (ck === 16) { keyshift = false; };
   if (ck === 37) {
     left = false;
   };
