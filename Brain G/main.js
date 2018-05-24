@@ -25,9 +25,9 @@ var C_hp = 10;
 var C_sabhp = 5;
 var C_attack = 5;
 var C_defence = 3;
-var C_speed;
+var C_speed=3;
 var C_outsize = 0;
-var C_hpgage = 70;
+var C_hpgage = 80;
 var C_sabhpgagecolor = 'rgba(52,87,119,1)';
 var C_worldx, C_worldy;
 var keyspace = false;
@@ -63,7 +63,7 @@ var E_color = 'rgba(10, 100, 230, 0.6)';
 var E_scolor = 'rgba(0, 50, 255, 1)';
 var E_maxcount = 100;
 var E_smaxcount = 1000;
-var E_attack = 1;
+var E_attack = 3;
 var E_defence = 1;
 //boss
 var B_hp = 200;
@@ -72,6 +72,8 @@ var B_maxcount = 4;
 var B_color = 'rgba(35, 71, 130,0.8)';
 var B_scolor = 'rgba(255,255,0,1)';
 var B_smaxcount = 10000;
+var B_attack = 5;
+var B_defence = 3;
 //Size---------------------
 var width, height;
 //Key---------------------
@@ -86,10 +88,12 @@ var fCC_12 = false;
 var fCC_23 = false;
 var fCC_45 = false;
 var fCC_56 = false;
-var fCC_78 = false;
 var fCC_89 = false;
-var ffCC_78 = 1;
+var fCC_78 = 1;
 var L_main = 1;
+//Skill----------------------
+var S_point = 10;
+var C_c, C_e, C_b;
 //Sytem-*--------------------
 var charactor, enemy, boss, bossCount, C_shot, E_shot, B_shot;
 var log = () => 0;
@@ -184,7 +188,7 @@ window.onload = function () {
     counter++;
     status(score);
     C_hpdraw(C_sabhp);
-    changecolor(CC_pass);
+    changecolor();
     C_sdraw();
     C_draw(charactor);
     CS_draw(CS_1, CS_2, CS_3, CS_4);
@@ -204,28 +208,44 @@ window.onload = function () {
     if (fCC_89) {
       CC_89();
     };
+    if (CC_pass) {
     if (L_main == 1) {
       log.setGroup("main")
     } else if (L_main == 2) {
       log.setGroup("main2")
     } else if (L_main == 3) {
       log.setGroup("main3")
-    };
+      };
+      
+    ctx.fillStyle = 'rgba(0,0,0,1)';
+      fontsize = 40;
+      ctx.beginPath();
+      ctx.textAlign = "right";
+      ctx.font = fontsize * world + "px 'Rounded Mplus 1c', 'Open Sans', 'Noto Sans Japanese', 'Yu Gothic', 'Meiryo UI', sans-serif";
+      ctx.fillText("CC_78 : " + fCC_78, screenCanvas.width - ((fontsize - fontsize / 3) * world), (fontsize*1+0)* world);
+      ctx.fillText("Hp : " + C_hp, screenCanvas.width - ((fontsize - fontsize / 3) * world), (fontsize*2+2) * world);
+      ctx.fillText("sHp : " + C_sabhp, screenCanvas.width - ((fontsize - fontsize / 3) * world), (fontsize*3+4) * world);
+      ctx.fillText("S_p : " + S_point, screenCanvas.width - ((fontsize - fontsize / 3) * world), (fontsize*4+6) * world);
+      ctx.fillText("At : " + C_attack, screenCanvas.width - ((fontsize - fontsize / 3) * world), (fontsize*5+8) * world);
+      ctx.fillText("Df : " + C_defence, screenCanvas.width - ((fontsize - fontsize / 3) * world), (fontsize*6+10) * world);
+      ctx.fillText("Sp : " + score, screenCanvas.width - ((fontsize - fontsize / 3) * world), (fontsize*7+12) * world);
+      ctx.closePath();
+    }
     //if (!slow || slowCount % 5 == 0) {
     //Game main----------------------------------------------------------------
     //charactor------------------------------------------------------
-    if (ffCC_78 != 1 && key0 || ffCC_78 == 1 && keyshift) { C_speed = 1.5; CS_color = 'rgba(76,76,76,1)' } else { C_speed = 3; CS_color = 'rgba(0,0,0,1)'; };
+    if (fCC_78 != 1 && key0 || fCC_78 == 1 && keyshift) { C_speed = 1.5; CS_color = 'rgba(76,76,76,1)' } else { C_speed = 3; CS_color = 'rgba(0,0,0,1)'; };
     if (up) {
-      charactor.position.y -= C_speed;
+      charactor.position.y -= C_speed*world;
     };
     if (down) {
-      charactor.position.y += C_speed;
+      charactor.position.y += C_speed*world;
     };
     if (right) {
-      charactor.position.x += C_speed;
+      charactor.position.x += C_speed*world;
     };
     if (left) {
-      charactor.position.x -= C_speed;
+      charactor.position.x -= C_speed*world;
     };
     if (CS_late.x == undefined) {
       CS_late.x = charactor.position.x;
@@ -329,6 +349,7 @@ window.onload = function () {
       }
     };
     //enemy----------------------------------------------------------
+    //Boss-----------------------------------------------------------
     //End main-----------------------------------------------------------------
     if (C_sabhp <= 0) ShowGameover("score : " + score);
     else requestAnimationFrame(arguments.callee);
@@ -359,25 +380,23 @@ function resize(screenCanvas, charactor) {
   C_outsize = 10 * world; //1477:c=1364:10    c*1364=1477*10  C=1477*10/1364
   charactor.size = C_outsize / 10 * 4;
   CS_size = C_outsize / 2;
-  C_speed = 3 * world;
+  C_speed = 3;
   //charactor.position.x = charactor.position.x/screencanvas.width
   //charactor.position.y = charactor.position.y * world;  
 };
 
-function changecolor(CC_passs) {
+function changecolor() {
   if (CC_pass) {
     C_sabhpgagecolor = 'rgba(255,0,0,1)';
-  } else { C_sabhpgagecolor = 'rgba(52,87,119,1)'; };
+  } else { C_sabhpgagecolor = 'rgba(16,87,121,1)'; };
 }
 
 function CC_23() {
   isLogEnable = true;
   if (L_main == 1) {
-    log.setGroup("main")
     log("main", screenCanvas.width, screenCanvas.height);
   } else if (L_main == 2) {
-    log.setGroup("main2")
-    //log("main2", );
+   // log("main2", fCC_78 + " : CC_78", C_hp + " : HP", C_sabhp + " : sHP",S_point+" : S_p", C_attack + " : At", C_defence + " : Df", C_speed + " : Sp");
   };
 };
 
@@ -463,42 +482,55 @@ function C_hpdraw(C_sabhp) {
   if (keyq) {
     ctx.globalAlpha = 1;
   } else {
-    ctx.globalAlpha = .1;
+    ctx.globalAlpha = .2;
   }
   ctx.beginPath();
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage + 5) * world, 0, 360 * (Math.PI / 180), false);
+  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage + 2) * world, 0, 360 * (Math.PI / 180), false);
   ctx.closePath();
   ctx.fillStyle = 'rgba(0,0,0,0.5)';
   ctx.fill();
+  ctx.lineWidth = 4 * world;
+  ctx.strokeStyle = 'rgba(255,255,255,1)';
+  ctx.stroke();
+
+
+  ctx.beginPath();
+  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 5) * world, -90 * (Math.PI / 180), ((360 * C_hp / 10) - 90) * (Math.PI / 180), false);
+  ctx.lineWidth = 10 * world;
+  ctx.strokeStyle = 'rgba(0,0,0,1)';
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 15) * world, -90 * (Math.PI / 180), ((360 * C_sabhp / 5) - 90) * (Math.PI / 180), false);
+  ctx.strokeStyle = C_sabhpgagecolor;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 25) * world, -90 * (Math.PI / 180), ((360 * S_point / 10) - 90) * (Math.PI / 180), false);
+  ctx.strokeStyle = 'rgba(196, 136, 71,1)';
+  ctx.stroke();
+  ctx.lineWidth = 1 * world;
 
   ctx.beginPath();
   ctx.moveTo(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world);
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 5) * world, -90 * (Math.PI / 180), ((360 * C_hp / 10) - 90) * (Math.PI / 180), false);
+  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 30) * world, -90 * (Math.PI / 180), ((360 * C_hp / 10) - 90) * (Math.PI / 180), false);
   ctx.moveTo(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world);
   ctx.closePath();
   ctx.fillStyle = C_color;
   ctx.fill();
 
-  ctx.beginPath();
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, C_hpgage * world, -90 * (Math.PI / 180), ((360 * C_sabhp / 5) - 90) * (Math.PI / 180), false);
-  ctx.lineWidth = 10 * world;
-  ctx.strokeStyle = C_sabhpgagecolor;
-  ctx.stroke();
-
-  ctx.beginPath();
+  ctx.globalAlpha = 1;
+  /*
   if (CC_pass) {
-    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 10) * world, ((360 * (ffCC_78 - 1) / 3) - 90) * (Math.PI / 180), ((360 * ffCC_78 / 3) - 90) * (Math.PI / 180), false);
+    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 10) * world, ((360 * (fCC_78 - 1) / 3) - 90) * (Math.PI / 180), ((360 * fCC_78 / 3) - 90) * (Math.PI / 180), false);
   } else {
     ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 10) * world, 0, 360 * (Math.PI / 180), false);
-  }
-  ctx.strokeStyle = 'rgba(196, 136, 71,1)';
-  ctx.stroke();
-
-  ctx.lineWidth = 1 * world;
-  ctx.globalAlpha = 1;
+  } 
+  */
 }
 
-function status(score) {
+function status(score){
+fontsize = 50;
   ctx.fillStyle = 'rgba(0,0,0,1)';
   ctx.beginPath();
   ctx.textAlign = "right";
@@ -524,18 +556,18 @@ function keyDown(event) {
   };
   if (ck === 32) { keyspace = true; };
   if (ck === 37) {
-    if (ffCC_78 == 2) { keya = true; } else if (ffCC_78 == 1) { left = true; };
+    if (fCC_78 == 2) { keya = true; } else if (fCC_78 == 1) { left = true; };
   };
   if (ck === 38) {
-    if (ffCC_78 == 2) { keyw = true; } else if (ffCC_78 == 1) { up = true; };
+    if (fCC_78 == 2) { keyw = true; } else if (fCC_78 == 1) { up = true; };
   };
   if (ck === 39) {
-    if (ffCC_78 == 2) { keyd = true; } else if (ffCC_78 == 1) { right = true; };
+    if (fCC_78 == 2) { keyd = true; } else if (fCC_78 == 1) { right = true; };
   };
   if (ck === 40) {
-    if (ffCC_78 == 2) {
+    if (fCC_78 == 2) {
       keys = true;
-    } else if (ffCC_78 == 1) { down = true; };
+    } else if (fCC_78 == 1) { down = true; };
   };
 
   if (ck === 29) {
@@ -584,21 +616,21 @@ function keyDown(event) {
     };
   };
   if (ck === 87) {
-    if (ffCC_78 != 1) {
+    if (fCC_78 != 1) {
       up = true;
     } else { keyw = true; };
   };
   if (ck === 83) {
-    if (ffCC_78 != 1) {
+    if (fCC_78 != 1) {
       down = true;
     } else { keys = true; };
   };
-  if (ck === 65) { if (ffCC_78 != 1) { left = true; } else { keya = true; }; };
-  if (ck === 68) { if (ffCC_78 != 1) { right = true; } else { keyd = true; }; };
-  if (ck === 79) { if (ffCC_78 == 3) { keyw = true; }; };
-  if (ck === 75) { if (ffCC_78 == 3) { keya = true; }; };
-  if (ck === 76) { if (ffCC_78 == 3) { keys = true; }; };
-  if (ck === 59) { if (ffCC_78 == 3) { keyd = true; }; };
+  if (ck === 65) { if (fCC_78 != 1) { left = true; } else { keya = true; }; };
+  if (ck === 68) { if (fCC_78 != 1) { right = true; } else { keyd = true; }; };
+  if (ck === 79) { if (fCC_78 == 3) { keyw = true; }; };
+  if (ck === 75) { if (fCC_78 == 3) { keya = true; }; };
+  if (ck === 76) { if (fCC_78 == 3) { keys = true; }; };
+  if (ck === 59) { if (fCC_78 == 3) { keyd = true; }; };
 
   if (ck == 107) {
     if (fCC_23) {
@@ -676,7 +708,7 @@ function keyDown(event) {
       };
     };
     if (key7 && key8) {
-      if (ffCC_78 == 3) { ffCC_78 = 1; } else if (ffCC_78 == 1) { ffCC_78 = 2; } else { ffCC_78 = 3 }
+      if (fCC_78 == 3) { fCC_78 = 1; } else if (fCC_78 == 1) { fCC_78 = 2; } else { fCC_78 = 3 }
     };
     if (key8 && key9) {
       if (!fCC_89) {
@@ -694,18 +726,18 @@ function keyUp(event) {
   if (ck === 32) { keyspace = false; };
 
   if (ck === 37) {
-    if (ffCC_78 == 2) { keya = false; } else if (ffCC_78 == 1) { left = false; };
+    if (fCC_78 == 2) { keya = false; } else if (fCC_78 == 1) { left = false; };
   };
   if (ck === 38) {
-    if (ffCC_78 == 2) { keyw = false; } else if (ffCC_78 == 1) { up = false; };
+    if (fCC_78 == 2) { keyw = false; } else if (fCC_78 == 1) { up = false; };
   };
   if (ck === 39) {
-    if (ffCC_78 == 2) { keyd = false; } else if (ffCC_78 == 1) { right = false; };
+    if (fCC_78 == 2) { keyd = false; } else if (fCC_78 == 1) { right = false; };
   };
   if (ck === 40) {
-    if (ffCC_78 == 2) {
+    if (fCC_78 == 2) {
       keys = false;
-    } else if (ffCC_78 == 1) { down = false; };
+    } else if (fCC_78 == 1) { down = false; };
   };
   if (ck === 29) {
     not = false;
@@ -743,21 +775,21 @@ function keyUp(event) {
   };
 
   if (ck === 87) {
-    if (ffCC_78 != 1) {
+    if (fCC_78 != 1) {
       up = false;
     } else { keyw = false; };
   };
-  if (ck === 83 != 1) {
-    if (ffCC_78) {
+  if (ck === 83) {
+    if (fCC_78 != 1) {
       down = false;
     } else { keys = false; };
   };
-  if (ck === 65) { if (ffCC_78 != 1) { left = false; } else { keya = false; }; };
-  if (ck === 68) { if (ffCC_78 != 1) { right = false; } else { keyd = false; }; };
-  if (ck === 79) { if (ffCC_78 == 3) { keyw = false; }; };
-  if (ck === 75) { if (ffCC_78 == 3) { keya = false; }; };
-  if (ck === 76) { if (ffCC_78 == 3) { keys = false; }; };
-  if (ck === 59) { if (ffCC_78 == 3) { keyd = false; }; };
+  if (ck === 65) { if (fCC_78 != 1) { left = false; } else { keya = false; }; };
+  if (ck === 68) { if (fCC_78 != 1) { right = false; } else { keyd = false; }; };
+  if (ck === 79) { if (fCC_78 == 3) { keyw = false; }; };
+  if (ck === 75) { if (fCC_78 == 3) { keya = false; }; };
+  if (ck === 76) { if (fCC_78 == 3) { keys = false; }; };
+  if (ck === 59) { if (fCC_78 == 3) { keyd = false; }; };
 }
 
 function ShowGameover(text) {
