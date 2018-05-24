@@ -30,7 +30,7 @@ var C_outsize = 0;
 var C_hpgage = 80;
 var C_sabhpgagecolor = 'rgba(52,87,119,1)';
 var C_worldx, C_worldy;
-var keyspace = false;
+var keyspace = undefined;
 var C_shot0v = { x: undefined, y: undefined };
 var C_shot1v = { x: undefined, y: undefined };
 var C_shot2v = { x: undefined, y: undefined };
@@ -292,7 +292,7 @@ window.onload = function () {
         C_shot1v = { x: 0.1 * world, y: -0.7 * world };
         C_shot2v = { x: -0.1 * world, y: -0.7 * world };
       }
-    }
+    };
     if (keyspace) {
       if (C_sabhp > 2) {
         if (counter % 15 == 0) {
@@ -550,11 +550,11 @@ function keyDown(event) {
     log("main3", "C K = " + ck);
   }
   //console.log(ck);
-
+        
   if (ck === 16) {
     keyshift = true;
   };
-  if (ck === 32) { keyspace = true; };
+  if (ck === 32) { keyspace = true; };  
   if (ck === 37) {
     if (fCC_78 == 2) { keya = true; } else if (fCC_78 == 1) { left = true; };
   };
@@ -638,7 +638,7 @@ function keyDown(event) {
         L_main = 1;
       } else {
         L_main += 1;
-      };
+      };   
     };
   };
   if (ck === 109) {
@@ -709,6 +709,14 @@ function keyDown(event) {
     };
     if (key7 && key8) {
       if (fCC_78 == 3) { fCC_78 = 1; } else if (fCC_78 == 1) { fCC_78 = 2; } else { fCC_78 = 3 }
+      up = false;
+      down = false;
+      right = false;
+      left = false;
+      keya = false;
+      keyw = false;
+      keys = false;
+      keyd = false;   
     };
     if (key8 && key9) {
       if (!fCC_89) {
