@@ -176,13 +176,13 @@ Boss.prototype.set = function (p, size, type) {
     this.param = 0;
     this.alive = true;
 };
-
+/*
 Boss.prototype.move = function () {
     this.param++;
     if (this.position.y < (screenCanvas.height - this.size) / 2) {
         this.position.y += 1;
     };
-}
+}*/
 // boss shot-------------------------
 function BossShot() {
     this.position = new Point();
@@ -201,6 +201,35 @@ BossShot.prototype.set = function (p, vector, size, speed) {
     this.alive = true;
 };
 BossShot.prototype.move = function () {
+    this.position.x += this.vector.x * this.speed;
+    this.position.y += this.vector.y * this.speed;
+    if (
+        this.position.x < -this.size ||
+        this.position.y < -this.size ||
+        this.position.x > this.size + screenCanvas.width ||
+        this.position.y > this.size + screenCanvas.height
+    ) {
+        this.alive = false;
+    }
+};
+//S_build----------------------------------------------------------------------------------------------------------------------------------------
+function S_build0() {
+    this.position = new Point();
+    this.vector = new Point();
+    this.size = 0;
+    this.speed = 0;
+    this.alive = false;
+}
+
+S_build0.prototype.set = function (p, vector, size, speed) {
+    this.position.x = p.x;
+    this.position.y = p.y;
+    this.size = size;
+    this.speed = speed;
+    this.vector = vector;
+    this.alive = true;
+};
+S_build0.prototype.move = function () {
     this.position.x += this.vector.x * this.speed;
     this.position.y += this.vector.y * this.speed;
     if (
