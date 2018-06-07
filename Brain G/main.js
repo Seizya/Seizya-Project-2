@@ -12,7 +12,7 @@ var B_counter = 0;
 var slow = false;
 var Key = 0;
 var score = 0;
-var world;
+var world, world2;
 var Music = false;
 var invincible = false;
 // - const --------------------------------------------------------------------
@@ -31,9 +31,18 @@ var C_hpgage = 80;
 var C_sabhpgagecolor = 'rgba(52,87,119,1)';
 var C_worldx, C_worldy;
 var keyspace = undefined;
-var C_shot0v = { x: undefined, y: undefined };
-var C_shot1v = { x: undefined, y: undefined };
-var C_shot2v = { x: undefined, y: undefined };
+var C_shot0v = {
+  x: undefined,
+  y: undefined
+};
+var C_shot1v = {
+  x: undefined,
+  y: undefined
+};
+var C_shot2v = {
+  x: undefined,
+  y: undefined
+};
 //Charactor sab
 var CS_color = 'rgba(0,0,0,1)';
 var CS_1 = {
@@ -80,7 +89,7 @@ var width, height;
 var up, down, right, left, not;
 var key0, key1, key2, key3, key4, key5, key6, key7, key8, key9, keyplus, keyminus;
 var keyq = true;
-var keya, keyd, keyw, keys, keyf, keyshift;
+var keya, keyd, keyw, keys, keyf, keyshift, keyctrl;
 //Cheat----------------------
 var CC_pass = false;
 var CC_passc = undefined;
@@ -94,11 +103,10 @@ var L_main = 1;
 //Skill----------------------
 var S_point = 0;
 var S_bmaxcount = 120;
-var S_bfar;
-var S_bsize;
-var S_bcolor;
+var S_bfar = 60 * world;
+var S_bcolor = 'rgba(139,69,19,1)';
 //Sytem-*--------------------
-var charactor, enemy, boss, bossCount, C_shot, E_shot, B_shot, S_build;
+var charactor, enemy, boss, bossCount, C_shot, E_shot, B_shot;
 var log = () => 0;
 var isLogEnable = true;
 var fontsize = 50;
@@ -109,7 +117,7 @@ window.onload = function () {
   else document.getElementById("log").remove();
   var img = new Image();
   img.src = "back9.bmp";
-  var a, b, c, d, e, f, g, h, i;
+  var a, b, c, d, e, f, g, h, /*i,j*/ k;
   var p = new Point(); {
     width = document.documentElement.clientWidth - 2;
     height = document.documentElement.clientHeight - 2;
@@ -160,19 +168,22 @@ window.onload = function () {
   B_shot = new Array(B_smaxcount);
   for (e = 0; e < B_shot.length; e++)
     B_shot[e] = new BossShot();
-  //Skill用インスタンス------------------------------------
+  //S_build----------------------------------------------    
   S_build = new Array(S_bmaxcount);
-  for (i = 0; i < S_build.length; i++)
-    S_build[i] = new S_build0();
+  for (k = 0; k < S_build.length; k++)
+    S_build[k] = new Skillbuild();
   //Main------------------------------------------------------------------------------------------------------------------------
   var slowCount = 0;
   charactor.position.x = screenCanvas.width / 2;
   charactor.position.y = screenCanvas.height / 5 * 4;
-  if (screenCanvas.height < screenCanvas.width) {
-    world = screenCanvas.height / 762.5;
-  } else {
-    world = screenCanvas.width / 1364
-  };
+  /* if (screenCanvas.width <= 762.5 * screenCanvas.height / 1364) {
+     world = screenCanvas.height / 762.5;
+     world2 = screenCanvas.height / 1364 * 2;
+   } else {
+     world = screenCanvas.height / 762.5;
+     world2 = screenCanvas.height / 762.5;
+   } //1364:762.5==w:h 1364*h==762.5*w 1364:762.5==h:w 1364*w==762.5*h w==762.5*h/1364 */
+
   //sytem main-----------------------------------------------------------------
   isLogEnable = false;
   CC_pass = true;
@@ -187,7 +198,7 @@ window.onload = function () {
     //sytem main---------------------------------------------------------------
     ctx.clearRect(0, 0, screenCanvas.width, screenCanvas.height);
     ctx.globalCompositeOperation = "source-over";
-    ctx.globalAlpha = .6;//944,1336
+    ctx.globalAlpha = .6; //944,1336
     if (screenCanvas.height >= screenCanvas.width * 1336 / 944) {
       ctx.drawImage(img, 0, 0, screenCanvas.height * 944 / 1336, screenCanvas.height); //944:1336=x:sch  1336*x=944*sch  x=944*sch/1336
     } else {
@@ -195,9 +206,10 @@ window.onload = function () {
     }
     ctx.globalAlpha = 1;
     counter++;
+    changecolor();
+    S_builddraw();
     status(score);
     C_hpdraw(C_sabhp);
-    changecolor();
     C_sdraw();
     C_draw(charactor);
     CS_draw(CS_1, CS_2, CS_3, CS_4);
@@ -226,20 +238,26 @@ window.onload = function () {
       fontsize = 40;
       ctx.beginPath();
       ctx.textAlign = "right";
-      ctx.font = fontsize * world + "px 'Rounded Mplus 1c', 'Open Sans', 'Noto Sans Japanese', 'Yu Gothic', 'Meiryo UI', sans-serif";
-      ctx.fillText("CC_78 : " + fCC_78, screenCanvas.width - ((fontsize - fontsize / 3) * world), (fontsize * 1 + 0) * world);
-      ctx.fillText("Hp : " + C_hp, screenCanvas.width - ((fontsize - fontsize / 3) * world), (fontsize * 2 + 2) * world);
-      ctx.fillText("sHp : " + C_sabhp, screenCanvas.width - ((fontsize - fontsize / 3) * world), (fontsize * 3 + 4) * world);
-      ctx.fillText("S_p : " + S_point, screenCanvas.width - ((fontsize - fontsize / 3) * world), (fontsize * 4 + 6) * world);
-      ctx.fillText("At : " + C_attack, screenCanvas.width - ((fontsize - fontsize / 3) * world), (fontsize * 5 + 8) * world);
-      ctx.fillText("Df : " + C_defence, screenCanvas.width - ((fontsize - fontsize / 3) * world), (fontsize * 6 + 10) * world);
-      ctx.fillText("Sp : " + score, screenCanvas.width - ((fontsize - fontsize / 3) * world), (fontsize * 7 + 12) * world);
+      ctx.font = fontsize * world2 + "px 'Rounded Mplus 1c', 'Open Sans', 'Noto Sans Japanese', 'Yu Gothic', 'Meiryo UI', sans-serif";
+      ctx.fillText("CC_78 : " + fCC_78, screenCanvas.width - ((fontsize - fontsize / 3) * world2), (fontsize * 1 + 0) * world2);
+      ctx.fillText("Hp : " + C_hp, screenCanvas.width - ((fontsize - fontsize / 3) * world2), (fontsize * 2 + 2) * world2);
+      ctx.fillText("sHp : " + C_sabhp, screenCanvas.width - ((fontsize - fontsize / 3) * world2), (fontsize * 3 + 4) * world2);
+      ctx.fillText("S_p : " + S_point, screenCanvas.width - ((fontsize - fontsize / 3) * world2), (fontsize * 4 + 6) * world2);
+      ctx.fillText("At : " + C_attack, screenCanvas.width - ((fontsize - fontsize / 3) * world2), (fontsize * 5 + 8) * world2);
+      ctx.fillText("Df : " + C_defence, screenCanvas.width - ((fontsize - fontsize / 3) * world2), (fontsize * 6 + 10) * world2);
+      ctx.fillText("Sp : " + score, screenCanvas.width - ((fontsize - fontsize / 3) * world2), (fontsize * 7 + 12) * world2);
       ctx.closePath();
     }
     //if (!slow || slowCount % 5 == 0) {
     //Game main----------------------------------------------------------------
     //charactor------------------------------------------------------
-    if (keyshift) { C_speed = 1.5; C_color = 'rgba(76,76,76,0.5)' } else { C_speed = 3; C_color = 'rgba(255,255,255,1)'; };
+    if (!keyctrl && keyshift) {
+      C_speed = 1.5;
+      C_color = 'rgba(76,76,76,0.5)'
+    } else {
+      C_speed = 3;
+      C_color = 'rgba(255,255,255,1)';
+    };
     if (charactor.position.y >= 0 && up) {
       charactor.position.y -= C_speed * world;
     };
@@ -287,15 +305,36 @@ window.onload = function () {
       CS_far = 25 * world;
     };
     if (C_sabhp > 2) {
-      C_shot0v = { x: 0 * world, y: -1 * world };
-      C_shot1v = { x: 0 * world, y: -1 * world };
-      C_shot2v = { x: 0 * world, y: -1 * world };
+      C_shot0v = {
+        x: 0 * world,
+        y: -1 * world
+      };
+      C_shot1v = {
+        x: 0 * world,
+        y: -1 * world
+      };
+      C_shot2v = {
+        x: 0 * world,
+        y: -1 * world
+      };
       if (keyw) {
-        C_shot1v = { x: -0.05 * world, y: -0.7 * world };
-        C_shot2v = { x: 0.05 * world, y: -0.7 * world };
+        C_shot1v = {
+          x: -0.05 * world,
+          y: -0.7 * world
+        };
+        C_shot2v = {
+          x: 0.05 * world,
+          y: -0.7 * world
+        };
       } else if (keys) {
-        C_shot1v = { x: 0.1 * world, y: -0.7 * world };
-        C_shot2v = { x: -0.1 * world, y: -0.7 * world };
+        C_shot1v = {
+          x: 0.1 * world,
+          y: -0.7 * world
+        };
+        C_shot2v = {
+          x: -0.1 * world,
+          y: -0.7 * world
+        };
       }
     };
     if (keyspace) {
@@ -353,9 +392,9 @@ window.onload = function () {
         }
       }
     };
-    //Skill build----------------------------------------------------
     //enemy----------------------------------------------------------
     //Boss-----------------------------------------------------------
+    //Skill----------------------------------------------------------
     //End main-----------------------------------------------------------------
     if (C_sabhp <= 0) ShowGameover("score : " + score);
     else requestAnimationFrame(arguments.callee);
@@ -366,23 +405,26 @@ window.onload = function () {
 };
 //Function---------------------------------------------------------------------
 function resize(screenCanvas, charactor) {
-  if (screenCanvas.height < screenCanvas.width) {
+  if (screenCanvas.width <= 762.5 * screenCanvas.height / 1364) {
     world = screenCanvas.height / 762.5;
+    world2 = screenCanvas.height / 1364 * 2;
   } else {
-    world = screenCanvas.width / 1364
-  };
+    world = screenCanvas.height / 762.5;
+    world2 = screenCanvas.height / 762.5;
+  } //1364:762.5==w:h 1364*h==762.5*w 1364:762.5==h:w 1364*w==762.5*h w==762.5*h/1364 
+
   C_worldx = charactor.position.x / screenCanvas.width;
   C_worldy = charactor.position.y / screenCanvas.height;
 
   if (fCC_89) {
     width = document.documentElement.clientWidth - 2;
     height = document.documentElement.clientHeight - 2;
-  } else {//w:h==1364:762  1364*h==762*w
+  } else { //w:h==1364:762  1364*h==762*w
     if (1364 * (document.documentElement.clientHeight - 2) >= 762.5 * (document.documentElement.clientWidth - 2)) {
       width = document.documentElement.clientWidth - 2;
-      height = 762.5 * (document.documentElement.clientWidth) / 1364;//1364*h==762*w 1364*h==762*E h==762*E/1364
+      height = 762.5 * (document.documentElement.clientWidth) / 1364; //1364*h==762*w 1364*h==762*E h==762*E/1364
     } else {
-      width = 1364 * (document.documentElement.clientHeight - 2) / 762.5;//1364*h==762*w 1364*E==762*w 1364*E/762==w
+      width = 1364 * (document.documentElement.clientHeight - 2) / 762.5; //1364*h==762*w 1364*E==762*w 1364*E/762==w
       height = document.documentElement.clientHeight - 2;
     }
   }
@@ -404,7 +446,9 @@ function resize(screenCanvas, charactor) {
 function changecolor() {
   if (CC_pass) {
     C_sabhpgagecolor = 'rgba(255,0,0,1)';
-  } else { C_sabhpgagecolor = 'rgba(16,87,121,1)'; };
+  } else {
+    C_sabhpgagecolor = 'rgba(16,87,121,1)';
+  };
 }
 
 function CC_23() {
@@ -494,6 +538,40 @@ function C_sdraw() {
   ctx.fill();
 }
 
+function S_builddraw() {
+  ctx.beginPath();
+  ctx.fillStyle = S_bcolor;
+  for (k = 0; k < S_bmaxcount; k++) {
+    if (S_build[k].alive) {
+      //S_build[k].move();
+      // translate, rotateなどの操作は、最後に指定したものから順番に実行されていくらしい。
+      ctx.save();
+      ctx.translate(S_build[k].position.x, S_build[k].position.y); // 3. 1で原点に移動された時期位置を本来の時期位置へ平行移動
+      ctx.rotate(0 + (S_build[k].place == 1 ? 0 : 0) + (S_build[k].place == 2 ? 180 * Math.PI / 180 : 0) + (S_build[k].place == 4 ? 270 * Math.PI / 180 : 0) + (S_build[k].place == 8 ? 90 * Math.PI / 180 : 0) +
+        (S_build[k].place == 5 ? 315 * Math.PI / 180 : 0) + (S_build[k].place == 6 ? 225 * Math.PI / 180 : 0) + (S_build[k].place == 9 ? 45 * Math.PI / 180 : 0) + (S_build[k].place == 10 ? 135 * Math.PI / 180 : 0)); // 2. 原点を中心として回転
+      ctx.translate(-S_build[k].position.x, -S_build[k].position.y); // 1. 自機位置が原点になるように平行移動
+      ctx.fillRect(
+        S_build[k].position.x - S_build[k].size / 2,
+        S_build[k].position.y - charactor.size,
+        S_build[k].size,
+        charactor.size * 2
+      );
+      ctx.rotate(0 + (S_build[k].place == 1 ? -0 : 0) + (S_build[k].place == 2 ? -180 * Math.PI / 180 : 0) + (S_build[k].place == 4 ? -270 * Math.PI / 180 : 0) + (S_build[k].place == 8 ? -90 * Math.PI / 180 : 0) +
+        (S_build[k].place == 5 ? -315 * Math.PI / 180 : 0) + (S_build[k].place == 6 ? -225 * Math.PI / 180 : 0) + (S_build[k].place == 9 ? -45 * Math.PI / 180 : 0) + (S_build[k].place == 10 ? -135 * Math.PI / 180 : 0)); // 
+      /*
+      ctx.arc(
+        S_build[k].position.x,
+        S_build[k].position.y,
+        S_build[k].size,
+        0, Math.PI * 2, false
+      );
+      ctx.fill();*/
+      ctx.closePath();
+      ctx.restore();
+    }
+  }
+}
+
 function C_hpdraw(C_sabhp) {
   if (keyq) {
     ctx.globalAlpha = 1;
@@ -501,50 +579,50 @@ function C_hpdraw(C_sabhp) {
     ctx.globalAlpha = .2;
   }
   ctx.beginPath();
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage + 2) * world, 0, 360 * (Math.PI / 180), false);
+  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage + 2) * world2, 0, 360 * (Math.PI / 180), false);
   ctx.closePath();
   ctx.fillStyle = 'rgba(0,0,0,0.5)';
   ctx.fill();
-  ctx.lineWidth = 4 * world;
+  ctx.lineWidth = 4 * world2;
   ctx.strokeStyle = 'rgba(255,255,255,1)';
   ctx.stroke();
 
 
   ctx.beginPath();
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 5) * world, -90 * (Math.PI / 180), ((360 * C_hp / 10) - 90) * (Math.PI / 180), false);
-  ctx.lineWidth = 10 * world;
+  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 5) * world2, -90 * (Math.PI / 180), ((360 * C_hp / 10) - 90) * (Math.PI / 180), false);
+  ctx.lineWidth = 10 * world2;
   ctx.strokeStyle = CS_color;
   ctx.stroke();
 
   ctx.beginPath();
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 15) * world, -90 * (Math.PI / 180), ((360 * C_sabhp / 5) - 90) * (Math.PI / 180), false);
+  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 15) * world2, -90 * (Math.PI / 180), ((360 * C_sabhp / 5) - 90) * (Math.PI / 180), false);
   ctx.strokeStyle = C_sabhpgagecolor;
   ctx.stroke();
 
   ctx.beginPath();
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 25) * world, -90 * (Math.PI / 180), (360 * (S_point % 20) / 20 - 90) * (Math.PI / 180), false);
+  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 25) * world2, -90 * (Math.PI / 180), (360 * (S_point % 20) / 20 - 90) * (Math.PI / 180), false);
   ctx.strokeStyle = 'rgba(196, 136, 71,1)';
   ctx.stroke();
 
   ctx.beginPath();
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 35) * world, -90 * (Math.PI / 180), (360 * Math.floor(S_point / 20) / 5 - 90) * (Math.PI / 180), false);
+  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 35) * world2, -90 * (Math.PI / 180), (360 * Math.floor(S_point / 20) / 5 - 90) * (Math.PI / 180), false);
   ctx.stroke();
-  ctx.lineWidth = 1 * world;
+  ctx.lineWidth = 1 * world2;
 
   ctx.beginPath();
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 00) * world, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 10) * world, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 20) * world, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 30) * world, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 40) * world, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
+  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 00) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
+  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 10) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
+  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 20) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
+  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 30) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
+  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 40) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
   ctx.closePath();
   ctx.strokeStyle = 'rgba(255,255,255,1)';
   ctx.stroke();
 
   ctx.beginPath();
-  ctx.moveTo(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world);
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 40) * world, -90 * (Math.PI / 180), ((360 * C_hp / 10) - 90) * (Math.PI / 180), false);
-  ctx.moveTo(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world);
+  ctx.moveTo(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2);
+  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 40) * world2, -90 * (Math.PI / 180), ((360 * C_hp / 10) - 90) * (Math.PI / 180), false);
+  ctx.moveTo(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2);
   ctx.closePath();
   ctx.fillStyle = C_color;
   ctx.fill();
@@ -552,9 +630,9 @@ function C_hpdraw(C_sabhp) {
   ctx.globalAlpha = 1;
   /*
   if (CC_pass) {
-    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 10) * world, ((360 * (fCC_78 - 1) / 3) - 90) * (Math.PI / 180), ((360 * fCC_78 / 3) - 90) * (Math.PI / 180), false);
+    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 10) * world2, ((360 * (fCC_78 - 1) / 3) - 90) * (Math.PI / 180), ((360 * fCC_78 / 3) - 90) * (Math.PI / 180), false);
   } else {
-    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world, (C_hpgage - 10) * world, 0, 360 * (Math.PI / 180), false);
+    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 10) * world2, 0, 360 * (Math.PI / 180), false);
   } 
   */
 }
@@ -564,8 +642,8 @@ function status(score) {
   ctx.fillStyle = 'rgba(0,0,0,1)';
   ctx.beginPath();
   ctx.textAlign = "right";
-  ctx.font = fontsize * world + "px 'Rounded Mplus 1c', 'Open Sans', 'Noto Sans Japanese', 'Yu Gothic', 'Meiryo UI', sans-serif";
-  ctx.fillText("Score : " + score, screenCanvas.width - (fontsize / 3) * world /*- fontsize * world * ((String(score).length + 8) / 2)*/, screenCanvas.height - (fontsize / 3) * world);
+  ctx.font = fontsize * world2 + "px 'Rounded Mplus 1c', 'Open Sans', 'Noto Sans Japanese', 'Yu Gothic', 'Meiryo UI', sans-serif";
+  ctx.fillText("Score : " + score, screenCanvas.width - (fontsize / 3) * world2 /*- fontsize * world2 * ((String(score).length + 8) / 2)*/ , screenCanvas.height - (fontsize / 3) * world2);
   ctx.closePath();
 }
 
@@ -574,7 +652,7 @@ function mouseMove(event) {
   mouse.y = event.clientY - screenCanvas.offsetTop;
 }
 //---------------------------------------------------------------------------------------
-function keyDown(event) {
+function keyDown(event, i, S_bfar) {
   var ck = event.keyCode;
   if (L_main == 3) {
     log("main3", "C K = " + ck);
@@ -584,18 +662,34 @@ function keyDown(event) {
   if (ck === 16) {
     keyshift = true;
   };
-  if (ck === 32) { keyspace = true; };
+  if (ck === 17) {
+    keyctrl = true;
+  }
+  if (ck === 32) {
+    keyspace = true;
+  };
+  if (ck === 27) {
+    fCC_89 = !fCC_89 ? true : false
+  }
   if (ck === 37) {
-    if (fCC_78 == 1) { left = true; };
+    if (fCC_78 == 1) {
+      left = true;
+    };
   };
   if (ck === 38) {
-    if (fCC_78 == 1) { up = true; };
+    if (fCC_78 == 1) {
+      up = true;
+    };
   };
   if (ck === 39) {
-    if (fCC_78 == 1) { right = true; };
+    if (fCC_78 == 1) {
+      right = true;
+    };
   };
   if (ck === 40) {
-    if (fCC_78 == 1) { down = true; };
+    if (fCC_78 == 1) {
+      down = true;
+    };
   };
 
   if (ck === 29) {
@@ -606,8 +700,6 @@ function keyDown(event) {
     }, 3000);
     CC_pass = false;
   };
-  if (ck === 70) { if (fCC_78 != 2) { keyf = true; }; };
-  if (ck === 74) { if (fCC_78 == 2) { keyf = true; }; };
   if (ck === 96) {
     key0 = true;
   };
@@ -638,55 +730,118 @@ function keyDown(event) {
   if (ck === 105) {
     key9 = true;
   };
-  if (ck === 81) {
-    if (fCC_78 == 1) {
-      if (!keyq) {
-        keyq = true;
-      } else {
-        keyq = false;
-      };
+  if (ck === (fCC_78 != 2 ? 81 : 80)) {
+    keyq = !keyq ? true : false
+  };
+  if (ck === 87) {
+    if (fCC_78 == 2) {
+      up = true;
+    } else {
+      keyw = true;
     };
   };
-  if (ck === 80) {
-    if (fCC_78 != 1) {
-      if (!keyq) {
-        keyq = true;
-      } else {
-        keyq = false;
-      };
+  if (ck === 83) {
+    if (fCC_78 == 2) {
+      down = true;
+    } else {
+      keys = true;
     };
   };
-  if (ck === 87) { if (fCC_78 == 2) { up = true; } else { keyw = true; }; };
-  if (ck === 83) { if (fCC_78 == 2) { down = true; } else { keys = true; }; };
-  if (ck === 65) { if (fCC_78 == 2) { left = true; } else { keya = true; }; };
-  if (ck === 68) { if (fCC_78 == 2) { right = true; } else { keyd = true; }; };
-  if (ck === 79) { if (fCC_78 == 3) { up = true; } else { keyw = true; }; };
-  if (ck === 75) { if (fCC_78 == 3) { left = true; } else { keya = true; }; };
-  if (ck === 76) { if (fCC_78 == 3) { down = true; } else { keys = true; }; };
-  if (ck === 59) { if (fCC_78 == 3) { right = true; } else { keyd = true; }; };
+  if (ck === 65) {
+    if (fCC_78 == 2) {
+      left = true;
+    } else {
+      keya = true;
+    };
+  };
+  if (ck === 68) {
+    if (fCC_78 == 2) {
+      right = true;
+    } else {
+      keyd = true;
+    };
+  };
+  if (ck === 79) {
+    if (fCC_78 == 3) {
+      up = true;
+    } else {
+      keyw = true;
+    };
+  };
+  if (ck === 75) {
+    if (fCC_78 == 3) {
+      left = true;
+    } else {
+      keya = true;
+    };
+  };
+  if (ck === 76) {
+    if (fCC_78 == 3) {
+      down = true;
+    } else {
+      keys = true;
+    };
+  };
+  if (ck === 59 || ck === 187) {
+    if (fCC_78 == 3) {
+      right = true;
+    } else {
+      keyd = true;
+    };
+  };
+  if (ck === 70) {
+    if (fCC_78 != 2) {
+      keyf = true;
+    };
+  };
+  if (ck === 74) {
+    if (fCC_78 == 2) {
+      keyf = true;
+    };
+  };
 
   if (ck == 107) {
-    if (fCC_23) {
-      if (L_main == 3) {
-        L_main = 1;
-      } else {
-        L_main += 1;
-      };
-    };
+    L_main = (fCC_23 && (L_main == 3 ? 1 : L_main + 1));
   };
   if (ck === 109) {
-    if (fCC_23) {
-      if (L_main == 1) {
-        L_main = 3
-      } else {
-        L_main -= 1;
-      }
-    };
+    L_main = (fCC_23 && (L_main == 1 ? L_main = 3 : L_main -= 1));
   };
   if (!CC_pass) {
     fCC_23 = false;
     isLogEnable = false;
   };
+  //Skillbuild---------------------------------------------
+  if (event.repeat == false) {
+    if (ck === 70 && fCC_78 != 2 || ck == 74 && fCC_78) {
+      if (C_sabhp > 0) {
+        for (k = 0; k < S_bmaxcount; k++) {
+          if (!S_build[k].alive) {
+            /*a = boss[b].position.distance(chara.position);
+            a.normalize();*/
+            let Vectors = [{
+              x: 0,
+              y: 0,
+              size: 80,
+              speed: 0
+            }];
+            let vectorCounter = 0;
+            if (up || down || right || left) {
+              S_bfar = 50 * world;
+              S_build[k].set({
+                  x: charactor.position.x + (right ? S_bfar : 0) + (left ? -S_bfar : 0),
+                  y: charactor.position.y + (up ? -S_bfar : 0) + (down ? S_bfar : 0)
+                }, Vectors[vectorCounter], Vectors[vectorCounter].size || 5, Vectors[vectorCounter].speed || 3,
+                0 + (up ? 1 : 0) + (down ? 2 : 0) + (left ? 4 : 0) + (right ? 8 : 0));
+            }
+            vectorCounter++;
+            // console.log(vectorCounter,bossShot[l]);
+            console.log(k, S_build[k].place, S_build[k].position.x, charactor.position.x);
+            break;
+          };
+        }
+      }
+    }
+  }
   //cheat------------------------------------------------------------------------------------------
   if (not) {
     if (CC_passc == 0) {
@@ -741,7 +896,13 @@ function keyDown(event) {
       };
     };
     if (key7 && key8) {
-      if (fCC_78 == 3) { fCC_78 = 1; } else if (fCC_78 == 1) { fCC_78 = 2; } else { fCC_78 = 3 }
+      if (fCC_78 == 3) {
+        fCC_78 = 1;
+      } else if (fCC_78 == 1) {
+        fCC_78 = 2;
+      } else {
+        fCC_78 = 3
+      }
       up = false;
       down = false;
       right = false;
@@ -751,6 +912,7 @@ function keyDown(event) {
       keys = false;
       keyd = false;
       keyshift = false;
+      keyf = false;
     };
     if (key8 && key9) {
       if (!fCC_89) {
@@ -764,24 +926,49 @@ function keyDown(event) {
 //---------------------------------------------------------------------------------------
 function keyUp(event) {
   var ck = event.keyCode;
-  if (ck === 16) { keyshift = false; };
-  if (ck === 32) { keyspace = false; };
+  if (ck === 16) {
+    keyshift = false;
+  };
+  if (ck === 17) {
+    keyctrl = false;
+  }
+  if (ck === 32) {
+    keyspace = false;
+  };
 
   if (ck === 37) {
-    if (fCC_78 == 1) { left = false; };
+    if (fCC_78 == 1) {
+      left = false;
+    };
   };
   if (ck === 38) {
-    if (fCC_78 == 1) { up = false; };
+    if (fCC_78 == 1) {
+      up = false;
+    };
   };
   if (ck === 39) {
-    if (fCC_78 == 1) { right = false; };
+    if (fCC_78 == 1) {
+      right = false;
+    };
   };
   if (ck === 40) {
-    if (fCC_78 == 1) { down = false; };
+    if (fCC_78 == 1) {
+      down = false;
+    };
   };
   if (ck === 29) {
     not = false;
     CC_passc = undefined;
+  };
+  if (ck === 70) {
+    if (fCC_78 != 2) {
+      keyf = false;
+    };
+  };
+  if (ck === 74) {
+    if (fCC_78 == 2) {
+      keyf = false;
+    };
   };
   if (ck === 96) {
     key0 = false;
@@ -814,14 +1001,62 @@ function keyUp(event) {
     key9 = false;
   };
 
-  if (ck === 87) { if (fCC_78 == 2) { up = false; } else { keyw = false; }; };
-  if (ck === 83) { if (fCC_78 == 2) { down = false; } else { keys = false; }; };
-  if (ck === 65) { if (fCC_78 == 2) { left = false; } else { keya = false; }; };
-  if (ck === 68) { if (fCC_78 == 2) { right = false; } else { keyd = false; }; };
-  if (ck === 79) { if (fCC_78 == 3) { up = false; } else { keyw = false; }; };
-  if (ck === 75) { if (fCC_78 == 3) { left = false; } else { keya = false; }; };
-  if (ck === 76) { if (fCC_78 == 3) { down = false; } else { keys = false; }; };
-  if (ck === 59) { if (fCC_78 == 3) { right = false; } else { keyd = false; }; };
+  if (ck === 87) {
+    if (fCC_78 == 2) {
+      up = false;
+    } else {
+      keyw = false;
+    };
+  };
+  if (ck === 83) {
+    if (fCC_78 == 2) {
+      down = false;
+    } else {
+      keys = false;
+    };
+  };
+  if (ck === 65) {
+    if (fCC_78 == 2) {
+      left = false;
+    } else {
+      keya = false;
+    };
+  };
+  if (ck === 68) {
+    if (fCC_78 == 2) {
+      right = false;
+    } else {
+      keyd = false;
+    };
+  };
+  if (ck === 79) {
+    if (fCC_78 == 3) {
+      up = false;
+    } else {
+      keyw = false;
+    };
+  };
+  if (ck === 75) {
+    if (fCC_78 == 3) {
+      left = false;
+    } else {
+      keya = false;
+    };
+  };
+  if (ck === 76) {
+    if (fCC_78 == 3) {
+      down = false;
+    } else {
+      keys = false;
+    };
+  };
+  if (ck === 59 || ck === 187) {
+    if (fCC_78 == 3) {
+      right = false;
+    } else {
+      keyd = false;
+    };
+  };
 }
 
 function ShowGameover(text) {

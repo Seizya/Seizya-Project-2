@@ -212,24 +212,26 @@ BossShot.prototype.move = function () {
         this.alive = false;
     }
 };
-//S_build----------------------------------------------------------------------------------------------------------------------------------------
-function S_build0() {
+//Skillbuild-------------------------
+function Skillbuild() {
     this.position = new Point();
     this.vector = new Point();
     this.size = 0;
     this.speed = 0;
     this.alive = false;
+    this.place = 0;
 }
 
-S_build0.prototype.set = function (p, vector, size, speed) {
+Skillbuild.prototype.set = function (p, vector, size, speed, place) {
     this.position.x = p.x;
     this.position.y = p.y;
     this.size = size;
     this.speed = speed;
     this.vector = vector;
     this.alive = true;
+    this.place = place;
 };
-S_build0.prototype.move = function () {
+Skillbuild.prototype.move = function () {
     this.position.x += this.vector.x * this.speed;
     this.position.y += this.vector.y * this.speed;
     if (
