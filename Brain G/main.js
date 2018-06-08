@@ -77,12 +77,13 @@ var E_defence = 1;
 //boss
 var B_hp = 200;
 var B_sabhp = 4;
-var B_maxcount = 4;
 var B_color = 'rgba(35, 71, 130,0.8)';
 var B_scolor = 'rgba(255,255,0,1)';
 var B_smaxcount = 10000;
 var B_attack = 5;
 var B_defence = 3;
+var B_4sfar = 0;
+var B_shotc = 0;
 //Size---------------------
 var width, height;
 //Key---------------------
@@ -106,10 +107,11 @@ var S_bmaxcount = 120;
 var S_bfar = 60 * world;
 var S_bcolor = 'rgba(139,69,19,1)';
 //Sytem-*--------------------
-var charactor, enemy, boss, bossCount, C_shot, E_shot, B_shot;
+var charactor, enemy, boss, bossCount, C_shot, E_shot, B_shot0, B_shot1, B_shot2;
 var log = () => 0;
 var isLogEnable = true;
 var fontsize = 50;
+var Game_count = 0;
 // - main ---------------------------------------------------------------------
 window.onload = function () {
   if (isLogEnable)
@@ -117,7 +119,7 @@ window.onload = function () {
   else document.getElementById("log").remove();
   var img = new Image();
   img.src = "back9.bmp";
-  var a, b, c, d, e, f, g, h, /*i,j*/ k;
+  var a, b, c, d, e, f, g, h, /*i,j*/ k, l;
   var p = new Point(); {
     width = document.documentElement.clientWidth - 2;
     height = document.documentElement.clientHeight - 2;
@@ -139,13 +141,11 @@ window.onload = function () {
   charactor = new Character();
   charactor.init(10);
 
+  boss = new Boss();
+
   enemy = new Array(E_maxcount);
   for (a = 0; a < E_maxcount; a++)
     enemy[a] = new Enemy();
-
-  boss = new Array(B_maxcount);
-  for (b = 0; b < B_maxcount; b++)
-    boss[b] = new Boss();
   // - ショット用インスタンス-------------------------------  
   bossCount = 0;
 
@@ -165,9 +165,17 @@ window.onload = function () {
   for (d = 0; d < E_shot.length; d++)
     E_shot[d] = new EnemyShot();
 
-  B_shot = new Array(B_smaxcount);
-  for (e = 0; e < B_shot.length; e++)
-    B_shot[e] = new BossShot();
+  B_shot0 = new Array(B_smaxcount);
+  for (e = 0; e < B_shot0.length; e++)
+    B_shot0[e] = new BossShot0();
+
+  B_shot1 = new Array(B_smaxcount);
+  for (f = 0; f < B_shot1.length; f++)
+    B_shot1[f] = new BossShot1();
+
+  B_shot2 = new Array(B_smaxcount);
+  for (l = 0; l < B_shot2.length; l++)
+    B_shot2[l] = new BossShot2();
   //S_build----------------------------------------------    
   S_build = new Array(S_bmaxcount);
   for (k = 0; k < S_build.length; k++)
@@ -189,6 +197,7 @@ window.onload = function () {
   CC_pass = true;
   fCC_78 = 2;
   S_point = 119;
+  Game_count = 2;
   //function---------------------------------------------------------------------------------------
   (function () {
     if (isLogEnable) document.getElementById("log").classList.remove("hide");
@@ -213,6 +222,8 @@ window.onload = function () {
     C_sdraw();
     C_draw(charactor);
     CS_draw(CS_1, CS_2, CS_3, CS_4);
+    B_sdraw();
+    B_draw();
     //Cheat---------------------------------------------------------- 
     if (fCC_12) {
       CC_12();
@@ -392,9 +403,108 @@ window.onload = function () {
         }
       }
     };
-    //enemy----------------------------------------------------------
-    //Boss-----------------------------------------------------------
-    //Skill----------------------------------------------------------
+    //enemy--------------------------------------------------------------------
+    if (Game_count == 1) {}
+    //Boss---------------------------------------------------------------------
+    else if (Game_count == 2) {
+      p.x = screenCanvas.width / 2;
+      p.y = screenCanvas.height / 4;
+      boss.set(p, 0);
+      boss.size = 20 * world;
+      if (B_sabhp == 4) {
+        B_counter++;
+        if (boss.alive) {
+          if (B_counter % 15 == 0 && B_counter % 50 != 0) {
+            a = boss.position.distance(charactor.position);
+            a.normalize();
+            let Vectors = [{
+              x: a.x,
+              y: a.y,
+              size: 7,
+              speed: 2
+            }];
+            let vectorCounter = 0;
+            for (e = 0; e < B_smaxcount; e++) {
+              if (!B_shot0[e].alive) {
+                B_shot0[e].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size || 5, Vectors[vectorCounter].speed || 3);
+                vectorCounter++;
+                if (vectorCounter >= Vectors.length) break;
+                // console.log(vectorCounter,bossShot[k]);
+              }
+            }
+            //console.log("a");
+          }
+          //座標計算-----------------------------------
+          B_4sfar = 3;
+          B_shotc += 1 * Math.PI / 180;
+          B_shotpx = boss.size * B_4sfar * Math.cos(B_shotc) + boss.position.x;
+          B_shotpy = boss.size * B_4sfar * Math.sin(B_shotc) + boss.position.y;
+          ///方向-------------------------------------
+          a = boss.position.distance(charactor.position);
+          a.normalize();
+          let Vectors = [{
+            x: 1.5, //右
+            y: 0
+            /*,
+            size: 5,
+            speed: 2.5*/
+          }, {
+            x: -1.5, //左
+            y: 0
+          }, {
+            x: -0.8, //下左下
+            y: 1.3
+          }, {
+            x: 0.8, //下右下
+            y: 1.3
+          }, {
+            x: 0, //上
+            y: -1.5
+          }, {
+            x: 1.3, //上右下
+            y: 0.8
+          }, {
+            x: 1.08, //右上
+            y: -1.08
+          }, {
+            x: -1.3, //上左下
+            y: 0.8
+          }, {
+            x: -1.08, //左上
+            y: -1.08
+          }];
+          let vectorCounter = 0;
+          if (B_counter % 30 == 0) {
+            for (f = 0; f < B_smaxcount; f++) {
+              if (!B_shot1[f].alive) {
+                B_shot1[f].set({
+                  x: B_shotpx,
+                  y: B_shotpy
+                }, Vectors[vectorCounter], Vectors[vectorCounter].size || 5, Vectors[vectorCounter].speed || 3);
+                vectorCounter++;
+                if (vectorCounter >= Vectors.length) break;
+              }
+            }
+          }
+          if (B_counter % 30 == 0) {
+            B_4sfar = 4;
+            vectorCounter = 0;
+            for (l = 0; l < B_smaxcount; l++) {
+              if (!B_shot2[l].alive) {
+                B_shot2[l].set({
+                  x: ((B_shotpx - boss.position.x) * -1) + boss.position.x,
+                  y: ((B_shotpy - boss.position.y) * -1) + boss.position.y
+                }, Vectors[vectorCounter], Vectors[vectorCounter].size || 5, Vectors[vectorCounter].speed || 3);
+                vectorCounter++;
+                if (vectorCounter >= Vectors.length) break;
+              }
+            }
+            //console.log(bossShot);
+            //console.log("a")            
+          };
+        }
+      }
+    };
     //End main-----------------------------------------------------------------
     if (C_sabhp <= 0) ShowGameover("score : " + score);
     else requestAnimationFrame(arguments.callee);
@@ -530,6 +640,68 @@ function C_sdraw() {
         C_shot0[c].position.x,
         C_shot0[c].position.y,
         C_shot0[c].size,
+        0, Math.PI * 2, false
+      );
+      ctx.closePath();
+    }
+  }
+  ctx.fill();
+}
+
+function B_draw() {
+  ctx.beginPath();
+  ctx.fillStyle = B_color;
+  if (boss.alive) {
+    boss.move();
+    ctx.arc(
+      boss.position.x,
+      boss.position.y,
+      boss.size,
+      0, Math.PI * 2, false
+    );
+    ctx.closePath();
+  }
+  ctx.fill();
+}
+
+function B_sdraw() {
+  ctx.fillStyle = B_scolor;
+  ctx.beginPath();
+  for (e = 0; e < B_smaxcount; e++) {
+    if (B_shot0[e].alive) {
+      B_shot0[e].move();
+      ctx.arc(
+        B_shot0[e].position.x,
+        B_shot0[e].position.y,
+        B_shot0[e].size,
+        0, Math.PI * 2, false
+      );
+      ctx.closePath();
+    }
+  }
+  ctx.fill();
+
+  ctx.fillStyle = B_scolor;
+  ctx.beginPath();
+  for (f = 0; f < B_smaxcount; f++) {
+    if (B_shot1[f].alive) {
+      B_shot1[f].move();
+      ctx.arc(
+        B_shot1[f].position.x,
+        B_shot1[f].position.y,
+        B_shot1[f].size,
+        0, Math.PI * 2, false
+      );
+      ctx.closePath();
+    }
+  }
+  for (l = 0; l < B_smaxcount; l++) {
+    if (B_shot2[l].alive) {
+      B_shot2[l].move();
+      ctx.arc(
+        B_shot2[l].position.x,
+        B_shot2[l].position.y,
+        B_shot2[l].size,
         0, Math.PI * 2, false
       );
       ctx.closePath();
@@ -816,7 +988,7 @@ function keyDown(event, i, S_bfar) {
       if (C_sabhp > 0) {
         for (k = 0; k < S_bmaxcount; k++) {
           if (!S_build[k].alive) {
-            /*a = boss[b].position.distance(chara.position);
+            /*a = boss.position.distance(chara.position);
             a.normalize();*/
             let Vectors = [{
               x: 0,

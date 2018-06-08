@@ -168,23 +168,18 @@ function Boss() {
     this.alive = false;
 }
 
-Boss.prototype.set = function (p, size, type) {
+Boss.prototype.set = function (p, size /*, type*/ ) {
     this.position.x = p.x;
     this.position.y = p.y;
     this.size = size;
-    this.type = type;
+    /* this.type = type;*/
     this.param = 0;
     this.alive = true;
 };
-/*
-Boss.prototype.move = function () {
-    this.param++;
-    if (this.position.y < (screenCanvas.height - this.size) / 2) {
-        this.position.y += 1;
-    };
-}*/
-// boss shot-------------------------
-function BossShot() {
+
+Boss.prototype.move = function () {}
+// boss shot0-------------------------
+function BossShot0() {
     this.position = new Point();
     this.vector = new Point();
     this.size = 0;
@@ -192,7 +187,7 @@ function BossShot() {
     this.alive = false;
 }
 
-BossShot.prototype.set = function (p, vector, size, speed) {
+BossShot0.prototype.set = function (p, vector, size, speed) {
     this.position.x = p.x;
     this.position.y = p.y;
     this.size = size;
@@ -200,7 +195,65 @@ BossShot.prototype.set = function (p, vector, size, speed) {
     this.vector = vector;
     this.alive = true;
 };
-BossShot.prototype.move = function () {
+BossShot0.prototype.move = function () {
+    this.position.x += this.vector.x * this.speed;
+    this.position.y += this.vector.y * this.speed;
+    if (
+        this.position.x < -this.size ||
+        this.position.y < -this.size ||
+        this.position.x > this.size + screenCanvas.width ||
+        this.position.y > this.size + screenCanvas.height
+    ) {
+        this.alive = false;
+    }
+};
+// boss shot1-------------------------
+function BossShot1() {
+    this.position = new Point();
+    this.vector = new Point();
+    this.size = 0;
+    this.speed = 0;
+    this.alive = false;
+}
+
+BossShot1.prototype.set = function (p, vector, size, speed) {
+    this.position.x = p.x;
+    this.position.y = p.y;
+    this.size = size;
+    this.speed = speed;
+    this.vector = vector;
+    this.alive = true;
+};
+BossShot1.prototype.move = function () {
+    this.position.x += this.vector.x * this.speed;
+    this.position.y += this.vector.y * this.speed;
+    if (
+        this.position.x < -this.size ||
+        this.position.y < -this.size ||
+        this.position.x > this.size + screenCanvas.width ||
+        this.position.y > this.size + screenCanvas.height
+    ) {
+        this.alive = false;
+    }
+};
+// boss shot2-------------------------
+function BossShot2() {
+    this.position = new Point();
+    this.vector = new Point();
+    this.size = 0;
+    this.speed = 0;
+    this.alive = false;
+}
+
+BossShot2.prototype.set = function (p, vector, size, speed) {
+    this.position.x = p.x;
+    this.position.y = p.y;
+    this.size = size;
+    this.speed = speed;
+    this.vector = vector;
+    this.alive = true;
+};
+BossShot2.prototype.move = function () {
     this.position.x += this.vector.x * this.speed;
     this.position.y += this.vector.y * this.speed;
     if (
