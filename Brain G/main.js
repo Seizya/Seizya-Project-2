@@ -18,14 +18,14 @@ var invincible = false;
 // - const --------------------------------------------------------------------
 //Charactor
 var C_color = 'rgba(255,255,255,1)';
-var C_scolor = 'rgba(255,0,0,0.8)';
-var C_s2color = 'rgba(255,209,42,1)';
+var C_scolor = 'rgba(0,0,0,1)';
+var C_s2color = 'rgba(255,255,255,1)';
 var C_smaxcount = 10000;
 var C_hp = 10;
 var C_sabhp = 5;
 var C_attack = 5;
 var C_defence = 3;
-var C_speed = 3;
+var C_speed = 5;
 var C_outsize = 0;
 var C_hpgage = 80;
 var C_sabhpgagecolor = 'rgba(52,87,119,1)';
@@ -77,27 +77,32 @@ var E_defence = 1;
 //boss
 var B_hp = 200;
 var B_sabhp = 4;
-var B_color = 'rgba(35, 71, 130,0.8)';
-var B_scolor = 'rgba(255,255,0,1)';
+var B_color = 'rgba(35, 71, 130,1)';
+var B_scolor = 'rgba(217,66,54,0.9)';
+var B_s2color = 'rgba(255,255,0,1)';
 var B_smaxcount = 10000;
 var B_attack = 5;
 var B_defence = 3;
 var B_4sfar = 0;
 var B_shotc = 0;
+var B_pop = true;
+var BS_color = 'rgba(255,255,255,1)';
+var B_rtime = undefined;
+var B_rspeed = undefined;
+var B_rsize = undefined;
 //Size---------------------
 var width, height;
 //Key---------------------
 var up, down, right, left, not;
 var key0, key1, key2, key3, key4, key5, key6, key7, key8, key9, keyplus, keyminus;
 var keyq = true;
-var keya, keyd, keyw, keys, keyf, keyshift, keyctrl;
+var keya, keyd, keyw, keys, keyf, keyshift, keyctrl, keyesc;
 //Cheat----------------------
 var CC_pass = false;
 var CC_passc = undefined;
 var fCC_12 = false;
 var fCC_23 = false;
 var fCC_45 = false;
-var fCC_56 = false;
 var fCC_89 = true;
 var fCC_78 = 1;
 var L_main = 1;
@@ -190,12 +195,13 @@ window.onload = function () {
    } else {
      world = screenCanvas.height / 762.5;
      world2 = screenCanvas.height / 762.5;
-   } //1364:762.5==w:h 1364*h==762.5*w 1364:762.5==h:w 1364*w==762.5*h w==762.5*h/1364 */
+   } //1364:762.5==w:h 1364*h==762.5*w 1364:762.5==h:w 1364*w==762.5*h w==762.5*h/1364*/
 
   //sytem main-----------------------------------------------------------------
   isLogEnable = false;
   CC_pass = true;
-  fCC_78 = 2;
+  /*
+    fCC_78 = 2;*/
   S_point = 119;
   Game_count = 2;
   //function---------------------------------------------------------------------------------------
@@ -223,6 +229,7 @@ window.onload = function () {
     C_draw(charactor);
     CS_draw(CS_1, CS_2, CS_3, CS_4);
     B_sdraw();
+    BS_draw();
     B_draw();
     //Cheat---------------------------------------------------------- 
     if (fCC_12) {
@@ -233,9 +240,6 @@ window.onload = function () {
     };
     if (fCC_45) {
       CC_45();
-    };
-    if (fCC_56) {
-      CC_56();
     };
     if (CC_pass) {
       if (L_main == 1) {
@@ -263,10 +267,10 @@ window.onload = function () {
     //Game main----------------------------------------------------------------
     //charactor------------------------------------------------------
     if (!keyctrl && keyshift) {
-      C_speed = 1.5;
+      C_speed = 2;
       C_color = 'rgba(76,76,76,0.5)'
     } else {
-      C_speed = 3;
+      C_speed = 5;
       C_color = 'rgba(255,255,255,1)';
     };
     if (charactor.position.y >= 0 && up) {
@@ -317,34 +321,34 @@ window.onload = function () {
     };
     if (C_sabhp > 2) {
       C_shot0v = {
-        x: 0 * world,
-        y: -1 * world
+        x: 0,
+        y: -1
       };
       C_shot1v = {
-        x: 0 * world,
-        y: -1 * world
+        x: 0,
+        y: -1
       };
       C_shot2v = {
-        x: 0 * world,
-        y: -1 * world
+        x: 0,
+        y: -1
       };
       if (keyw) {
         C_shot1v = {
-          x: -0.05 * world,
-          y: -0.7 * world
+          x: -0.05,
+          y: -0.7
         };
         C_shot2v = {
-          x: 0.05 * world,
-          y: -0.7 * world
+          x: 0.05,
+          y: -0.7
         };
       } else if (keys) {
         C_shot1v = {
-          x: 0.1 * world,
-          y: -0.7 * world
+          x: 0.1,
+          y: -0.7
         };
         C_shot2v = {
-          x: -0.1 * world,
-          y: -0.7 * world
+          x: -0.1,
+          y: -0.7
         };
       }
     };
@@ -354,13 +358,13 @@ window.onload = function () {
           let Vectors = [{
             x: C_shot0v.x,
             y: C_shot0v.y,
-            size: 4 * world,
-            speed: 8 * world
+            size: 4,
+            speed: 8
           }];
           let vectorCounter = 0;
           for (c = 0; c < C_smaxcount; c++) {
             if (!C_shot0[c].alive) {
-              C_shot0[c].set(charactor.position, Vectors[vectorCounter], Vectors[vectorCounter].size || 5 * world, Vectors[vectorCounter].speed || 3 * world);
+              C_shot0[c].set(charactor.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
               vectorCounter++;
               if (vectorCounter >= Vectors.length) break;
             }
@@ -371,13 +375,13 @@ window.onload = function () {
           let Vectors = [{
             x: C_shot1v.x,
             y: C_shot1v.y,
-            size: 2.5 * world,
-            speed: 8 * world
+            size: 2.5,
+            speed: 8
           }];
           let vectorCounter = 0;
           for (g = 0; g < C_smaxcount; g++) {
             if (!C_shot1[g].alive) {
-              C_shot1[g].set(CS_1, Vectors[vectorCounter], Vectors[vectorCounter].size || 5 * world, Vectors[vectorCounter].speed || 3 * world);
+              C_shot1[g].set(CS_1, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
               vectorCounter++;
               if (vectorCounter >= Vectors.length) break;
             }
@@ -388,13 +392,13 @@ window.onload = function () {
           let Vectors = [{
             x: C_shot2v.x,
             y: C_shot2v.y,
-            size: 2.5 * world,
-            speed: 8 * world
+            size: 2.5,
+            speed: 8
           }];
           let vectorCounter = 0;
           for (h = 0; h < C_smaxcount; h++) {
             if (!C_shot2[h].alive) {
-              C_shot2[h].set(CS_2, Vectors[vectorCounter], Vectors[vectorCounter].size || 5 * world, Vectors[vectorCounter].speed || 3 * world);
+              C_shot2[h].set(CS_2, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
               vectorCounter++;
               if (vectorCounter >= Vectors.length) break;
             }
@@ -407,26 +411,31 @@ window.onload = function () {
     if (Game_count == 1) {}
     //Boss---------------------------------------------------------------------
     else if (Game_count == 2) {
-      p.x = screenCanvas.width / 2;
-      p.y = screenCanvas.height / 4;
-      boss.set(p, 0);
-      boss.size = 20 * world;
+      if (B_pop) {
+        p.x = screenCanvas.width / 2;
+        p.y = screenCanvas.height / 5;
+        boss.set(p, 0);
+        boss.size = 20 * world;
+        B_pop = false;
+      }
       if (B_sabhp == 4) {
         B_counter++;
         if (boss.alive) {
-          if (B_counter % 15 == 0 && B_counter % 50 != 0) {
+          //console.log(B_rtime);
+          if (B_counter % B_rtime == 0 && B_counter % (B_rtime * 4) != 0) {
             a = boss.position.distance(charactor.position);
             a.normalize();
             let Vectors = [{
               x: a.x,
               y: a.y,
-              size: 7,
-              speed: 2
+              size: 7
+              /*,
+                            speed: 2*/
             }];
             let vectorCounter = 0;
             for (e = 0; e < B_smaxcount; e++) {
               if (!B_shot0[e].alive) {
-                B_shot0[e].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size || 5, Vectors[vectorCounter].speed || 3);
+                B_shot0[e].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || B_rspeed * world);
                 vectorCounter++;
                 if (vectorCounter >= Vectors.length) break;
                 // console.log(vectorCounter,bossShot[k]);
@@ -435,10 +444,14 @@ window.onload = function () {
             //console.log("a");
           }
           //座標計算-----------------------------------
-          B_4sfar = 3;
-          B_shotc += 1 * Math.PI / 180;
+          B_4sfar = (B_hp >= 100) ? 3 : (B_hp >= 50) ? 4 : 5;
+          B_shotc += 1 * Math.PI / ((B_hp >= 100) ? 180 : (B_hp > 50) ? 90 : 45);
           B_shotpx = boss.size * B_4sfar * Math.cos(B_shotc) + boss.position.x;
           B_shotpy = boss.size * B_4sfar * Math.sin(B_shotc) + boss.position.y;
+          //乱数計算----------------------------------
+          B_rtime = ((B_hp >= 100) ? 30 : (B_hp >= 50) ? Math.round(Math.random() * 10 + 20) : Math.round(Math.random() * 10 + 10));
+          B_rspeed = ((B_hp >= 100) ? 3 : (B_hp >= 50) ? Math.round(Math.random() * 2 + 2) : Math.round(Math.random() * 4 + 1));
+          B_rsize = ((B_hp >= 100) ? 5 : (B_hp >= 50) ? Math.round(Math.random() * 4 + 3) : Math.round(Math.random() * 8 + 1));
           ///方向-------------------------------------
           a = boss.position.distance(charactor.position);
           a.normalize();
@@ -474,27 +487,26 @@ window.onload = function () {
             y: -1.08
           }];
           let vectorCounter = 0;
-          if (B_counter % 30 == 0) {
+          if (B_counter % B_rtime == 0) {
             for (f = 0; f < B_smaxcount; f++) {
               if (!B_shot1[f].alive) {
                 B_shot1[f].set({
                   x: B_shotpx,
                   y: B_shotpy
-                }, Vectors[vectorCounter], Vectors[vectorCounter].size || 5, Vectors[vectorCounter].speed || 3);
+                }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || B_rsize * world, Vectors[vectorCounter].speed * world || B_rspeed * world);
                 vectorCounter++;
                 if (vectorCounter >= Vectors.length) break;
               }
             }
           }
           if (B_counter % 30 == 0) {
-            B_4sfar = 4;
             vectorCounter = 0;
             for (l = 0; l < B_smaxcount; l++) {
               if (!B_shot2[l].alive) {
                 B_shot2[l].set({
                   x: ((B_shotpx - boss.position.x) * -1) + boss.position.x,
                   y: ((B_shotpy - boss.position.y) * -1) + boss.position.y
-                }, Vectors[vectorCounter], Vectors[vectorCounter].size || 5, Vectors[vectorCounter].speed || 3);
+                }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
                 vectorCounter++;
                 if (vectorCounter >= Vectors.length) break;
               }
@@ -503,6 +515,87 @@ window.onload = function () {
             //console.log("a")            
           };
         }
+      } else if (B_sabhp == 3) {
+        if (boss.alive) {
+          //座標計算-----------------------------------
+          B_shotpx = B_shotpx + ((screenCanvas.width / 6 * 5 - B_shotpx) / Math.abs(screenCanvas.width / 6 * 5 - B_shotpx));
+          B_shotpy = B_shotpy + ((screenCanvas.height / 6 - B_shotpy) / Math.abs(screenCanvas.height / 6 - B_shotpy));
+          //乱数計算----------------------------------
+          B_rtime = ((B_hp >= 100) ? 30 : (B_hp >= 50) ? Math.round(Math.random() * 10 + 20) : Math.round(Math.random() * 10 + 10));
+          B_rspeed = ((B_hp >= 100) ? 3 : (B_hp >= 50) ? Math.round(Math.random() * 2 + 2) : Math.round(Math.random() * 4 + 1));
+          B_rsize = ((B_hp >= 100) ? 5 : (B_hp >= 50) ? Math.round(Math.random() * 4 + 3) : Math.round(Math.random() * 8 + 1));
+          ///方向-------------------------------------
+          B_counter++;
+          //console.log(B_rtime);
+          if (B_counter % B_rtime == 0 && B_counter % (B_rtime * 4) != 0) {
+            a = boss.position.distance(charactor.position);
+            a.normalize();
+            let Vectors = [{
+              x: a.x,
+              y: a.y,
+              size: 7
+              /*,
+                            speed: 2*/
+            }];
+            let vectorCounter = 0;
+            for (e = 0; e < B_smaxcount; e++) {
+              if (!B_shot0[e].alive) {
+                B_shot0[e].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || B_rspeed * world);
+                vectorCounter++;
+                if (vectorCounter >= Vectors.length) break;
+                // console.log(vectorCounter,bossShot[k]);
+              }
+            }
+            //console.log("a");
+          }
+          if (boss.alive) { //{}の整理用
+            a = boss.position.distance(charactor.position);
+            a.normalize();
+            let Vectors = [{
+              x: a.x, //右
+              y: a.y
+              /*,
+              size: 5,
+              speed: 2.5*/
+            }];
+            let vectorCounter = 0;
+            if (B_counter % B_rtime == 0) {
+              for (f = 0; f < B_smaxcount; f++) {
+                if (!B_shot1[f].alive) {
+                  B_shot1[f].set({
+                    x: B_shotpx,
+                    y: B_shotpy
+                  }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || B_rsize * world, Vectors[vectorCounter].speed * world || B_rspeed * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                }
+              }
+            }
+            if (B_counter % 30 == 0) {
+              vectorCounter = 0;
+              for (l = 0; l < B_smaxcount; l++) {
+                if (!B_shot2[l].alive) {
+                  B_shot2[l].set({
+                    x: ((B_shotpx - boss.position.x) * -1) + boss.position.x,
+                    y: ((B_shotpy - boss.position.y) * -1) + boss.position.y
+                  }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                }
+              }
+              //console.log(bossShot);
+              //console.log("a")            
+            };
+          }
+        }
+      }
+      //B_当たり判定-----------------------------------
+
+      //B_Level--------------------------------------      
+      if (B_hp <= 0) {
+        score += 1000;
+        B_hp = (B_sabhp != 1) ? 200 : 0;
+        B_sabhp -= 1;
       }
     };
     //End main-----------------------------------------------------------------
@@ -515,9 +608,9 @@ window.onload = function () {
 };
 //Function---------------------------------------------------------------------
 function resize(screenCanvas, charactor) {
-  if (screenCanvas.width <= 762.5 * screenCanvas.height / 1364) {
+  if (762.5 / document.documentElement.clientHeight <= 1364 / document.documentElement.clientWidth) {
     world = screenCanvas.height / 762.5;
-    world2 = screenCanvas.height / 1364 * 2;
+    world2 = screenCanvas.width / 1364;
   } else {
     world = screenCanvas.height / 762.5;
     world2 = screenCanvas.height / 762.5;
@@ -526,11 +619,11 @@ function resize(screenCanvas, charactor) {
   C_worldx = charactor.position.x / screenCanvas.width;
   C_worldy = charactor.position.y / screenCanvas.height;
 
-  if (fCC_89) {
+  if (!keyesc) {
     width = document.documentElement.clientWidth - 2;
     height = document.documentElement.clientHeight - 2;
   } else { //w:h==1364:762  1364*h==762*w
-    if (1364 * (document.documentElement.clientHeight - 2) >= 762.5 * (document.documentElement.clientWidth - 2)) {
+    if ((document.documentElement.clientHeight - 2) >= 762.5 * (document.documentElement.clientWidth - 2) / 1364) {
       width = document.documentElement.clientWidth - 2;
       height = 762.5 * (document.documentElement.clientWidth) / 1364; //1364*h==762*w 1364*h==762*E h==762*E/1364
     } else {
@@ -591,10 +684,12 @@ function CS_draw(CS_1, CS_2, CS_3, CS_4) {
   ctx.arc(CS_1.x, CS_1.y, CS_size, 0, Math.PI * 2, false)
   ctx.moveTo(CS_2.x, CS_2.y);
   ctx.arc(CS_2.x, CS_2.y, CS_size, 0, Math.PI * 2, false)
-  ctx.moveTo(CS_3.x, CS_3.y);
-  ctx.arc(CS_3.x, CS_3.y, CS_size, 0, Math.PI * 2, false)
-  ctx.moveTo(CS_4.x, CS_4.y);
-  ctx.arc(CS_4.x, CS_4.y, CS_size, 0, Math.PI * 2, false)
+  if (B_sabhp <= 2) {
+    ctx.moveTo(CS_3.x, CS_3.y);
+    ctx.arc(CS_3.x, CS_3.y, CS_size, 0, Math.PI * 2, false)
+    ctx.moveTo(CS_4.x, CS_4.y);
+    ctx.arc(CS_4.x, CS_4.y, CS_size, 0, Math.PI * 2, false)
+  };
   ctx.closePath();
   ctx.strokeStyle = CS_color;
   ctx.stroke();
@@ -664,6 +759,46 @@ function B_draw() {
   ctx.fill();
 }
 
+function BS_draw() {
+  ctx.beginPath();
+  ctx.fillStyle = BS_color;
+  if (boss.alive) {
+    if (B_sabhp == 4) {
+      //boss.move();
+      ctx.arc(
+        ((B_shotpx - boss.position.x) * -1) + boss.position.x,
+        ((B_shotpy - boss.position.y) * -1) + boss.position.y,
+        boss.size / 2,
+        0, Math.PI * 2, false
+      );
+      ctx.moveTo(B_shotpx, B_shotpy);
+      ctx.arc(
+        B_shotpx,
+        B_shotpy,
+        boss.size / 2,
+        0, Math.PI * 2, false
+      );
+    } else if (B_sabhp == 3) {
+      //boss.move();
+      ctx.arc(
+        ((B_shotpx - boss.position.x) * -1) + boss.position.x,
+        B_shotpy,
+        boss.size / 2,
+        0, Math.PI * 2, false
+      );
+      ctx.moveTo(B_shotpx, B_shotpy);
+      ctx.arc(
+        B_shotpx,
+        B_shotpy,
+        boss.size / 2,
+        0, Math.PI * 2, false
+      );
+    }
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
 function B_sdraw() {
   ctx.fillStyle = B_scolor;
   ctx.beginPath();
@@ -681,7 +816,7 @@ function B_sdraw() {
   }
   ctx.fill();
 
-  ctx.fillStyle = B_scolor;
+  ctx.fillStyle = B_s2color;
   ctx.beginPath();
   for (f = 0; f < B_smaxcount; f++) {
     if (B_shot1[f].alive) {
@@ -841,7 +976,7 @@ function keyDown(event, i, S_bfar) {
     keyspace = true;
   };
   if (ck === 27) {
-    fCC_89 = !fCC_89 ? true : false
+    keyesc = !keyesc ? true : false
   }
   if (ck === 37) {
     if (fCC_78 == 1) {
@@ -1007,7 +1142,7 @@ function keyDown(event, i, S_bfar) {
             }
             vectorCounter++;
             // console.log(vectorCounter,bossShot[l]);
-            console.log(k, S_build[k].place, S_build[k].position.x, charactor.position.x);
+            //console.log(k, S_build[k].place, S_build[k].position.x, charactor.position.x);
             break;
           };
         }
@@ -1015,7 +1150,7 @@ function keyDown(event, i, S_bfar) {
     }
   }
   //cheat------------------------------------------------------------------------------------------
-  if (not) {
+  if (!event.repeat && not) {
     if (CC_passc == 0) {
       if (key0) {
         CC_passc = 3;
@@ -1061,10 +1196,21 @@ function keyDown(event, i, S_bfar) {
       };
     };
     if (key5 && key6) {
-      if (!fCC_56) {
-        fCC_56 = true;
-      } else {
-        fCC_56 = false;
+      if (ck === 48) {
+        B_sabhp = 0;
+        B_hp = 0;
+      } else if (ck === 49) {
+        B_sabhp = 1
+        B_hp = 200;
+      } else if (ck === 50) {
+        B_sabhp = 2
+        B_hp = 200;
+      } else if (ck === 51) {
+        B_sabhp = 3
+        B_hp = 200;
+      } else if (ck === 52) {
+        B_sabhp = 4
+        B_hp = 200;
       };
     };
     if (key7 && key8) {

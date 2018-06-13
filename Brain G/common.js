@@ -1,23 +1,30 @@
 // - point --------------------------------------------------------------------
-function Point(){
+function Point() {
     this.x = 0;
     this.y = 0;
 }
 
-Point.prototype.distance = function(p){
+Point.prototype.distance = function (p) {
     var q = new Point();
     q.x = p.x - this.x;
     q.y = p.y - this.y;
     return q;
 };
 
-Point.prototype.length = function(){
+Point.prototype.distances = function (p1, p2) {
+    var q = new Point();
+    q.x = p1 - this.x;
+    q.y = p2 - this.y;
+    return q;
+};
+
+Point.prototype.length = function () {
     return Math.sqrt(this.x * this.x + this.y * this.y);
 };
 
-Point.prototype.normalize = function(){
+Point.prototype.normalize = function () {
     var i = this.length();
-    if(i > 0){
+    if (i > 0) {
         var j = 1 / i;
         this.x *= j;
         this.y *= j;
