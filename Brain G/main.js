@@ -90,6 +90,8 @@ var BS_color = 'rgba(255,255,255,1)';
 var B_rtime = undefined;
 var B_rspeed = undefined;
 var B_rsize = undefined;
+var B_shotp1={x:0,y:0};
+var B_shotp2={x:0,y:0};
 //Size---------------------
 var width, height;
 //Key---------------------
@@ -446,8 +448,10 @@ window.onload = function () {
           //座標計算-----------------------------------
           B_4sfar = (B_hp >= 100) ? 3 : (B_hp >= 50) ? 4 : 5;
           B_shotc += 1 * Math.PI / ((B_hp >= 100) ? 180 : (B_hp > 50) ? 90 : 45);
-          B_shotpx = boss.size * B_4sfar * Math.cos(B_shotc) + boss.position.x;
-          B_shotpy = boss.size * B_4sfar * Math.sin(B_shotc) + boss.position.y;
+          B_shotp1.x = boss.size * B_4sfar * Math.cos(B_shotc) + boss.position.x;
+          B_shotp1.y = boss.size * B_4sfar * Math.sin(B_shotc) + boss.position.y;
+          B_shotp2.x=((B_shotp1.x - boss.position.x) * -1) + boss.position.x;
+          B_shotp2.y=((B_shotp1.y - boss.position.y) * -1) + boss.position.y;
           //乱数計算----------------------------------
           B_rtime = ((B_hp >= 100) ? 30 : (B_hp >= 50) ? Math.round(Math.random() * 10 + 20) : Math.round(Math.random() * 10 + 10));
           B_rspeed = ((B_hp >= 100) ? 3 : (B_hp >= 50) ? Math.round(Math.random() * 2 + 2) : Math.round(Math.random() * 4 + 1));
@@ -491,8 +495,8 @@ window.onload = function () {
             for (f = 0; f < B_smaxcount; f++) {
               if (!B_shot1[f].alive) {
                 B_shot1[f].set({
-                  x: B_shotpx,
-                  y: B_shotpy
+                  x: B_shotp1.x,
+                  y: B_shotp1.y
                 }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || B_rsize * world, Vectors[vectorCounter].speed * world || B_rspeed * world);
                 vectorCounter++;
                 if (vectorCounter >= Vectors.length) break;
@@ -504,8 +508,8 @@ window.onload = function () {
             for (l = 0; l < B_smaxcount; l++) {
               if (!B_shot2[l].alive) {
                 B_shot2[l].set({
-                  x: ((B_shotpx - boss.position.x) * -1) + boss.position.x,
-                  y: ((B_shotpy - boss.position.y) * -1) + boss.position.y
+                  x: B_shotp2.x,
+                  y: B_shotp2.y
                 }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
                 vectorCounter++;
                 if (vectorCounter >= Vectors.length) break;
@@ -518,8 +522,13 @@ window.onload = function () {
       } else if (B_sabhp == 3) {
         if (boss.alive) {
           //座標計算-----------------------------------
-          B_shotpx = B_shotpx + ((screenCanvas.width / 6 * 5 - B_shotpx) / Math.abs(screenCanvas.width / 6 * 5 - B_shotpx));
-          B_shotpy = B_shotpy + ((screenCanvas.height / 6 - B_shotpy) / Math.abs(screenCanvas.height / 6 - B_shotpy));
+          if(Math.abs(screenCanvas.width / 6 * 5 - B_shotp1.x)>2||Math.abs(screenCanvas.height / 8 - B_shotp1.y)>2){
+          B_shotp1.x = B_shotp1.x + ((screenCanvas.width / 6 * 5 - B_shotp1.x) / Math.abs(screenCanvas.width / 6 * 5 - B_shotp1.x));
+          B_shotp1.y = B_shotp1.y + ((screenCanvas.height / 8 - B_shotp1.y) / Math.abs(screenCanvas.height / 8 - B_shotp1.y));
+          B_shotp2.x=  ((B_shotp1.x - boss.position.x) * -1) + boss.position.x         
+          B_shotp2.y=B_shotp2.y + ((screenCanvas.height / 8 - B_shotp2.y) / Math.abs(screenCanvas.height / 8 - B_shotp2.y));
+          //console.log(B_shotp1.x,B_shotp1.y)
+        }
           //乱数計算----------------------------------
           B_rtime = ((B_hp >= 100) ? 30 : (B_hp >= 50) ? Math.round(Math.random() * 10 + 20) : Math.round(Math.random() * 10 + 10));
           B_rspeed = ((B_hp >= 100) ? 3 : (B_hp >= 50) ? Math.round(Math.random() * 2 + 2) : Math.round(Math.random() * 4 + 1));
@@ -563,8 +572,8 @@ window.onload = function () {
               for (f = 0; f < B_smaxcount; f++) {
                 if (!B_shot1[f].alive) {
                   B_shot1[f].set({
-                    x: B_shotpx,
-                    y: B_shotpy
+                    x: B_shotp1.x,
+                    y: B_shotp1.y
                   }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || B_rsize * world, Vectors[vectorCounter].speed * world || B_rspeed * world);
                   vectorCounter++;
                   if (vectorCounter >= Vectors.length) break;
@@ -576,8 +585,8 @@ window.onload = function () {
               for (l = 0; l < B_smaxcount; l++) {
                 if (!B_shot2[l].alive) {
                   B_shot2[l].set({
-                    x: ((B_shotpx - boss.position.x) * -1) + boss.position.x,
-                    y: ((B_shotpy - boss.position.y) * -1) + boss.position.y
+                    x:B_shotp2.x,
+                    y:B_shotp2.y
                   }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
                   vectorCounter++;
                   if (vectorCounter >= Vectors.length) break;
@@ -766,30 +775,30 @@ function BS_draw() {
     if (B_sabhp == 4) {
       //boss.move();
       ctx.arc(
-        ((B_shotpx - boss.position.x) * -1) + boss.position.x,
-        ((B_shotpy - boss.position.y) * -1) + boss.position.y,
+        B_shotp1.x,
+        B_shotp1.y,
         boss.size / 2,
         0, Math.PI * 2, false
       );
-      ctx.moveTo(B_shotpx, B_shotpy);
+      ctx.moveTo(B_shotp2.x, B_shotp2.y);
       ctx.arc(
-        B_shotpx,
-        B_shotpy,
+        B_shotp2.x,
+        B_shotp2.y,
         boss.size / 2,
         0, Math.PI * 2, false
       );
     } else if (B_sabhp == 3) {
       //boss.move();
       ctx.arc(
-        ((B_shotpx - boss.position.x) * -1) + boss.position.x,
-        B_shotpy,
+        B_shotp1.x,
+        B_shotp1.y,
         boss.size / 2,
         0, Math.PI * 2, false
       );
-      ctx.moveTo(B_shotpx, B_shotpy);
+      ctx.moveTo(B_shotp2.x, B_shotp2.y);
       ctx.arc(
-        B_shotpx,
-        B_shotpy,
+        B_shotp2.x,
+        B_shotp2.y,
         boss.size / 2,
         0, Math.PI * 2, false
       );
