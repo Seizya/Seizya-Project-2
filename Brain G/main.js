@@ -80,22 +80,38 @@ var B_sabhp = 4;
 var B_color = 'rgba(35, 71, 130,1)';
 var B_scolor = 'rgba(217,66,54,0.9)';
 var B_s2color = 'rgba(255,255,0,1)';
-var B_s3color='rgba(255,255,255,1)';
+var B_s3color = 'rgba(255,255,255,1)';
 var B_smaxcount = 10000;
 var B_attack = 5;
 var B_defence = 3;
 var B_4sfar = 0;
 var B_shotc = 0;
 var B_pop = true;
-var B_name=undefined;//Neko(天狐),Skyless Fox(空狐)
+var B_name = undefined; //Neko(天狐),Skyless Fox(空狐)
 var BS_color = 'rgba(196, 136, 71,1)';
 var B_rtime = undefined;
 var B_rspeed = undefined;
 var B_rsize = undefined;
-var B_shotp1={x:undefined,y:undefined,c:true};
-var B_shotp2={x:undefined,y:undefined,c:true};
-var B_shotp3={x:undefined,y:undefined,c:true};
-var B_shotp4={x:undefined,y:undefined,c:true};
+var B_shotp1 = {
+  x: undefined,
+  y: undefined,
+  c: true
+};
+var B_shotp2 = {
+  x: undefined,
+  y: undefined,
+  c: true
+};
+var B_shotp3 = {
+  x: undefined,
+  y: undefined,
+  c: true
+};
+var B_shotp4 = {
+  x: undefined,
+  y: undefined,
+  c: true
+};
 //Size---------------------
 var width, height;
 //Key---------------------
@@ -118,11 +134,11 @@ var S_bmaxcount = 120;
 var S_bfar = 60 * world;
 var S_bcolor = 'rgba(139,69,19,1)';
 //Sytem-*--------------------
-var charactor, enemy, boss, bossCount, C_shot, E_shot, B_shot0, B_shot1, B_shot2,B_shot3,B_shot4;
+var charactor, enemy, boss, bossCount, C_shot, E_shot, B_shot0, B_shot1, B_shot25B_shot3, B_shot4, B_shot5, B_shot6;
 var log = () => 0;
 var isLogEnable = true;
 var fontsize = 50;
-var Game_count = 0;
+var Game_count = 06
 // - main ---------------------------------------------------------------------
 window.onload = function () {
   if (isLogEnable)
@@ -130,7 +146,7 @@ window.onload = function () {
   else document.getElementById("log").remove();
   var img = new Image();
   img.src = "back9.bmp";
-  var a, b, c, d, e, f, g, h, /*i,j*/ k, l,m,n,o,p;
+  var a, b, c, d, e, f, g, h, /*i,j*/ k, l, m, n, o, /*p,q,*/ r;
   var p = new Point(); {
     width = document.documentElement.clientWidth - 2;
     height = document.documentElement.clientHeight - 2;
@@ -188,16 +204,21 @@ window.onload = function () {
   for (l = 0; l < B_shot2.length; l++)
     B_shot2[l] = new BossShot2();
 
-  B_shot3 = new Array(C_smaxcount);
+  B_shot3 = new Array(B_smaxcount);
   for (m = 0; m < B_shot3.length; m++)
-    B_shot3[m] = new CharaShot2();
+    B_shot3[m] = new BossShot3();
 
-  B_shot4 = new Array(C_smaxcount);
+  B_shot4 = new Array(B_smaxcount);
   for (n = 0; n < B_shot4.length; n++)
-    B_shot4[n] = new CharaShot2();
-  B_shot4 = new Array(C_smaxcount);
-  for (n = 0; n < B_shot4.length; n++)
-    B_shot4[n] = new CharaShot2();
+    B_shot4[n] = new BossShot4();
+
+  B_shot5 = new Array(B_smaxcount);
+  for (o = 0; o < B_shot5.length; o++)
+    B_shot5[o] = new BossShot5();
+
+  B_shot6 = new Array(B_smaxcount);
+  for (r = 0; r < B_shot6.length; r++)
+    B_shot6[r] = new BossShot6();
   //S_build----------------------------------------------    
   S_build = new Array(S_bmaxcount);
   for (k = 0; k < S_build.length; k++)
@@ -437,11 +458,11 @@ window.onload = function () {
         B_pop = false;
       }
       if (B_sabhp == 4) {
-        B_name="Neko";
+        B_name = "Neko";
         B_counter++;
         if (boss.alive) {
           //console.log(B_rtime);
-          if (B_counter % 30== 0 && B_counter % 120 != 0) {
+          if (B_counter % 30 == 0 && B_counter % 120 != 0) {
             a = boss.position.distance(charactor.position);
             a.normalize();
             let Vectors = [{
@@ -467,13 +488,13 @@ window.onload = function () {
           B_shotc += 1 * Math.PI / ((B_hp >= 150) ? 180 : (B_hp > 100) ? 90 : 45);
           B_shotp1.x = boss.size * B_4sfar * Math.cos(B_shotc) + boss.position.x;
           B_shotp1.y = boss.size * B_4sfar * Math.sin(B_shotc) + boss.position.y;
-          B_shotp2.x=((B_shotp1.x - boss.position.x) * -1) + boss.position.x;
-          B_shotp2.y=((B_shotp1.y - boss.position.y) * -1) + boss.position.y;
-          if(B_hp<=50){            
-          B_shotp3.x = boss.size * B_4sfar/2 * Math.cos(-B_shotc) + boss.position.x;
-          B_shotp3.y = boss.size * B_4sfar/2 * Math.sin(-B_shotc) + boss.position.y;
-          B_shotp4.x=((B_shotp3.x - boss.position.x) * -1) + boss.position.x;
-          B_shotp4.y=((B_shotp3.y - boss.position.y) * -1) + boss.position.y;
+          B_shotp2.x = ((B_shotp1.x - boss.position.x) * -1) + boss.position.x;
+          B_shotp2.y = ((B_shotp1.y - boss.position.y) * -1) + boss.position.y;
+          if (B_hp <= 50) {
+            B_shotp3.x = boss.size * B_4sfar / 2 * Math.cos(-B_shotc) + boss.position.x;
+            B_shotp3.y = boss.size * B_4sfar / 2 * Math.sin(-B_shotc) + boss.position.y;
+            B_shotp4.x = ((B_shotp3.x - boss.position.x) * -1) + boss.position.x;
+            B_shotp4.y = ((B_shotp3.y - boss.position.y) * -1) + boss.position.y;
           }
           //乱数計算----------------------------------
           B_rtime = ((B_hp >= 150) ? 30 : (B_hp >= 100) ? Math.round(Math.random() * 10 + 20) : Math.round(Math.random() * 10 + 10));
@@ -535,217 +556,225 @@ window.onload = function () {
                 vectorCounter++;
                 if (vectorCounter >= Vectors.length) break;
               }
-            }          
-        }
-        if(B_hp<=50){
-          if (B_counter % 30 == 0) {
-            vectorCounter = 0;
-            for (m = 0; m < B_smaxcount; m++) {
-              if (!B_shot3[m].alive) {
-                B_shot3[m].set({
-                  x: B_shotp3.x,
-                  y: B_shotp3.y
-                }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
-                vectorCounter++;
-                if (vectorCounter >= Vectors.length) break;
-              }
             }
-            vectorCounter = 0;
-            for (n = 0; n < B_smaxcount; n++) {
-              if (!B_shot4[n].alive) {
-                B_shot4[n].set({
-                  x: B_shotp4.x,
-                  y: B_shotp4.y
-                }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
-                vectorCounter++;
-                if (vectorCounter >= Vectors.length) break;
+          }
+          if (B_hp <= 50) {
+            if (B_counter % 30 == 0) {
+              vectorCounter = 0;
+              for (m = 0; m < B_smaxcount; m++) {
+                if (!B_shot3[m].alive) {
+                  B_shot3[m].set({
+                    x: B_shotp3.x,
+                    y: B_shotp3.y
+                  }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                }
               }
-            }
-            //console.log(bossShot);
-            //console.log("a")            
-          };
-        }
+              vectorCounter = 0;
+              for (n = 0; n < B_smaxcount; n++) {
+                if (!B_shot4[n].alive) {
+                  B_shot4[n].set({
+                    x: B_shotp4.x,
+                    y: B_shotp4.y
+                  }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                }
+              }
+              //console.log(bossShot);
+              //console.log("a")            
+            };
+          }
         }
       } else if (B_sabhp == 3) {
         if (boss.alive) {
           //座標計算-----------------------------------
-          if(Math.abs(screenCanvas.width / 6 * 5 - B_shotp1.x)>2||Math.abs(screenCanvas.height / 8 - B_shotp1.y)>2){
-          B_shotp1.x = B_shotp1.x + ((screenCanvas.width / 6 * 5 - B_shotp1.x) / Math.abs(screenCanvas.width / 6 * 5 - B_shotp1.x));
-          B_shotp1.y = B_shotp1.y + ((screenCanvas.height / 8 - B_shotp1.y) / Math.abs(screenCanvas.height / 8 - B_shotp1.y));
-          B_shotp1.c = true;
-          B_shotp2.x = ((B_shotp1.x - boss.position.x) * -1) + boss.position.x         
-          B_shotp2.y = B_shotp2.y + ((screenCanvas.height / 8 - B_shotp2.y) / Math.abs(screenCanvas.height / 8 - B_shotp2.y));
-          B_shotp2.c = true;
-        }else{
-          B_shotp1.c = false;
-          B_shotp2.c = false;}
-        if(Math.abs(screenCanvas.width / 6 * 5 - B_shotp3.x)>2||Math.abs(screenCanvas.height / 8 - B_shotp3.y)>2){
-          B_shotp3.x = B_shotp3.x + ((screenCanvas.width / 6 * 5 - B_shotp3.x) / Math.abs(screenCanvas.width / 6 * 5 - B_shotp3.x));
-          B_shotp3.y = B_shotp3.y + ((screenCanvas.height / 8 - B_shotp3.y) / Math.abs(screenCanvas.height / 8 - B_shotp3.y));
-          B_shotp3.c = true;
-          B_shotp4.x = ((B_shotp3.x - boss.position.x) * -1) + boss.position.x         
-          B_shotp4.y = B_shotp4.y + ((screenCanvas.height / 8 - B_shotp4.y) / Math.abs(screenCanvas.height / 8 - B_shotp4.y));
-          B_shotp4.c = true;
-          //console.log(B_shotp1.x,B_shotp1.y)
-        }else{
-          B_shotp3.c = false;
-          B_shotp4.c = false;}
+          if (Math.abs(screenCanvas.width / 6 * 5 - B_shotp1.x) > 2 || Math.abs(screenCanvas.height / 8 - B_shotp1.y) > 2) {
+            B_shotp1.x = B_shotp1.x + ((screenCanvas.width / 6 * 5 - B_shotp1.x) / Math.abs(screenCanvas.width / 6 * 5 - B_shotp1.x));
+            B_shotp1.y = B_shotp1.y + ((screenCanvas.height / 8 - B_shotp1.y) / Math.abs(screenCanvas.height / 8 - B_shotp1.y));
+            B_shotp1.c = true;
+            B_shotp2.x = ((B_shotp1.x - boss.position.x) * -1) + boss.position.x
+            B_shotp2.y = B_shotp2.y + ((screenCanvas.height / 8 - B_shotp2.y) / Math.abs(screenCanvas.height / 8 - B_shotp2.y));
+            B_shotp2.c = true;
+          } else {
+            B_shotp1.c = false;
+            B_shotp2.c = false;
+          }
+          if (Math.abs(screenCanvas.width / 6 * 5 - B_shotp3.x) > 2 || Math.abs(screenCanvas.height / 8 - B_shotp3.y) > 2) {
+            B_shotp3.x = B_shotp3.x + ((screenCanvas.width / 6 * 5 - B_shotp3.x) / Math.abs(screenCanvas.width / 6 * 5 - B_shotp3.x));
+            B_shotp3.y = B_shotp3.y + ((screenCanvas.height / 8 - B_shotp3.y) / Math.abs(screenCanvas.height / 8 - B_shotp3.y));
+            B_shotp3.c = true;
+            B_shotp4.x = ((B_shotp3.x - boss.position.x) * -1) + boss.position.x
+            B_shotp4.y = B_shotp4.y + ((screenCanvas.height / 8 - B_shotp4.y) / Math.abs(screenCanvas.height / 8 - B_shotp4.y));
+            B_shotp4.c = true;
+            //console.log(B_shotp1.x,B_shotp1.y)
+          } else {
+            B_shotp3.c = false;
+            B_shotp4.c = false;
+          }
           //乱数計算----------------------------------
           B_rtime = ((B_hp >= 100) ? 30 : (B_hp >= 50) ? Math.round(Math.random() * 10 + 20) : Math.round(Math.random() * 10 + 10));
           B_rspeed = ((B_hp >= 100) ? 3 : (B_hp >= 50) ? Math.round(Math.random() * 2 + 2) : Math.round(Math.random() * 4 + 1));
           B_rsize = ((B_hp >= 100) ? 5 : (B_hp >= 50) ? Math.round(Math.random() * 4 + 3) : Math.round(Math.random() * 8 + 1));
-         B_counter++;
+          B_counter++;
           ///方向-------------------------------------
-        if (boss.alive) {
-          //console.log(B_rtime);
-          if (B_counter % 30== 0 && B_counter % 120 != 0) {
-            a = boss.position.distance(charactor.position);
-            a.normalize();
-            let Vectors = [{
-              x: a.x,
-              y: a.y,
-              size: 7/*,
-              speed: 2*/
-            }];
-            let vectorCounter = 0;
-            for (e = 0; e < B_smaxcount; e++) {
-              if (!B_shot0[e].alive) {
-                B_shot0[e].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || B_rspeed * world);
-                vectorCounter++;
-                if (vectorCounter >= Vectors.length) break;
-                // console.log(vectorCounter,bossShot[k]);
+          if (boss.alive) {
+            //console.log(B_rtime);
+            if (B_counter % 30 == 0 && B_counter % 120 != 0) {
+              a = boss.position.distance(charactor.position);
+              a.normalize();
+              let Vectors = [{
+                x: a.x,
+                y: a.y,
+                size: 7
+                /*,
+                                speed: 2*/
+              }];
+              let vectorCounter = 0;
+              for (e = 0; e < B_smaxcount; e++) {
+                if (!B_shot0[e].alive) {
+                  B_shot0[e].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || B_rspeed * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                  // console.log(vectorCounter,bossShot[k]);
+                }
+              }
+              //console.log("a");
+            }
+            if (B_counter % 40 == 0) {
+              a = boss.position.distance(charactor.position);
+              a.normalize();
+              let Vectors = [{
+                x: 1.5,
+                y: 0
+                /*,
+                size: 7,
+                speed: 2*/
+              }, {
+                x: -1.5,
+                y: 0
+              }];
+              console.log("B_shot1 created.");
+              let vectorCounter = 0;
+              for (o = 0; o < B_smaxcount; o++) {
+                if (!B_shot5[o].alive) continue;
+                vectorCounter = 0;
+                for (f = 0; f < B_smaxcount; f++) {
+                  if (B_shot1[f].alive) continue;
+                  B_shot1[f].set(B_shot5[o].position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                }
+              }
+              for (r = 0; r < B_smaxcount; r++) {
+                if (!B_shot6[r].alive) continue;
+                vectorCounter = 0;
+                for (l = 0; l < B_smaxcount; l++) {
+                  if (B_shot2[l].alive) continue;
+                  B_shot2[l].set(B_shot6[r].position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                }
+                //console.log("a");
               }
             }
-            //console.log("a");
+            if (B_hp <= 50) {
+              a = boss.position.distance(charactor.position);
+              a.normalize();
+              let Vectors = [{
+                x: 1.5, //右
+                y: 0
+                /*,
+                size: 5,
+                speed: 2.5*/
+              }, {
+                x: -1.5, //左
+                y: 0
+              }, {
+                x: -0.8, //下左下
+                y: 1.3
+              }, {
+                x: 0.8, //下右下
+                y: 1.3
+              }, {
+                x: 0, //上
+                y: -1.5
+              }, {
+                x: 1.3, //上右下
+                y: 0.8
+              }, {
+                x: 1.08, //右上
+                y: -1.08
+              }, {
+                x: -1.3, //上左下
+                y: 0.8
+              }, {
+                x: -1.08, //左上
+                y: -1.08
+              }];
+              let vectorCounter = 0;
+              if (B_counter % 30 == 0) {
+                for (m = 0; m < B_smaxcount; m++) {
+                  if (!B_shot3[m].alive) {
+                    B_shot3[m].set({
+                      x: B_shotp3.x,
+                      y: B_shotp3.y
+                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                    vectorCounter++;
+                    if (vectorCounter >= Vectors.length) break;
+                  }
+                }
+                vectorCounter = 0;
+                for (n = 0; n < B_smaxcount; n++) {
+                  if (!B_shot4[n].alive) {
+                    B_shot4[n].set({
+                      x: B_shotp4.x,
+                      y: B_shotp4.y
+                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                    vectorCounter++;
+                    if (vectorCounter >= Vectors.length) break;
+                  }
+                }
+                //console.log(bossShot);
+                //console.log("a")            
+              };
+            }
+            if (B_counter % B_rtime == 0) {
+              a = boss.position.distance(charactor.position);
+              a.normalize();
+              let Vectors = [{
+                x: 0,
+                y: 1.5
+                /*,
+                size: 7,
+                speed: 2*/
+              }];
+              let vectorCounter = 0;
+              for (o = 0; o < B_smaxcount; o++) {
+                if (!B_shot5[o].alive) {
+                  B_shot5[o].set({
+                    x: B_shotp1.x,
+                    y: B_shotp1.y
+                  }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || B_rspeed * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                }
+              }
+              vectorCounter = 0;
+              for (r = 0; r < B_smaxcount; r++) {
+                if (!B_shot6[r].alive) {
+                  B_shot6[r].set({
+                    x: B_shotp2.x,
+                    y: B_shotp2.y
+                  }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || B_rspeed * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                }
+              }
+              //console.log("a");
+            }
           }
-          if (B_counter % B_rtime== 0) {
-            a = boss.position.distance(charactor.position);
-            a.normalize();
-            let Vectors = [{
-              x: 1.5,
-              y: 0/*,
-              size: 7,
-              speed: 2*/
-            },{x:-1.5,y:0}];
-            let vectorCounter = 0;
-            for (f = 0; f < B_smaxcount; f++) {
-              if (!B_shot1[f].alive) {
-                B_shot1[f].set({
-                  x: B_shotp1.x,
-                  y: B_shotp1.y
-                }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
-                vectorCounter++;
-                if (vectorCounter >= Vectors.length) break;
-              }
-            }
-            vectorCounter = 0;
-            for (l = 0; l < B_smaxcount; l++) {
-              if (!B_shot2[l].alive) {
-                B_shot2[l].set({
-                  x: B_shotp2.x,
-                  y: B_shotp2.y
-                }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
-                vectorCounter++;
-                if (vectorCounter >= Vectors.length) break;
-              }
-            } 
-            //console.log("a");
-          }
-          if(B_hp<=50){
-          a = boss.position.distance(charactor.position);
-          a.normalize();
-          let Vectors = [{
-            x: 1.5, //右
-            y: 0
-            /*,
-            size: 5,
-            speed: 2.5*/
-          }, {
-            x: -1.5, //左
-            y: 0
-          }, {
-            x: -0.8, //下左下
-            y: 1.3
-          }, {
-            x: 0.8, //下右下
-            y: 1.3
-          }, {
-            x: 0, //上
-            y: -1.5
-          }, {
-            x: 1.3, //上右下
-            y: 0.8
-          }, {
-            x: 1.08, //右上
-            y: -1.08
-          }, {
-            x: -1.3, //上左下
-            y: 0.8
-          }, {
-            x: -1.08, //左上
-            y: -1.08
-          }];
-          let vectorCounter = 0;
-          if (B_counter % 30 == 0) {
-            for (m = 0; m < B_smaxcount; m++) {
-              if (!B_shot3[m].alive) {
-                B_shot3[m].set({
-                  x: B_shotp3.x,
-                  y: B_shotp3.y
-                }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
-                vectorCounter++;
-                if (vectorCounter >= Vectors.length) break;
-              }
-            }
-            vectorCounter = 0;
-            for (n = 0; n < B_smaxcount; n++) {
-              if (!B_shot4[n].alive) {
-                B_shot4[n].set({
-                  x: B_shotp4.x,
-                  y: B_shotp4.y
-                }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
-                vectorCounter++;
-                if (vectorCounter >= Vectors.length) break;
-              }
-            }
-            //console.log(bossShot);
-            //console.log("a")            
-          };
-          }
-          if (B_counter % 40== 0) {
-            a = boss.position.distance(charactor.position);
-            a.normalize();
-            let Vectors = [{
-              x: 0,
-              y: 1.5/*,
-              size: 7,
-              speed: 2*/
-            }];
-            let vectorCounter = 0;
-            for (f = 0; f < B_smaxcount; f++) {
-              if (!B_shot1[f].alive) {
-                B_shot1[f].set({
-                  x: B_shotp1.x,
-                  y: B_shotp1.y
-                }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
-                vectorCounter++;
-                if (vectorCounter >= Vectors.length) break;
-              }
-            }
-            vectorCounter = 0;
-            for (l = 0; l < B_smaxcount; l++) {
-              if (!B_shot2[l].alive) {
-                B_shot2[l].set({
-                  x: B_shotp2.x,
-                  y: B_shotp2.y
-                }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
-                vectorCounter++;
-                if (vectorCounter >= Vectors.length) break;
-              }
-            } 
-            //console.log("a");
-          }          
-        }
         }
       }
       //B_当たり判定-----------------------------------
@@ -755,8 +784,8 @@ window.onload = function () {
         score += 1000;
         B_hp = (B_sabhp != 1) ? 200 : 0;
         B_sabhp -= 1;
-        ctx.fillStyle=B_color;
-        ctx.fillRect(0,0,screenCanvas.width,screenCanvas.height);
+        ctx.fillStyle = B_color;
+        ctx.fillRect(0, 0, screenCanvas.width, screenCanvas.height);
       }
     };
     //End main-----------------------------------------------------------------
@@ -775,19 +804,19 @@ function resize(screenCanvas, charactor) {
     world = screenCanvas.width / 1364;
   } //1364:762.5==w:h 1364*h==762.5*w 1364:762.5==h:w 1364*w==762.5*h w==762.5*h/1364 
 
-  world2=((screenCanvas.width>=screenCanvas.height)?screenCanvas.height:screenCanvas.width)/762.5;
+  world2 = ((screenCanvas.width >= screenCanvas.height) ? screenCanvas.height : screenCanvas.width) / 762.5;
 
   C_worldx = charactor.position.x / screenCanvas.width;
   C_worldy = charactor.position.y / screenCanvas.height;
 
-  keyesc=true;
+  //keyesc=true;
   if (!keyesc) {
     width = document.documentElement.clientWidth - 2;
     height = document.documentElement.clientHeight - 2;
   } else { //w:h==1364:762  1364*h==762*w
-    if ((document.documentElement.clientHeight - 2)/762.5 >= (document.documentElement.clientWidth - 2) / 1364) {
+    if ((document.documentElement.clientHeight - 2) / 762.5 >= (document.documentElement.clientWidth - 2) / 1364) {
       width = document.documentElement.clientWidth - 2;
-      height = 762.5 * (document.documentElement.clientWidth-2) / 1364; //1364*h==762*w 1364*h==762*E h==762*E/1364
+      height = 762.5 * (document.documentElement.clientWidth - 2) / 1364; //1364*h==762*w 1364*h==762*E h==762*E/1364
     } else {
       width = 1364 * (document.documentElement.clientHeight - 2) / 762.5; //1364*h==762*w 1364*E==762*w 1364*E/762==w
       height = document.documentElement.clientHeight - 2;
@@ -925,22 +954,22 @@ function BS_draw() {
   ctx.beginPath();
   ctx.fillStyle = BS_color;
   if (boss.alive) {
-      //boss.move();
-      ctx.arc(
-        B_shotp1.x,
-        B_shotp1.y,
-        boss.size / (B_shotp1.c?2:1.5),
-        0, Math.PI * 2, false
-      );
-      ctx.moveTo(B_shotp2.x, B_shotp2.y);
-      ctx.arc(
-        B_shotp2.x,
-        B_shotp2.y,
-        boss.size / (B_shotp2.c?2:1.5),
-        0, Math.PI * 2, false
-      );
-      if(B_sabhp==4&&B_hp<=50||B_sabhp==3&&(B_shotp3.c||B_shotp4.c)){
-        ctx.moveTo(B_shotp3.x,B_shotp3.y)
+    //boss.move();
+    ctx.arc(
+      B_shotp1.x,
+      B_shotp1.y,
+      boss.size / (B_shotp1.c ? 2 : 1.5),
+      0, Math.PI * 2, false
+    );
+    ctx.moveTo(B_shotp2.x, B_shotp2.y);
+    ctx.arc(
+      B_shotp2.x,
+      B_shotp2.y,
+      boss.size / (B_shotp2.c ? 2 : 1.5),
+      0, Math.PI * 2, false
+    );
+    if (B_sabhp == 4 && B_hp <= 50 || B_sabhp == 3 && (B_shotp3.c || B_shotp4.c)) {
+      ctx.moveTo(B_shotp3.x, B_shotp3.y)
       ctx.arc(
         B_shotp3.x,
         B_shotp3.y,
@@ -953,8 +982,8 @@ function BS_draw() {
         B_shotp4.y,
         boss.size / 2,
         0, Math.PI * 2, false
-      );        
-      }
+      );
+    }
     ctx.closePath();
     ctx.fill();
   }
@@ -1032,37 +1061,65 @@ function B_sdraw() {
     }
   }
   ctx.fill();
+
+  ctx.fillStyle = B_s3color;
+  ctx.beginPath();
+  for (o = 0; o < B_smaxcount; o++) {
+    if (B_shot5[o].alive) {
+      B_shot5[o].move();
+      ctx.arc(
+        B_shot5[o].position.x,
+        B_shot5[o].position.y,
+        B_shot5[o].size,
+        0, Math.PI * 2, false
+      );
+      ctx.closePath();
+    }
+  }
+  for (r = 0; r < B_smaxcount; r++) {
+    if (B_shot6[r].alive) {
+      B_shot6[r].move();
+      ctx.arc(
+        B_shot6[r].position.x,
+        B_shot6[r].position.y,
+        B_shot6[r].size,
+        0, Math.PI * 2, false
+      );
+      ctx.closePath();
+    }
+  }
+  ctx.fill();
 }
 
-function B_hpdraw(){
-  ctx.globalAlpha=(keyq?1:.2);
+function B_hpdraw() {
+  ctx.globalAlpha = (keyq ? 1 : .2);
 
-  ctx.fillStyle=B_color;
+  ctx.fillStyle = B_color;
   ctx.beginPath();
-  ctx.fillRect(screenCanvas.width-10-C_hpgage*2.9*(B_hp>150?B_hp-150:0)/50,10*world2,C_hpgage*2.9*(B_hp>150?B_hp-150:0)/50,30*world2);
-  ctx.fillRect(screenCanvas.width-10-C_hpgage*2.6*(B_hp>=150?50:(B_hp>100?B_hp-100:0))/50,50*world2,(C_hpgage*2.6)*(B_hp>=150?50:(B_hp>100?B_hp-100:0))/50,30*world2);
-  ctx.fillRect(screenCanvas.width-10-C_hpgage*2.3*(B_hp>=100?50:(B_hp>50?B_hp-50:0))/50,90*world2,(C_hpgage*2.3)*(B_hp>=100?50:(B_hp>50?B_hp-50:0))/50,30*world2);
-  ctx.fillRect(screenCanvas.width-10-C_hpgage*2.0*(B_hp>=50?50:B_hp)/50,130*world2,(C_hpgage*2.0)*(B_hp>=50?50:B_hp)/50,30*world2);
-  
+  ctx.fillRect(screenCanvas.width - 10 - C_hpgage * 2.9 * (B_hp > 150 ? B_hp - 150 : 0) / 50, 10 * world2, C_hpgage * 2.9 * (B_hp > 150 ? B_hp - 150 : 0) / 50, 30 * world2);
+  ctx.fillRect(screenCanvas.width - 10 - C_hpgage * 2.6 * (B_hp >= 150 ? 50 : (B_hp > 100 ? B_hp - 100 : 0)) / 50, 50 * world2, (C_hpgage * 2.6) * (B_hp >= 150 ? 50 : (B_hp > 100 ? B_hp - 100 : 0)) / 50, 30 * world2);
+  ctx.fillRect(screenCanvas.width - 10 - C_hpgage * 2.3 * (B_hp >= 100 ? 50 : (B_hp > 50 ? B_hp - 50 : 0)) / 50, 90 * world2, (C_hpgage * 2.3) * (B_hp >= 100 ? 50 : (B_hp > 50 ? B_hp - 50 : 0)) / 50, 30 * world2);
+  ctx.fillRect(screenCanvas.width - 10 - C_hpgage * 2.0 * (B_hp >= 50 ? 50 : B_hp) / 50, 130 * world2, (C_hpgage * 2.0) * (B_hp >= 50 ? 50 : B_hp) / 50, 30 * world2);
+
   ctx.strokeStyle = 'rgba(255,255,255,1)';
-  ctx.strokeRect(screenCanvas.width-C_hpgage*2.9-10,10*world2,C_hpgage*2.9,30*world2)
-  ctx.strokeRect(screenCanvas.width-C_hpgage*2.6-10,50*world2,C_hpgage*2.6,30*world2)
-  ctx.strokeRect(screenCanvas.width-C_hpgage*2.3-10,90*world2,C_hpgage*2.3,30*world2)
-  ctx.strokeRect(screenCanvas.width-C_hpgage*2.0-10,130*world2,C_hpgage*2.0,30*world2)
+  ctx.strokeRect(screenCanvas.width - C_hpgage * 2.9 - 10, 10 * world2, C_hpgage * 2.9, 30 * world2)
+  ctx.strokeRect(screenCanvas.width - C_hpgage * 2.6 - 10, 50 * world2, C_hpgage * 2.6, 30 * world2)
+  ctx.strokeRect(screenCanvas.width - C_hpgage * 2.3 - 10, 90 * world2, C_hpgage * 2.3, 30 * world2)
+  ctx.strokeRect(screenCanvas.width - C_hpgage * 2.0 - 10, 130 * world2, C_hpgage * 2.0, 30 * world2)
   ctx.closePath();
 
-  ctx.fillStyle='rgba(255,255,255,.5)';
-  ctx.fillRect(screenCanvas.width-C_hpgage*1.7-10,170*world2,C_hpgage*1.7,30*world2)
+  ctx.fillStyle = 'rgba(255,255,255,.5)';
+  ctx.fillRect(screenCanvas.width - C_hpgage * 1.7 - 10, 170 * world2, C_hpgage * 1.7, 30 * world2)
 
-  ctx.globalAlpha=1;
+  ctx.globalAlpha = 1;
 
   ctx.fillStyle = 'rgba(0,0,0,1)';
-  ctx.strokeStyle=B_color;
+  ctx.strokeStyle = B_color;
   fontsize = 30;
   ctx.textAlign = "right";
   ctx.font = fontsize * world2 + "px 'Rounded Mplus 1c', 'Open Sans', 'Noto Sans Japanese', 'Yu Gothic', 'Meiryo UI', sans-serif";
-  ctx.fillText(B_name,screenCanvas.width-15,195*world2);
-  ctx.strokeText(B_name,screenCanvas.width-15,195*world2);  
+  ctx.fillText(B_name, screenCanvas.width - 15, 195 * world2);
+  ctx.strokeText(B_name, screenCanvas.width - 15, 195 * world2);
 }
 
 function S_builddraw() {
@@ -1258,9 +1315,10 @@ function keyDown(event, i, S_bfar) {
     key9 = true;
   };
   if (event.repeat == false) {
-  if (ck === (fCC_78 != 2 ? 81 : 80)) {
-    keyq = !keyq ? true : false
-  };}
+    if (ck === (fCC_78 != 2 ? 81 : 80)) {
+      keyq = !keyq ? true : false
+    };
+  }
   if (ck === 87) {
     if (fCC_78 == 2) {
       up = true;
@@ -1318,7 +1376,9 @@ function keyDown(event, i, S_bfar) {
     };
   };
 
-  if(ck===(fCC_78!=2?70:74)){keyf=true;};
+  if (ck === (fCC_78 != 2 ? 70 : 74)) {
+    keyf = true;
+  };
 
   if (ck == 107) {
     L_main = (fCC_23 && (L_main == 3 ? 1 : L_main + 1));
@@ -1491,7 +1551,9 @@ function keyUp(event) {
     not = false;
     CC_passc = undefined;
   };
-  if(ck===(fCC_78!=2?70:74)){keyf=true;};
+  if (ck === (fCC_78 != 2 ? 70 : 74)) {
+    keyf = true;
+  };
   if (ck === 96) {
     key0 = false;
   };
