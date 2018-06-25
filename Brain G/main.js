@@ -88,6 +88,7 @@ var B_4sfar = 0;
 var B_shotc = 0;
 var B_pop = true;
 var B_name = undefined; //Neko(天狐),Skyless Fox(空狐)
+var B_worldx, B_worldy;
 var BS_color = 'rgba(196, 136, 71,1)';
 var B_rtime = undefined;
 var B_rspeed = undefined;
@@ -139,6 +140,9 @@ var log = () => 0;
 var isLogEnable = true;
 var fontsize = 50;
 var Game_count = 2;
+var sc = {
+  center: undefined
+};
 // - main ---------------------------------------------------------------------
 window.onload = function () {
   if (isLogEnable)
@@ -153,6 +157,10 @@ window.onload = function () {
     screenCanvas = document.getElementById('screen');
     screenCanvas.width = width;
     screenCanvas.height = height;
+    sc.center = {
+      height: screenCanvas.height / 2,
+      width: screenCanvas.width / 2
+    };
     ctx = screenCanvas.getContext('2d');
     screenCanvas.addEventListener('mousemove', mouseMove, true);
     document.addEventListener('keydown', keyDown, true);
@@ -233,7 +241,7 @@ window.onload = function () {
     S_build[k] = new Skillbuild();
   //Main------------------------------------------------------------------------------------------------------------------------
   var slowCount = 0;
-  charactor.position.x = screenCanvas.width / 2;
+  charactor.position.x = sc.center.width;
   charactor.position.y = screenCanvas.height / 5 * 4;
   /* if (screenCanvas.width <= 762.5 * screenCanvas.height / 1364) {
      world = screenCanvas.height / 762.5;
@@ -268,16 +276,16 @@ window.onload = function () {
     ctx.globalAlpha = 1;
     counter++;
     changecolor();
-    status(score);
-    B_sdraw();
-    C_sdraw();
-    CS_draw(CS_1, CS_2, CS_3, CS_4);
-    BS_draw();
-    B_draw();
-    C_draw(charactor);
-    S_builddraw();
     C_hpdraw(C_sabhp);
     B_hpdraw();
+    C_sdraw();
+    CS_draw(CS_1, CS_2, CS_3, CS_4);
+    C_draw(charactor);
+    B_sdraw();
+    BS_draw();
+    B_draw();
+    S_builddraw();
+    status(score);
     //Cheat---------------------------------------------------------- 
     if (fCC_12) {
       CC_12();
@@ -313,6 +321,9 @@ window.onload = function () {
     //if (!slow || slowCount % 5 == 0) {
     //Game main----------------------------------------------------------------
     //charactor------------------------------------------------------
+    C_outsize = 10 * world; //1477:c=1364:10    c*1364=1477*10  C=1477*10/1364
+    charactor.size = C_outsize / 10 * 4;
+    CS_size = C_outsize / 2;
     if (!keyctrl && keyshift) {
       C_speed = 2;
       C_color = 'rgba(76,76,76,0.5)'
@@ -495,13 +506,14 @@ window.onload = function () {
     //Boss---------------------------------------------------------------------
     else if (Game_count == 2) {
       if (B_pop) {
-        p.x = screenCanvas.width / 2;
+        p.x = sc.center.width;
         p.y = screenCanvas.height / 5;
         boss.set(p, 0);
         boss.size = 20 * world;
         B_pop = false;
       }
       if (B_sabhp == 4) {
+        boss.size = 20 * world;
         B_name = "Neko";
         B_counter++;
         if (boss.alive) {
@@ -539,44 +551,51 @@ window.onload = function () {
             B_shotp3.y = boss.size * B_4sfar / 2 * Math.sin(-B_shotc) + boss.position.y;
             B_shotp4.x = ((B_shotp3.x - boss.position.x) * -1) + boss.position.x;
             B_shotp4.y = ((B_shotp3.y - boss.position.y) * -1) + boss.position.y;
+          } else {
+            B_shotp3.x = B_shotp1.x
+            B_shotp3.y = B_shotp1.y
+            B_shotp4.x = B_shotp2.x
+            B_shotp4.y = B_shotp2.y
           }
           //乱数計算----------------------------------
           B_rtime = ((B_hp >= 150) ? 30 : (B_hp >= 100) ? Math.round(Math.random() * 10 + 20) : Math.round(Math.random() * 10 + 10));
           B_rspeed = ((B_hp >= 150) ? 3 : (B_hp >= 100) ? Math.round(Math.random() * 2 + 2) : Math.round(Math.random() * 4 + 1));
           B_rsize = ((B_hp >= 150) ? 5 : (B_hp >= 100) ? Math.round(Math.random() * 4 + 3) : Math.round(Math.random() * 8 + 1));
-          ///方向-------------------------------------
+          //Boss Vectol-------------------------------
+          boss.position.x += Math.abs(sc.center.width - boss.position.x) >= 1 ? (boss.position.x < sc.center.width ? 1 : -1) : sc.center.width - boss.position.x;
+          boss.position.y += Math.abs(screenCanvas.height / 5 - boss.position.y) >= 1 ? (boss.position.y < screenCanvas.height / 5 ? 1 : -1) : screenCanvas.height / 5 - boss.position.y;
+          //方向-------------------------------------
           a = boss.position.distance(charactor.position);
           a.normalize();
           let Vectors = [{
-            x: 1.5, //右
-            y: 0
-            /*,
-            size: 5,
+            x: Math.cos(0 * (Math.PI / 180)),
+            y: Math.sin(0 * (Math.PI / 180))
+            /*,size: 5,
             speed: 2.5*/
           }, {
-            x: -1.5, //左
-            y: 0
+            x: Math.cos(33.75 * (Math.PI / 180)),
+            y: Math.sin(33.75 * (Math.PI / 180))
           }, {
-            x: -0.8, //下左下
-            y: 1.3
+            x: Math.cos(67.5 * (Math.PI / 180)),
+            y: Math.sin(67.5 * (Math.PI / 180))
           }, {
-            x: 0.8, //下右下
-            y: 1.3
+            x: Math.cos(112.5 * (Math.PI / 180)),
+            y: Math.sin(112.5 * (Math.PI / 180))
           }, {
-            x: 0, //上
-            y: -1.5
+            x: Math.cos(146.25 * (Math.PI / 180)),
+            y: Math.sin(146.25 * (Math.PI / 180))
           }, {
-            x: 1.3, //上右下
-            y: 0.8
+            x: Math.cos(180 * (Math.PI / 180)),
+            y: Math.sin(180 * (Math.PI / 180))
           }, {
-            x: 1.08, //右上
-            y: -1.08
+            x: Math.cos(225 * (Math.PI / 180)),
+            y: Math.sin(225 * (Math.PI / 180))
           }, {
-            x: -1.3, //上左下
-            y: 0.8
+            x: Math.cos(270 * (Math.PI / 180)),
+            y: Math.sin(270 * (Math.PI / 180))
           }, {
-            x: -1.08, //左上
-            y: -1.08
+            x: Math.cos(315 * (Math.PI / 180)),
+            y: Math.sin(315 * (Math.PI / 180))
           }];
           let vectorCounter = 0;
           if (B_counter % B_rtime == 0) {
@@ -633,12 +652,13 @@ window.onload = function () {
         }
       } else if (B_sabhp == 3) {
         if (boss.alive) {
+          boss.size = 20 * world;
           //座標計算-----------------------------------
           if (Math.abs(screenCanvas.width / 6 * 5 - B_shotp1.x) > 2 || Math.abs(screenCanvas.height / 8 - B_shotp1.y) > 2) {
             B_shotp1.x = B_shotp1.x + ((screenCanvas.width / 6 * 5 - B_shotp1.x) / Math.abs(screenCanvas.width / 6 * 5 - B_shotp1.x));
             B_shotp1.y = B_shotp1.y + ((screenCanvas.height / 8 - B_shotp1.y) / Math.abs(screenCanvas.height / 8 - B_shotp1.y));
             B_shotp1.c = true;
-            B_shotp2.x = ((B_shotp1.x - boss.position.x) * -1) + boss.position.x
+            B_shotp2.x = ((B_shotp1.x - (B_hp > 150 ? boss.position.x : sc.center.width)) * -1) + (B_hp > 150 ? boss.position.x : sc.center.width)
             B_shotp2.y = B_shotp2.y + ((screenCanvas.height / 8 - B_shotp2.y) / Math.abs(screenCanvas.height / 8 - B_shotp2.y));
             B_shotp2.c = true;
           } else {
@@ -646,11 +666,11 @@ window.onload = function () {
             B_shotp2.c = false;
           }
           if (B_hp > 50 && (Math.abs(screenCanvas.width / 6 * 5 - B_shotp3.x) > 2 || Math.abs(screenCanvas.height / 8 - B_shotp3.y) > 2)) {
-            B_shotp3.x = B_shotp3.x + ((screenCanvas.width / 6 * 5 - B_shotp3.x) / Math.abs(screenCanvas.width / 6 * 5 - B_shotp3.x));
-            B_shotp3.y = B_shotp3.y + ((screenCanvas.height / 8 - B_shotp3.y) / Math.abs(screenCanvas.height / 8 - B_shotp3.y));
+            B_shotp3.x += ((screenCanvas.width / 6 * 5 - B_shotp3.x) / Math.abs(screenCanvas.width / 6 * 5 - B_shotp3.x));
+            B_shotp3.y += ((screenCanvas.height / 8 - B_shotp3.y) / Math.abs(screenCanvas.height / 8 - B_shotp3.y));
             B_shotp3.c = true;
-            B_shotp4.x = ((B_shotp3.x - boss.position.x) * -1) + boss.position.x
-            B_shotp4.y = B_shotp4.y + ((screenCanvas.height / 8 - B_shotp4.y) / Math.abs(screenCanvas.height / 8 - B_shotp4.y));
+            B_shotp4.x += ((screenCanvas.width / 6 - B_shotp4.x) / Math.abs(screenCanvas.width / 6 - B_shotp4.x));
+            B_shotp4.y += ((screenCanvas.height / 8 - B_shotp4.y) / Math.abs(screenCanvas.height / 8 - B_shotp4.y));
             B_shotp4.c = true;
           } else if (B_hp <= 50) {
             B_4sfar = 5;
@@ -675,9 +695,12 @@ window.onload = function () {
           if (B_hp < 150) {
             B_4sfar = 5;
             B_shotc += 1 * Math.PI / 90;
-            boss.position.x = boss.size * B_4sfar * 1.5 * Math.cos(B_shotc / 2) + screenCanvas.width / 2;
+            boss.position.x = boss.size * B_4sfar * 1.5 * Math.cos(B_shotc / 2) + sc.center.width;
             //boss.position.y = boss.size * B_4sfar/8 * Math.sin(B_shotc*10) + screenCanvas.height/5;
             //boss.position.y = boss.position.y+(Math.random()*10-5);
+          } else {
+            boss.position.x += Math.abs(sc.center.width - boss.position.x) >= 1 ? (boss.position.x < sc.center.width ? 1 : -1) : sc.center.width - boss.position.x;
+            boss.position.y += Math.abs(screenCanvas.height / 5 - boss.position.y) >= 1 ? (boss.position.y < screenCanvas.height / 5 ? 1 : -1) : screenCanvas.height / 5 - boss.position.y;
           }
           ///方向-------------------------------------
           if (boss.alive) {
@@ -742,35 +765,34 @@ window.onload = function () {
               a = boss.position.distance(charactor.position);
               a.normalize();
               let Vectors = [{
-                x: 1.5, //右
-                y: 0
-                /*,
-                size: 5,
+                x: Math.cos(0 * (Math.PI / 180)),
+                y: Math.sin(0 * (Math.PI / 180))
+                /*,size: 5,
                 speed: 2.5*/
               }, {
-                x: -1.5, //左
-                y: 0
+                x: Math.cos(33.75 * (Math.PI / 180)),
+                y: Math.sin(33.75 * (Math.PI / 180))
               }, {
-                x: -0.8, //下左下
-                y: 1.3
+                x: Math.cos(67.5 * (Math.PI / 180)),
+                y: Math.sin(67.5 * (Math.PI / 180))
               }, {
-                x: 0.8, //下右下
-                y: 1.3
+                x: Math.cos(112.5 * (Math.PI / 180)),
+                y: Math.sin(112.5 * (Math.PI / 180))
               }, {
-                x: 0, //上
-                y: -1.5
+                x: Math.cos(146.25 * (Math.PI / 180)),
+                y: Math.sin(146.25 * (Math.PI / 180))
               }, {
-                x: 1.3, //上右下
-                y: 0.8
+                x: Math.cos(180 * (Math.PI / 180)),
+                y: Math.sin(180 * (Math.PI / 180))
               }, {
-                x: 1.08, //右上
-                y: -1.08
+                x: Math.cos(225 * (Math.PI / 180)),
+                y: Math.sin(225 * (Math.PI / 180))
               }, {
-                x: -1.3, //上左下
-                y: 0.8
+                x: Math.cos(270 * (Math.PI / 180)),
+                y: Math.sin(270 * (Math.PI / 180))
               }, {
-                x: -1.08, //左上
-                y: -1.08
+                x: Math.cos(315 * (Math.PI / 180)),
+                y: Math.sin(315 * (Math.PI / 180))
               }];
               let vectorCounter = 0;
               if (B_counter % 30 == 0) {
@@ -835,8 +857,535 @@ window.onload = function () {
             }
           }
         }
-      } else if (B_hp == 2) {
+      } else if (B_sabhp == 2) {
+        if (boss.alive) {
+          boss.size = 20 * world;
+          //座標計算-----------------------------------
+          if (B_hp > 150 && (Math.abs(sc.center.width - B_shotp1.x) > 1 || Math.abs(sc.center.height - B_shotp1.y) > 1)) {
+            B_shotp1.x = B_shotp1.x + (sc.center.width - B_shotp1.x) / Math.abs(sc.center.width - B_shotp1.x);
+            B_shotp1.y = B_shotp1.y + (sc.center.height - B_shotp1.y) / Math.abs(sc.center.height - B_shotp1.y);
+            B_shotp1.c = true;
+            B_shotp2.x = sc.center.width + (sc.center.width - B_shotp1.x);
+            B_shotp2.y = B_shotp1.y;
+            B_shotp2.c = true;
+            //console.log("AA");
+          } else if (B_hp <= 150) {
+            var BB = screenCanvas.width / 10;
+            var CC = screenCanvas.height / 10;
+            if (B_shotp1.x < BB * 9 && B_shotp1.x > BB && B_shotp1.y < CC * 9 && B_shotp1.y > CC) {
+              B_shotp1.x = B_shotp1.x + (BB - B_shotp1.x) / Math.abs(BB - B_shotp1.x);
+              B_shotp1.y = B_shotp1.y + (CC - B_shotp1.y) / Math.abs(CC - B_shotp1.y);
+              B_shotp1.c = true;
+              B_shotp2.x = sc.center.width + (sc.center.width - B_shotp1.x);
+              B_shotp2.y = sc.center.height + (sc.center.height - B_shotp1.y);
+              B_shotp2.c = true;
+              //console.log("BB");
+            } else {
+              B_shotp1.x += (B_shotp1.x >= BB && B_shotp1.y <= CC) ? -2 : ((B_shotp1.x <= BB * 9 && B_shotp1.y >= CC * 9) ? 2 : 0);
+              B_shotp1.y += (B_shotp1.y >= CC && B_shotp1.x >= BB * 9) ? -2 : ((B_shotp1.y <= CC * 9 && B_shotp1.x <= BB) ? 2 : 0);
+              B_shotp1.c = false;
+              B_shotp2.x = sc.center.width + (sc.center.width - B_shotp1.x);
+              B_shotp2.y = sc.center.height + (sc.center.height - B_shotp1.y);
+              B_shotp2.c = false;
+            }
+          }
+          if (B_hp > 50) {
+            if (Math.abs(sc.center.width - B_shotp3.x) > 1 || Math.abs(sc.center.height - B_shotp3.y) > 1) {
+              B_shotp3.x += (sc.center.width - B_shotp3.x) / Math.abs(sc.center.width - B_shotp3.x);
+              B_shotp3.y += (sc.center.height - B_shotp3.y) / Math.abs(sc.center.height - B_shotp3.y);
+              B_shotp3.c = true;
+            }
+            if (Math.abs(sc.center.width - B_shotp4.x) > 1 || Math.abs(sc.center.height - B_shotp4.y) > 1) {
+              B_shotp4.x = B_shotp4.x + (sc.center.width - B_shotp4.x) / Math.abs(sc.center.width - B_shotp4.x);
+              B_shotp4.y = B_shotp4.y + (sc.center.height - B_shotp4.y) / Math.abs(sc.center.height - B_shotp4.y);
+              B_shotp4.c = true;
+            }
+          } else if (B_hp <= 50) {
+            var DD = screenCanvas.width / 7;
+            var EE = screenCanvas.height / 7;
+            if (B_shotp3.x < DD * 6 && B_shotp3.x > DD && B_shotp3.y < EE * 6 && B_shotp3.y > EE) {
+              B_shotp3.x -= (DD - B_shotp3.x) / Math.abs(DD - B_shotp3.x);
+              B_shotp3.y += (EE - B_shotp3.y) / Math.abs(EE - B_shotp3.y);
+              B_shotp3.c = true;
+              B_shotp4.x = sc.center.width + (sc.center.width - B_shotp3.x);
+              B_shotp4.y = sc.center.height + (sc.center.height - B_shotp3.y);
+              B_shotp4.c = true;
+              //console.log("CC");
+            } else {
+              B_shotp3.x += (B_shotp3.x >= DD && B_shotp3.y >= EE * 6) ? -2 : ((B_shotp3.x <= DD * 6 && B_shotp3.y <= EE) ? 2 : 0);
+              B_shotp3.y += (B_shotp3.y >= EE && B_shotp3.x <= DD) ? -2 : ((B_shotp3.y <= EE * 6 && B_shotp3.x >= DD * 6) ? 2 : 0);
+              B_shotp3.c = false;
+              B_shotp4.x = sc.center.width + (sc.center.width - B_shotp3.x);
+              B_shotp4.y = sc.center.height + (sc.center.height - B_shotp3.y);
+              B_shotp4.c = false;
+            }
+          }
+          //乱数計算----------------------------------
+          B_rtime = ((B_hp >= 100) ? 30 : (B_hp >= 50) ? Math.round(Math.random() * 20 + 20) : Math.round(Math.random() * 40 + 10));
+          B_rspeed = ((B_hp >= 100) ? 3 : (B_hp >= 50) ? Math.round(Math.random() * 2 + 2) : Math.round(Math.random() * 4 + 1));
+          B_rsize = ((B_hp >= 100) ? 5 : (B_hp >= 50) ? Math.round(Math.random() * 4 + 3) : Math.round(Math.random() * 8 + 1));
+          B_counter++;
+          //Boss Vectol-------------------------------
+          boss.position.x += Math.abs(sc.center.width - boss.position.x) >= 1 ? (boss.position.x < sc.center.width ? 1 : -1) : sc.center.width - boss.position.x;
+          boss.position.y += Math.abs(sc.center.height - boss.position.y) >= 1 ? (boss.position.y < sc.center.height ? 1 : -1) : sc.center.height - boss.position.y;
+          ///方向-------------------------------------
+          if (boss.alive) {
+            //console.log(B_rtime);
+            if (B_hp > 150 && (B_counter % 30 == 0 && B_counter % 120 != 0)) {
+              a = boss.position.distance(charactor.position);
+              a.normalize();
+              let Vectors = [{
+                x: a.x,
+                y: a.y,
+                size: 7
+                /*,speed: 2*/
+              }];
+              let vectorCounter = 0;
+              for (e = 0; e < B_smaxcount; e++) {
+                if (!B_shot0[e].alive) {
+                  B_shot0[e].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                  // console.log(vectorCounter,bossShot[k]);
+                }
+              }
+              //console.log("a");
+            }
+            if (B_hp <= 100 && (B_counter % 10 == 0 && B_counter % 50 != 0)) {
+              a = boss.position.distance(charactor.position);
+              a.normalize();
+              let Vectors = [{
+                x: Math.cos((B_hp < 100 ? -1 : 1) * B_counter * (Math.PI / 180)),
+                y: Math.sin((B_hp < 100 ? -1 : 1) * B_counter * (Math.PI / 180))
+                /*,size: 5,
+                speed: 2.5*/
+              }, {
+                x: Math.cos((B_counter + 90) * (Math.PI / 180)),
+                y: Math.sin((B_counter + 90) * (Math.PI / 180))
+              }, {
+                x: Math.cos((B_counter + 180) * (Math.PI / 180)),
+                y: Math.sin((B_counter + 180) * (Math.PI / 180))
+              }, {
+                x: Math.cos((B_counter + 270) * (Math.PI / 180)),
+                y: Math.sin((B_counter + 270) * (Math.PI / 180))
+              }];
+              let vectorCounter = 0;
+              for (e = 0; e < B_smaxcount; e++) {
+                if (!B_shot0[e].alive) {
+                  B_shot0[e].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                  // console.log(vectorCounter,bossShot[k]);
+                }
+              }
+              //console.log("a");
+            }
+            if (boss.alive) {
+              a = boss.position.distance(charactor.position);
+              a.normalize();
+              let Vectors = [{
+                x: Math.cos(9 * (Math.PI / 180)),
+                y: Math.sin(9 * (Math.PI / 180))
+              }, {
+                x: Math.cos(27 * (Math.PI / 180)),
+                y: Math.sin(27 * (Math.PI / 180))
+              }, {
+                x: Math.cos(45 * (Math.PI / 180)),
+                y: Math.sin(45 * (Math.PI / 180)),
+                size: 8
+              }, {
+                x: Math.cos(63 * (Math.PI / 180)),
+                y: Math.sin(63 * (Math.PI / 180))
+              }, {
+                x: Math.cos(81 * (Math.PI / 180)),
+                y: Math.sin(81 * (Math.PI / 180))
+              }, {
+                x: Math.cos(99 * (Math.PI / 180)),
+                y: Math.sin(99 * (Math.PI / 180))
+              }, {
+                x: Math.cos(117 * (Math.PI / 180)),
+                y: Math.sin(117 * (Math.PI / 180))
+              }, {
+                x: Math.cos(135 * (Math.PI / 180)),
+                y: Math.sin(135 * (Math.PI / 180)),
+                size: 8
+              }, {
+                x: Math.cos(153 * (Math.PI / 180)),
+                y: Math.sin(153 * (Math.PI / 180))
+              }, {
+                x: Math.cos(171 * (Math.PI / 180)),
+                y: Math.sin(171 * (Math.PI / 180))
+              }, {
+                x: Math.cos(189 * (Math.PI / 180)),
+                y: Math.sin(189 * (Math.PI / 180))
+              }, {
+                x: Math.cos(207 * (Math.PI / 180)),
+                y: Math.sin(207 * (Math.PI / 180))
+              }, {
+                x: Math.cos(225 * (Math.PI / 180)),
+                y: Math.sin(225 * (Math.PI / 180)),
+                size: 8
+              }, {
+                x: Math.cos(243 * (Math.PI / 180)),
+                y: Math.sin(243 * (Math.PI / 180))
+              }, {
+                x: Math.cos(261 * (Math.PI / 180)),
+                y: Math.sin(261 * (Math.PI / 180))
+              }, {
+                x: Math.cos(279 * (Math.PI / 180)),
+                y: Math.sin(279 * (Math.PI / 180))
+              }, {
+                x: Math.cos(297 * (Math.PI / 180)),
+                y: Math.sin(297 * (Math.PI / 180))
+              }, {
+                x: Math.cos(315 * (Math.PI / 180)),
+                y: Math.sin(315 * (Math.PI / 180)),
+                size: 8
+              }, {
+                x: Math.cos(333 * (Math.PI / 180)),
+                y: Math.sin(333 * (Math.PI / 180))
+              }, {
+                x: Math.cos(351 * (Math.PI / 180)),
+                y: Math.sin(351 * (Math.PI / 180))
+              }];
+              //console.log("B_shot1 created.");
+              let vectorCounter = 0;
+              if (B_counter % (B_hp > 150 ? 50 : (B_hp > 100 ? 100 : 150)) == 0) {
+                for (f = 0; f < B_smaxcount; f++) {
+                  if (B_shot1[f].alive) continue;
+                  B_shot1[f].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                }
+                /*vectorCounter = 0;
+                for (l = 0; l < B_smaxcount; l++) {
+                  if (B_shot2[l].alive) continue;
+                 B_shot2[l].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                }*/
+                //console.log("a");
+              }
+              if (B_hp <= 50 && B_counter % 100 == 0) {
+                vectorCounter = 0;
+                for (o = 0; o < B_smaxcount; o++) {
+                  if (!B_shot5[o].alive) {
+                    B_shot5[o].set({
+                      x: B_shotp3.x,
+                      y: B_shotp3.y
+                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                    vectorCounter++;
+                    if (vectorCounter >= Vectors.length) break;
+                  }
+                }
+                vectorCounter = 0;
+                for (r = 0; r < B_smaxcount; r++) {
+                  if (!B_shot6[r].alive) {
+                    B_shot6[r].set({
+                      x: B_shotp4.x,
+                      y: B_shotp4.y
+                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                    vectorCounter++;
+                    if (vectorCounter >= Vectors.length) break;
+                  }
+                }
+                //console.log("a");
+              }
+            }
+            if (B_hp <= 150) {
+              a = boss.position.distance(charactor.position);
+              a.normalize();
+              let Vectors = [{
+                x: Math.cos(B_counter * (Math.PI / 180)),
+                y: Math.sin(B_counter * (Math.PI / 180))
+                /*,size: 5,
+                speed: 2.5*/
+              }, {
+                x: Math.cos((B_counter + 90) * (Math.PI / 180)),
+                y: Math.sin((B_counter + 90) * (Math.PI / 180))
+              }, {
+                x: Math.cos((B_counter + 180) * (Math.PI / 180)),
+                y: Math.sin((B_counter + 180) * (Math.PI / 180))
+              }, {
+                x: Math.cos((B_counter + 270) * (Math.PI / 180)),
+                y: Math.sin((B_counter + 270) * (Math.PI / 180))
+              }];
+              let vectorCounter = 0;
+              if (B_counter % 15 == 0) {
+                for (m = 0; m < B_smaxcount; m++) {
+                  if (!B_shot3[m].alive) {
+                    B_shot3[m].set({
+                      x: B_shotp1.x,
+                      y: B_shotp1.y
+                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                    vectorCounter++;
+                    if (vectorCounter >= Vectors.length) break;
+                  }
+                }
+                vectorCounter = 0;
+                for (n = 0; n < B_smaxcount; n++) {
+                  if (!B_shot4[n].alive) {
+                    B_shot4[n].set({
+                      x: B_shotp2.x,
+                      y: B_shotp2.y
+                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                    vectorCounter++;
+                    if (vectorCounter >= Vectors.length) break;
+                  }
+                }
+                //console.log(bossShot);
+                //console.log("a")            
+              };
+            }
 
+          }
+        }
+      } else if (B_sabhp == 1) {
+        if (boss.alive) {
+          boss.size = 20 * world;
+          //座標計算-----------------------------------
+          if (B_hp > 50) {
+            B_shotp1.x += Math.abs(0 + 30 - B_shotp1.x) >= 1 ? (0 + 30 < B_shotp1.x ? -1 : 1) : 0 + 30 - B_shotp1.x;
+            B_shotp1.y += Math.abs(0 + 30 - B_shotp1.y) >= 1 ? (0 + 30 < B_shotp1.y ? -1 : 1) : 0 + 30 - B_shotp1.y;
+            B_shotp1.c = true;
+            B_shotp3.x += Math.abs(0 + 30 - B_shotp3.x) >= 1 ? (0 + 30 < B_shotp3.x ? -1 : 1) : 0 + 30 - B_shotp3.x;
+            B_shotp3.y += Math.abs(screenCanvas.height - 30 - B_shotp3.y) >= 1 ? (screenCanvas.height - 30 < B_shotp3.y ? -1 : 1) : screenCanvas.height - 30 - B_shotp3.y;
+            B_shotp3.c = true;
+            //console.log("AA");
+          } else if (B_hp <= 50) {
+            B_shotp1.x += (0 - B_shotp1.x) / Math.abs(0 - B_shotp1.x);
+            B_shotp1.y += (sc.center.height - B_shotp1.y) / Math.abs(sc.center.height - B_shotp1.y);
+            B_shotp1.c = true;
+            B_shotp3.x += (sc.center.width - B_shotp3.x) / Math.abs(sc.center.width - B_shotp3.x);
+            B_shotp3.y += (0 - B_shotp3.y) / Math.abs(0 - B_shotp3.y);
+            B_shotp3.c = true;
+          }
+          B_shotp2.x = sc.center.width + (sc.center.width - B_shotp1.x);
+          B_shotp2.y = sc.center.height + (sc.center.height - B_shotp1.y);
+          B_shotp2.c = true;
+          B_shotp4.x = sc.center.width + (sc.center.width - B_shotp3.x);
+          B_shotp4.y = sc.center.height + (sc.center.height - B_shotp3.y);
+          B_shotp4.c = true;
+          //乱数計算----------------------------------
+          B_rtime = ((B_hp >= 100) ? 30 : (B_hp >= 50) ? Math.round(Math.random() * 20 + 20) : Math.round(Math.random() * 40 + 10));
+          B_rspeed = ((B_hp >= 100) ? 3 : (B_hp >= 50) ? Math.round(Math.random() * 2 + 2) : Math.round(Math.random() * 4 + 1));
+          B_rsize = ((B_hp >= 100) ? 5 : (B_hp >= 50) ? Math.round(Math.random() * 4 + 3) : Math.round(Math.random() * 8 + 1));
+          B_counter++;
+          //Boss Vectol-------------------------------
+          boss.position.x += Math.abs(sc.center.width - boss.position.x) >= 1 ? (boss.position.x < sc.center.width ? 1 : -1) : sc.center.width - boss.position.x;
+          boss.position.y += Math.abs(sc.center.height - boss.position.y) >= 1 ? (boss.position.y < sc.center.height ? 1 : -1) : sc.center.height - boss.position.y;
+          ///方向-------------------------------------
+          if (boss.alive) {
+            //console.log(B_rtime);
+            if (B_hp > 150 && (B_counter % 30 == 0 && B_counter % 120 != 0)) {
+              a = boss.position.distance(charactor.position);
+              a.normalize();
+              let Vectors = [{
+                x: a.x,
+                y: a.y,
+                size: 7
+                /*,speed: 2*/
+              }];
+              let vectorCounter = 0;
+              for (e = 0; e < B_smaxcount; e++) {
+                if (!B_shot0[e].alive) {
+                  B_shot0[e].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                  // console.log(vectorCounter,bossShot[k]);
+                }
+              }
+              //console.log("a");
+            }
+            if (B_hp <= 100 && (B_counter % 10 == 0 && B_counter % 50 != 0)) {
+              a = boss.position.distance(charactor.position);
+              a.normalize();
+              let Vectors = [{
+                x: Math.cos((B_hp < 100 ? -1 : 1) * B_counter * (Math.PI / 180)),
+                y: Math.sin((B_hp < 100 ? -1 : 1) * B_counter * (Math.PI / 180))
+                /*,size: 5,
+                speed: 2.5*/
+              }, {
+                x: Math.cos((B_counter + 90) * (Math.PI / 180)),
+                y: Math.sin((B_counter + 90) * (Math.PI / 180))
+              }, {
+                x: Math.cos((B_counter + 180) * (Math.PI / 180)),
+                y: Math.sin((B_counter + 180) * (Math.PI / 180))
+              }, {
+                x: Math.cos((B_counter + 270) * (Math.PI / 180)),
+                y: Math.sin((B_counter + 270) * (Math.PI / 180))
+              }];
+              let vectorCounter = 0;
+              for (e = 0; e < B_smaxcount; e++) {
+                if (!B_shot0[e].alive) {
+                  B_shot0[e].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                  // console.log(vectorCounter,bossShot[k]);
+                }
+              }
+              //console.log("a");
+            }
+            if (boss.alive) {
+              a = boss.position.distance(charactor.position);
+              a.normalize();
+              let Vectors = [{
+                x: Math.cos(9 * (Math.PI / 180)),
+                y: Math.sin(9 * (Math.PI / 180))
+              }, {
+                x: Math.cos(27 * (Math.PI / 180)),
+                y: Math.sin(27 * (Math.PI / 180))
+              }, {
+                x: Math.cos(45 * (Math.PI / 180)),
+                y: Math.sin(45 * (Math.PI / 180)),
+                size: 8
+              }, {
+                x: Math.cos(63 * (Math.PI / 180)),
+                y: Math.sin(63 * (Math.PI / 180))
+              }, {
+                x: Math.cos(81 * (Math.PI / 180)),
+                y: Math.sin(81 * (Math.PI / 180))
+              }, {
+                x: Math.cos(99 * (Math.PI / 180)),
+                y: Math.sin(99 * (Math.PI / 180))
+              }, {
+                x: Math.cos(117 * (Math.PI / 180)),
+                y: Math.sin(117 * (Math.PI / 180))
+              }, {
+                x: Math.cos(135 * (Math.PI / 180)),
+                y: Math.sin(135 * (Math.PI / 180)),
+                size: 8
+              }, {
+                x: Math.cos(153 * (Math.PI / 180)),
+                y: Math.sin(153 * (Math.PI / 180))
+              }, {
+                x: Math.cos(171 * (Math.PI / 180)),
+                y: Math.sin(171 * (Math.PI / 180))
+              }, {
+                x: Math.cos(189 * (Math.PI / 180)),
+                y: Math.sin(189 * (Math.PI / 180))
+              }, {
+                x: Math.cos(207 * (Math.PI / 180)),
+                y: Math.sin(207 * (Math.PI / 180))
+              }, {
+                x: Math.cos(225 * (Math.PI / 180)),
+                y: Math.sin(225 * (Math.PI / 180)),
+                size: 8
+              }, {
+                x: Math.cos(243 * (Math.PI / 180)),
+                y: Math.sin(243 * (Math.PI / 180))
+              }, {
+                x: Math.cos(261 * (Math.PI / 180)),
+                y: Math.sin(261 * (Math.PI / 180))
+              }, {
+                x: Math.cos(279 * (Math.PI / 180)),
+                y: Math.sin(279 * (Math.PI / 180))
+              }, {
+                x: Math.cos(297 * (Math.PI / 180)),
+                y: Math.sin(297 * (Math.PI / 180))
+              }, {
+                x: Math.cos(315 * (Math.PI / 180)),
+                y: Math.sin(315 * (Math.PI / 180)),
+                size: 8
+              }, {
+                x: Math.cos(333 * (Math.PI / 180)),
+                y: Math.sin(333 * (Math.PI / 180))
+              }, {
+                x: Math.cos(351 * (Math.PI / 180)),
+                y: Math.sin(351 * (Math.PI / 180))
+              }];
+              //console.log("B_shot1 created.");
+              let vectorCounter = 0;
+              if (B_counter % (B_hp > 150 ? 50 : (B_hp > 100 ? 100 : 150)) == 0) {
+                for (f = 0; f < B_smaxcount; f++) {
+                  if (B_shot1[f].alive) continue;
+                  B_shot1[f].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                }
+                /*vectorCounter = 0;
+                for (l = 0; l < B_smaxcount; l++) {
+                  if (B_shot2[l].alive) continue;
+                 B_shot2[l].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                }*/
+                //console.log("a");
+              }
+              if (B_hp <= 50 && B_counter % 100 == 0) {
+                vectorCounter = 0;
+                for (o = 0; o < B_smaxcount; o++) {
+                  if (!B_shot5[o].alive) {
+                    B_shot5[o].set({
+                      x: B_shotp3.x,
+                      y: B_shotp3.y
+                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                    vectorCounter++;
+                    if (vectorCounter >= Vectors.length) break;
+                  }
+                }
+                vectorCounter = 0;
+                for (r = 0; r < B_smaxcount; r++) {
+                  if (!B_shot6[r].alive) {
+                    B_shot6[r].set({
+                      x: B_shotp4.x,
+                      y: B_shotp4.y
+                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                    vectorCounter++;
+                    if (vectorCounter >= Vectors.length) break;
+                  }
+                }
+                //console.log("a");
+              }
+            }
+            if (B_hp <= 150) {
+              a = boss.position.distance(charactor.position);
+              a.normalize();
+              let Vectors = [{
+                x: Math.cos(B_counter * (Math.PI / 180)),
+                y: Math.sin(B_counter * (Math.PI / 180))
+                /*,size: 5,
+                speed: 2.5*/
+              }, {
+                x: Math.cos((B_counter + 90) * (Math.PI / 180)),
+                y: Math.sin((B_counter + 90) * (Math.PI / 180))
+              }, {
+                x: Math.cos((B_counter + 180) * (Math.PI / 180)),
+                y: Math.sin((B_counter + 180) * (Math.PI / 180))
+              }, {
+                x: Math.cos((B_counter + 270) * (Math.PI / 180)),
+                y: Math.sin((B_counter + 270) * (Math.PI / 180))
+              }];
+              let vectorCounter = 0;
+              if (B_counter % 15 == 0) {
+                for (m = 0; m < B_smaxcount; m++) {
+                  if (!B_shot3[m].alive) {
+                    B_shot3[m].set({
+                      x: B_shotp1.x,
+                      y: B_shotp1.y
+                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                    vectorCounter++;
+                    if (vectorCounter >= Vectors.length) break;
+                  }
+                }
+                vectorCounter = 0;
+                for (n = 0; n < B_smaxcount; n++) {
+                  if (!B_shot4[n].alive) {
+                    B_shot4[n].set({
+                      x: B_shotp2.x,
+                      y: B_shotp2.y
+                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                    vectorCounter++;
+                    if (vectorCounter >= Vectors.length) break;
+                  }
+                }
+                //console.log(bossShot);
+                //console.log("a")            
+              };
+            }
+
+          }
+        }
       };
       //B_当たり判定-----------------------------------
 
@@ -859,7 +1408,7 @@ window.onload = function () {
 };
 //Function---------------------------------------------------------------------
 function resize(screenCanvas, charactor) {
-  if (762.5 / document.documentElement.clientHeight <= 1364 / document.documentElement.clientWidth) {
+  if ((document.documentElement.clientHeight - 2) / 762.5 <= (document.documentElement.clientWidth - 2) / 1364) {
     world = screenCanvas.height / 762.5;
   } else {
     world = screenCanvas.width / 1364;
@@ -869,8 +1418,10 @@ function resize(screenCanvas, charactor) {
 
   C_worldx = charactor.position.x / screenCanvas.width;
   C_worldy = charactor.position.y / screenCanvas.height;
+  B_worldx = boss.position.x / screenCanvas.width;
+  B_worldy = boss.position.y / screenCanvas.height;
 
-  //keyesc=true;
+  keyesc = true;
   if (!keyesc) {
     width = document.documentElement.clientWidth - 2;
     height = document.documentElement.clientHeight - 2;
@@ -888,12 +1439,13 @@ function resize(screenCanvas, charactor) {
 
   charactor.position.x = screenCanvas.width * C_worldx;
   charactor.position.y = screenCanvas.height * C_worldy;
+  boss.position.x = screenCanvas.width * B_worldx;
+  boss.position.y = screenCanvas.height * B_worldy;
 
-  C_outsize = 10 * world;
-  C_outsize = 10 * world; //1477:c=1364:10    c*1364=1477*10  C=1477*10/1364
-  charactor.size = C_outsize / 10 * 4;
-  CS_size = C_outsize / 2;
-  C_speed = 3;
+  sc.center = {
+    height: screenCanvas.height / 2,
+    width: screenCanvas.width / 2
+  };
   //charactor.position.x = charactor.position.x/screencanvas.width
   //charactor.position.y = charactor.position.y * world;  
 };
@@ -903,6 +1455,15 @@ function changecolor() {
     C_sabhpgagecolor = 'rgba(255,0,0,1)';
   } else {
     C_sabhpgagecolor = 'rgba(16,87,121,1)';
+  };
+  if (B_sabhp >= 3) {
+    B_color = 'rgba(35, 71, 130,1)';
+    BS_color = 'rgba(196, 136, 71,1)';
+    B_name = "Neko";
+  } else {
+    B_color = 'hsla(31,51%,52%,1)';
+    BS_color = 'rgba(35, 71, 130,1)';
+    B_name = "Skyless Fox";
   };
 }
 
@@ -1027,6 +1588,7 @@ function C_sdraw() {
 function B_draw() {
   ctx.beginPath();
   ctx.fillStyle = B_color;
+  ctx.strokeStyle = BS_color;
   //ctx.fillStyle = 'hsla(240,'+(Math.random()*100+0)+'%,50%,1)';
   //ctx.fillStyle = 'hsla(217,'+(B_counter%20===0?(Math.random()*60+27):57)+'%,32%,1)';
   if (boss.alive) {
@@ -1040,44 +1602,55 @@ function B_draw() {
     ctx.closePath();
   }
   ctx.fill();
+  ctx.stroke();
   //if(B_hp<150){ctx.stroke();}
 }
 
 function BS_draw() {
   ctx.beginPath();
   ctx.fillStyle = BS_color;
+  ctx.strokeStyle = B_color;
   if (boss.alive) {
     //boss.move();
     ctx.arc(
       B_shotp1.x,
       B_shotp1.y,
-      boss.size / (B_shotp1.c ? 2 : 1.5),
+      (B_sabhp != 1 ? (boss.size / (B_shotp2.c ? 2 : 1.5)) : boss.size * 1.5),
       0, Math.PI * 2, false
     );
     ctx.moveTo(B_shotp2.x, B_shotp2.y);
     ctx.arc(
       B_shotp2.x,
       B_shotp2.y,
-      boss.size / (B_shotp2.c ? 2 : 1.5),
+      (B_sabhp != 1 ? (boss.size / (B_shotp2.c ? 2 : 1.5)) : boss.size * 1.5),
       0, Math.PI * 2, false
     );
-    if (B_sabhp == 4 && B_hp <= 50 || B_sabhp == 3 && (B_shotp3.c || B_shotp4.c)) {
+    if (B_sabhp == 4 && B_hp <= 50 || B_sabhp == 3 && (B_shotp3.c || B_shotp4.c) || B_sabhp == 2 || B_sabhp == 1) {
       ctx.moveTo(B_shotp3.x, B_shotp3.y)
       ctx.arc(
         B_shotp3.x,
         B_shotp3.y,
-        boss.size / 2,
+        (B_sabhp != 1 ? boss.size / 2 : boss.size * 1.5),
         0, Math.PI * 2, false
       );
       ctx.moveTo(B_shotp4.x, B_shotp4.y);
       ctx.arc(
         B_shotp4.x,
         B_shotp4.y,
-        boss.size / 2,
+        (B_sabhp != 1 ? boss.size / 2 : boss.size * 1.5),
         0, Math.PI * 2, false
       );
     }
     ctx.closePath();
+    if (B_sabhp == 2) {
+      if (B_hp <= 50) {
+        ctx.strokeRect(screenCanvas.width / 7 - 0.5, screenCanvas.height / 7 - 0.5, screenCanvas.width / 7 * 5 + 1, screenCanvas.height / 7 * 5 + 1);
+      }
+      if (B_hp <= 150) {
+        ctx.strokeRect(screenCanvas.width / 10 - 0.5, screenCanvas.height / 10 - 0.5, screenCanvas.width / 10 * 8 + 1, screenCanvas.height / 10 * 8 + 1);
+      }
+    }
+    ctx.stroke();
     ctx.fill();
   }
 }
@@ -1155,7 +1728,7 @@ function B_sdraw() {
   }
   ctx.fill();
 
-  ctx.fillStyle = B_scolor;
+  ctx.fillStyle = (B_sabhp != 2 ? B_scolor : B_s2color);
   ctx.beginPath();
   for (o = 0; o < B_smaxcount; o++) {
     if (B_shot5[o].alive) {
@@ -1579,7 +2152,10 @@ function keyDown(event, i, S_bfar) {
         B_hp = 200;
       };
       if (ck === 13) {
-        B_hp = window.prompt("B_hp", "")
+        var AA = window.prompt("B_hp", "");
+        if (AA != (NaN || null || undefined || "")) {
+          B_hp = AA;
+        };
       };
     };
     if (key7 && key8) {
