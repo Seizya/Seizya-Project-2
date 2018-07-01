@@ -8,6 +8,7 @@ var ctx;
 var fire = false;
 var counter = 0;
 var B_counter = 0;
+var T_counter = 0;
 //var chara;
 var slow = false;
 var Key = 0;
@@ -21,7 +22,8 @@ var C_color = 'rgba(255,255,255,1)';
 var C_scolor = 'rgba(0,0,0,1)';
 var C_s2color = 'rgba(255,255,255,1)';
 var C_smaxcount = 10000;
-var C_hp = 10;
+var C_name ="";
+var C_hp = 5;
 var C_sabhp = 5;
 var C_attack = 5;
 var C_defence = 3;
@@ -119,15 +121,15 @@ var width, height;
 var up, down, right, left, not;
 var key0, key1, key2, key3, key4, key5, key6, key7, key8, key9, keyplus, keyminus;
 var keyq = true;
-var keya, keyd, keyw, keys, keyf, keyshift, keyctrl, keyesc;
+var keya, keyd, keyw, keys, keyf, keyshift, keyctrl, keyesc,keyalt,keyenter,keydot,keyf1
 //Cheat----------------------
 var CC_pass = false;
 var CC_passc = undefined;
 var fCC_12 = false;
-var fCC_23 = false;
+var fCC_23 = {TF:false,c:1};
 var fCC_45 = false;
-var fCC_89 = true;
-var fCC_78 = 1;
+var fCC_89 = 1;
+var fCC_78 = false;
 var L_main = 1;
 //Skill----------------------
 var S_point = 0;
@@ -135,7 +137,7 @@ var S_bmaxcount = 120;
 var S_bfar = 60 * world;
 var S_bcolor = 'rgba(139,69,19,1)';
 //Sytem-*--------------------
-var charactor, enemy, boss, bossCount, C_shot, E_shot, B_shot0, B_shot1, B_shot25B_shot3, B_shot4, B_shot5, B_shot6;
+var charactor, enemy, boss, bossCount, C_shot, E_shot, B_shot0, B_shot1, B_shot2_shot3, B_shot4, B_shot5, B_shot6;
 var log = () => 0;
 var isLogEnable = true;
 var fontsize = 50;
@@ -255,8 +257,8 @@ window.onload = function () {
   isLogEnable = false;
   CC_pass = true;
   /*
-    fCC_78 = 2;*/
-  S_point = 119;
+  fCC_89 = 2;*/
+  S_point = 200;
   Game_count = 2;
   //function---------------------------------------------------------------------------------------
   (function () {
@@ -275,9 +277,11 @@ window.onload = function () {
     }
     ctx.globalAlpha = 1;
     counter++;
+    T_counter= (new Date).getTime();
     changecolor();
     C_hpdraw(C_sabhp);
     B_hpdraw();
+    status(score);
     C_sdraw();
     CS_draw(CS_1, CS_2, CS_3, CS_4);
     C_draw(charactor);
@@ -285,37 +289,35 @@ window.onload = function () {
     BS_draw();
     B_draw();
     S_builddraw();
-    status(score);
     //Cheat---------------------------------------------------------- 
-    if (fCC_12) {
-      CC_12();
-    };
-    if (fCC_23) {
-      CC_23();
-    };
-    if (fCC_45) {
-      CC_45();
-    };
     if (CC_pass) {
-      if (L_main == 1) {
-        log.setGroup("main")
-      } else if (L_main == 2) {
-        log.setGroup("main2")
-      } else if (L_main == 3) {
-        log.setGroup("main3")
-      };
+      if(fCC_23.TF&&fCC_23.c==2){
+        if(L_main==1){
+          log.setGroup("main")
+        } else if (L_main == 2) {
+          log.setGroup("main2")
+        } else if (L_main == 3) {
+          log.setGroup("main3")
+        };
+        CC_23();
+      }
+    }
+    if(fCC_23.TF&&fCC_23.c==1){
+      ctx.fillStyle = 'rgba(255,255,255,0.2)';
+      ctx.fillRect(0,0,screenCanvas.width/4,screenCanvas.height);
       ctx.fillStyle = 'rgba(0,0,0,1)';
       fontsize = 40;
       ctx.beginPath();
       ctx.textAlign = "left";
       ctx.font = fontsize * world2 + "px 'Rounded Mplus 1c', 'Open Sans', 'Noto Sans Japanese', 'Yu Gothic', 'Meiryo UI', sans-serif";
-      ctx.fillText("CC78 : " + fCC_78, 0, (fontsize * 1 + 0) * world2);
-      ctx.fillText("Hp  : " + C_hp, 0, (fontsize * 2 + 2) * world2);
+      ctx.fillText("CC89 : " + fCC_89, 0, (fontsize * 1 + 0) * world2);
+      ctx.fillText("Hpm : " + C_hp, 0, (fontsize * 2 + 2) * world2);
       ctx.fillText("Hps : " + C_sabhp, 0, (fontsize * 3 + 4) * world2);
-      ctx.fillText("S_p : " + S_point, 0, (fontsize * 4 + 6) * world2);
+      ctx.fillText("Skp : " + S_point, 0, (fontsize * 4 + 6) * world2);
       ctx.fillText("Atk : " + C_attack, 0, (fontsize * 5 + 8) * world2);
       ctx.fillText("Def : " + C_defence, 0, (fontsize * 6 + 10) * world2);
-      ctx.fillText("Spd : " + score, 0, (fontsize * 7 + 12) * world2);
+      ctx.fillText("Spd : " + (fCC_78?"Accelate":C_speed), 0, (fontsize * 7 + 12) * world2);
+      ctx.fillText("Spc : " + not,0,(fontsize * 8 + 14) * world2);
       ctx.closePath();
     }
     //if (!slow || slowCount % 5 == 0) {
@@ -325,13 +327,17 @@ window.onload = function () {
     charactor.size = C_outsize / 10 * 4;
     CS_size = C_outsize / 2;
     if (!keyctrl && keyshift) {
-      C_speed = 2;
-      C_color = 'rgba(76,76,76,0.5)'
-    } else {
-      C_speed = 5;
-      C_color = 'rgba(255,255,255,1)';
-    };
-    if (charactor.position.y >= 0 && up) {
+      if(fCC_78){
+        C_speed = 20;
+        C_color = 'rgba(255,255,255,0)';
+      }else{
+       C_speed = 2;
+       C_color = 'rgba(76,76,76,1)'}
+     } else {
+       C_speed = 5;
+       C_color = 'rgba(255,255,255,1)';
+     };
+     if (charactor.position.y >= 0 && up) {
       charactor.position.y -= C_speed * world;
     };
     if (charactor.position.y <= screenCanvas.height && down) {
@@ -351,7 +357,7 @@ window.onload = function () {
         CS_late.x = (charactor.position.x * 0.3 + CS_late.x * 0.7);
         CS_late.y = (charactor.position.y * 0.3 + CS_late.y * 0.7);
         /* JIKI_OKURETERU.x=Math.min(1364,Math.max(JIKI_OKURETERU.x));
-         JIKI_OKURETERU.y=Math.min(630,Math.max(JIKI_OKURETERU.y));*/
+        JIKI_OKURETERU.y=Math.min(630,Math.max(JIKI_OKURETERU.y));*/
       } else {
         CS_late.x = (charactor.position.x * 0.5 + CS_late.x * 0.5);
         CS_late.y = (charactor.position.y * 0.5 + CS_late.y * 0.5);
@@ -412,7 +418,7 @@ window.onload = function () {
         y: ((keya || keyd) ? 0 : (keyw ? -1 : (keys ? 1 : -0.5)))
       };
     };
-    if (keyspace) {
+    if (keyspace||(not && CC_pass)) {
       if (counter % 15 == 0) {
         let Vectors = [{
           x: C_shot0v.x,
@@ -504,19 +510,19 @@ window.onload = function () {
     //enemy--------------------------------------------------------------------
     if (Game_count == 1) {}
     //Boss---------------------------------------------------------------------
-    else if (Game_count == 2) {
-      if (B_pop) {
-        p.x = sc.center.width;
-        p.y = screenCanvas.height / 5;
-        boss.set(p, 0);
-        boss.size = 20 * world;
-        B_pop = false;
-      }
-      if (B_sabhp == 4) {
-        boss.size = 20 * world;
-        B_name = "Neko";
-        B_counter++;
-        if (boss.alive) {
+  else if (Game_count == 2) {
+    if (B_pop) {
+      p.x = sc.center.width;
+      p.y = screenCanvas.height / 5;
+      boss.set(p, 0);
+      boss.size = 20 * world;
+      B_pop = false;
+    }
+    if (B_sabhp == 4) {
+      boss.size = 20 * world;
+      B_name = "Neko";
+      B_counter++;
+      if (boss.alive) {
           //console.log(B_rtime);
           if (B_counter % 30 == 0 && B_counter % 120 != 0) {
             a = boss.position.distance(charactor.position);
@@ -526,7 +532,7 @@ window.onload = function () {
               y: a.y,
               size: 7
               /*,
-                            speed: 2*/
+              speed: 2*/
             }];
             let vectorCounter = 0;
             for (e = 0; e < B_smaxcount; e++) {
@@ -1145,19 +1151,19 @@ window.onload = function () {
           boss.size = 20 * world;
           //座標計算-----------------------------------
           if (B_hp > 50) {
-            B_shotp1.x += Math.abs(0 + 30 - B_shotp1.x) >= 1 ? (0 + 30 < B_shotp1.x ? -1 : 1) : 0 + 30 - B_shotp1.x;
-            B_shotp1.y += Math.abs(0 + 30 - B_shotp1.y) >= 1 ? (0 + 30 < B_shotp1.y ? -1 : 1) : 0 + 30 - B_shotp1.y;
+            B_shotp1.x += Math.abs(0 + 40*world - B_shotp1.x) >= 1 ? (0 + 40*world < B_shotp1.x ? -1 : 1) : 0 + 40*world - B_shotp1.x;
+            B_shotp1.y += Math.abs(0 + 40*world - B_shotp1.y) >= 1 ? (0 + 40*world < B_shotp1.y ? -1 : 1) : 0 + 40*world - B_shotp1.y;
             B_shotp1.c = true;
-            B_shotp3.x += Math.abs(0 + 30 - B_shotp3.x) >= 1 ? (0 + 30 < B_shotp3.x ? -1 : 1) : 0 + 30 - B_shotp3.x;
-            B_shotp3.y += Math.abs(screenCanvas.height - 30 - B_shotp3.y) >= 1 ? (screenCanvas.height - 30 < B_shotp3.y ? -1 : 1) : screenCanvas.height - 30 - B_shotp3.y;
+            B_shotp3.x += Math.abs(0 + 40*world - B_shotp3.x) >= 1 ? (0 + 40*world < B_shotp3.x ? -1 : 1) : 0 + 40*world - B_shotp3.x;
+            B_shotp3.y += Math.abs(screenCanvas.height - 40*world - B_shotp3.y) >= 1 ? (screenCanvas.height - 40*world < B_shotp3.y ? -1 : 1) : screenCanvas.height - 40*world - B_shotp3.y;
             B_shotp3.c = true;
             //console.log("AA");
           } else if (B_hp <= 50) {
-            B_shotp1.x += (0 - B_shotp1.x) / Math.abs(0 - B_shotp1.x);
-            B_shotp1.y += (sc.center.height - B_shotp1.y) / Math.abs(sc.center.height - B_shotp1.y);
+            B_shotp1.x += Math.abs(0 + 40*world - B_shotp1.x) >= 1 ? (0 + 40*world < B_shotp1.x ? -1 : 1) : 0 + 40*world - B_shotp1.x;
+            B_shotp1.y += Math.abs(sc.center.height- B_shotp1.y) >= 1 ? (sc.center.height < B_shotp1.y ? -1 : 1) : sc.center.height - B_shotp1.y;
             B_shotp1.c = true;
-            B_shotp3.x += (sc.center.width - B_shotp3.x) / Math.abs(sc.center.width - B_shotp3.x);
-            B_shotp3.y += (0 - B_shotp3.y) / Math.abs(0 - B_shotp3.y);
+            B_shotp3.x += Math.abs(sc.center.width - B_shotp3.x) >= 1 ? (sc.center.width< B_shotp3.x ? -1 : 1) : sc.center.width - B_shotp3.x;
+            B_shotp3.y += Math.abs(screenCanvas.height - 40*world - B_shotp3.y) >= 1 ? (screenCanvas.height - 40*world < B_shotp3.y ? -1 : 1) : screenCanvas.height - 40*world - B_shotp3.y;
             B_shotp3.c = true;
           }
           B_shotp2.x = sc.center.width + (sc.center.width - B_shotp1.x);
@@ -1172,61 +1178,22 @@ window.onload = function () {
           B_rsize = ((B_hp >= 100) ? 5 : (B_hp >= 50) ? Math.round(Math.random() * 4 + 3) : Math.round(Math.random() * 8 + 1));
           B_counter++;
           //Boss Vectol-------------------------------
-          boss.position.x += Math.abs(sc.center.width - boss.position.x) >= 1 ? (boss.position.x < sc.center.width ? 1 : -1) : sc.center.width - boss.position.x;
-          boss.position.y += Math.abs(sc.center.height - boss.position.y) >= 1 ? (boss.position.y < sc.center.height ? 1 : -1) : sc.center.height - boss.position.y;
+          if (B_hp >100) {
+            boss.position.x += Math.abs(sc.center.width - boss.position.x) >= 1 ? (boss.position.x < sc.center.width ? 1 : -1) : sc.center.width - boss.position.x;
+            boss.position.y += Math.abs(sc.center.height - boss.position.y) >= 1 ? (boss.position.y < sc.center.height ? 1 : -1) : sc.center.height - boss.position.y;
+          } else if (B_hp <= 100) {
+            if(boss.position.x>=100*world&&boss.position.x<=screenCanvas.width-100*world&&boss.position.y>=100*world&&boss.position.y<=screenCanvas.height-100*world){
+              boss.position.x+=1;
+            }else{
+              if(boss.position.y<100*world){boss.position.x+=1.5}
+                if(boss.position.y>screenCanvas.height-100*world){boss.position.x-=1.5}
+                  if(boss.position.x<100*world){boss.position.y-=1.5}
+                    if(boss.position.x>screenCanvas.width-100*world){boss.position.y+=1.5};
+                };
+              }
           ///方向-------------------------------------
           if (boss.alive) {
-            //console.log(B_rtime);
-            if (B_hp > 150 && (B_counter % 30 == 0 && B_counter % 120 != 0)) {
-              a = boss.position.distance(charactor.position);
-              a.normalize();
-              let Vectors = [{
-                x: a.x,
-                y: a.y,
-                size: 7
-                /*,speed: 2*/
-              }];
-              let vectorCounter = 0;
-              for (e = 0; e < B_smaxcount; e++) {
-                if (!B_shot0[e].alive) {
-                  B_shot0[e].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
-                  vectorCounter++;
-                  if (vectorCounter >= Vectors.length) break;
-                  // console.log(vectorCounter,bossShot[k]);
-                }
-              }
-              //console.log("a");
-            }
-            if (B_hp <= 100 && (B_counter % 10 == 0 && B_counter % 50 != 0)) {
-              a = boss.position.distance(charactor.position);
-              a.normalize();
-              let Vectors = [{
-                x: Math.cos((B_hp < 100 ? -1 : 1) * B_counter * (Math.PI / 180)),
-                y: Math.sin((B_hp < 100 ? -1 : 1) * B_counter * (Math.PI / 180))
-                /*,size: 5,
-                speed: 2.5*/
-              }, {
-                x: Math.cos((B_counter + 90) * (Math.PI / 180)),
-                y: Math.sin((B_counter + 90) * (Math.PI / 180))
-              }, {
-                x: Math.cos((B_counter + 180) * (Math.PI / 180)),
-                y: Math.sin((B_counter + 180) * (Math.PI / 180))
-              }, {
-                x: Math.cos((B_counter + 270) * (Math.PI / 180)),
-                y: Math.sin((B_counter + 270) * (Math.PI / 180))
-              }];
-              let vectorCounter = 0;
-              for (e = 0; e < B_smaxcount; e++) {
-                if (!B_shot0[e].alive) {
-                  B_shot0[e].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
-                  vectorCounter++;
-                  if (vectorCounter >= Vectors.length) break;
-                  // console.log(vectorCounter,bossShot[k]);
-                }
-              }
-              //console.log("a");
-            }
-            if (boss.alive) {
+            if(B_counter%(B_hp>100?100:150)==0){
               a = boss.position.distance(charactor.position);
               a.normalize();
               let Vectors = [{
@@ -1296,49 +1263,16 @@ window.onload = function () {
               }];
               //console.log("B_shot1 created.");
               let vectorCounter = 0;
-              if (B_counter % (B_hp > 150 ? 50 : (B_hp > 100 ? 100 : 150)) == 0) {
-                for (f = 0; f < B_smaxcount; f++) {
-                  if (B_shot1[f].alive) continue;
-                  B_shot1[f].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+              for (e = 0; e < B_smaxcount; e++) {
+                if (!B_shot0[e].alive) {
+                  B_shot0[e].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
                   vectorCounter++;
                   if (vectorCounter >= Vectors.length) break;
+                  // console.log(vectorCounter,bossShot[k]);
                 }
-                /*vectorCounter = 0;
-                for (l = 0; l < B_smaxcount; l++) {
-                  if (B_shot2[l].alive) continue;
-                 B_shot2[l].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
-                  vectorCounter++;
-                  if (vectorCounter >= Vectors.length) break;
-                }*/
-                //console.log("a");
-              }
-              if (B_hp <= 50 && B_counter % 100 == 0) {
-                vectorCounter = 0;
-                for (o = 0; o < B_smaxcount; o++) {
-                  if (!B_shot5[o].alive) {
-                    B_shot5[o].set({
-                      x: B_shotp3.x,
-                      y: B_shotp3.y
-                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
-                    vectorCounter++;
-                    if (vectorCounter >= Vectors.length) break;
-                  }
-                }
-                vectorCounter = 0;
-                for (r = 0; r < B_smaxcount; r++) {
-                  if (!B_shot6[r].alive) {
-                    B_shot6[r].set({
-                      x: B_shotp4.x,
-                      y: B_shotp4.y
-                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
-                    vectorCounter++;
-                    if (vectorCounter >= Vectors.length) break;
-                  }
-                }
-                //console.log("a");
               }
             }
-            if (B_hp <= 150) {
+            if (B_counter %10 == 0) {
               a = boss.position.distance(charactor.position);
               a.normalize();
               let Vectors = [{
@@ -1357,33 +1291,172 @@ window.onload = function () {
                 y: Math.sin((B_counter + 270) * (Math.PI / 180))
               }];
               let vectorCounter = 0;
-              if (B_counter % 15 == 0) {
-                for (m = 0; m < B_smaxcount; m++) {
-                  if (!B_shot3[m].alive) {
-                    B_shot3[m].set({
-                      x: B_shotp1.x,
-                      y: B_shotp1.y
-                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
-                    vectorCounter++;
-                    if (vectorCounter >= Vectors.length) break;
-                  }
+              for (f = 0; f < B_smaxcount; f++) {
+                if (B_shot1[f].alive) continue;
+                B_shot1[f].set({x:B_shotp1.x,y:B_shotp1.y}, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                vectorCounter++;
+                if (vectorCounter >= Vectors.length) break;
+              }
+              vectorCounter = 0;
+              for (l = 0; l < B_smaxcount; l++) {
+                if (B_shot2[l].alive) continue;
+                B_shot2[l].set({x:B_shotp2.x,y:B_shotp2.y}, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                vectorCounter++;
+                if (vectorCounter >= Vectors.length) break;
+              }
+                //console.log("a");
+              }
+              if (B_counter % 50 == 0) {
+                a = boss.position.distance(charactor.position);
+                a.normalize();
+                let Vectors = [{
+                  x: Math.cos((Math.PI / 180)),
+                  y: Math.sin((Math.PI / 180)),
+                  size:8
+                }, {
+                  x: Math.cos(18 * (Math.PI / 180)),
+                  y: Math.sin(18 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(36 * (Math.PI / 180)),
+                  y: Math.sin(36 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(54 * (Math.PI / 180)),
+                  y: Math.sin(54 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(72 * (Math.PI / 180)),
+                  y: Math.sin(72 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(90 * (Math.PI / 180)),
+                  y: Math.sin(90 * (Math.PI / 180)),
+                  size:8
+                }, {
+                  x: Math.cos(108 * (Math.PI / 180)),
+                  y: Math.sin(108 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(126 * (Math.PI / 180)),
+                  y: Math.sin(126 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(144 * (Math.PI / 180)),
+                  y: Math.sin(144 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(162 * (Math.PI / 180)),
+                  y: Math.sin(162 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(180 * (Math.PI / 180)),
+                  y: Math.sin(180 * (Math.PI / 180)),
+                  size:8
+                }, {
+                  x: Math.cos(198 * (Math.PI / 180)),
+                  y: Math.sin(198 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(216 * (Math.PI / 180)),
+                  y: Math.sin(216 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(234 * (Math.PI / 180)),
+                  y: Math.sin(234 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(252 * (Math.PI / 180)),
+                  y: Math.sin(252 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(270 * (Math.PI / 180)),
+                  y: Math.sin(270 * (Math.PI / 180)),
+                  size:8
+                }, {
+                  x: Math.cos(288 * (Math.PI / 180)),
+                  y: Math.sin(288 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(306 * (Math.PI / 180)),
+                  y: Math.sin(306 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(324 * (Math.PI / 180)),
+                  y: Math.sin(324 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(342 * (Math.PI / 180)),
+                  y: Math.sin(342 * (Math.PI / 180))
+                }];
+              //console.log("B_shot1 created.");
+              let vectorCounter = 0;
+              for (m = 0; m < B_smaxcount; m++) {
+                if (!B_shot3[m].alive) {
+                  B_shot3[m].set({
+                    x: B_shotp3.x,
+                    y: B_shotp3.y
+                  }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
                 }
-                vectorCounter = 0;
-                for (n = 0; n < B_smaxcount; n++) {
-                  if (!B_shot4[n].alive) {
-                    B_shot4[n].set({
-                      x: B_shotp2.x,
-                      y: B_shotp2.y
-                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
-                    vectorCounter++;
-                    if (vectorCounter >= Vectors.length) break;
-                  }
+              }
+              vectorCounter = 0;
+              for (n = 0; n < B_smaxcount; n++) {
+                if (!B_shot4[n].alive) {
+                  B_shot4[n].set({
+                    x: B_shotp4.x,
+                    y: B_shotp4.y
+                  }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
                 }
+              }
                 //console.log(bossShot);
                 //console.log("a")            
               };
+              if (B_hp <= 150 && (T_counter/1000 % 30) < 14&&B_counter%5==0) {
+                { 
+                  a =distanse(sc.center.width,sc.center.height,B_shotp1.x,B_shotp1.y);
+                  a.normalize();
+                  let Vectors = [{
+                    x:a.x,
+                    y:a.y,
+                    size: boss.size*1.5,
+                    speed: 10
+                  }];
+                  let vectorCounter = 0;
+                  for (o = 0; o < B_smaxcount; o++) {
+                    if (!B_shot5[o].alive) {
+                      B_shot5[o].set({
+                        x: B_shotp1.x,
+                        y: B_shotp1.y
+                      }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                      vectorCounter++;
+                      if (vectorCounter >= Vectors.length) break;
+                    }
+                  }
+                //console.log("a");
+              }
+              {
+                a =distanse(sc.center.width,sc.center.height,B_shotp4.x,B_shotp4.y);
+                a.normalize();
+                let Vectors = [{
+                  x:a.x,
+                  y:a.y,
+                  size: boss.size*1.5,
+                  speed: 10
+                }];
+                let vectorCounter = 0;
+                for (r = 0; r < B_smaxcount; r++) {
+                  if (!B_shot6[r].alive) {
+                    B_shot6[r].set({
+                      x: B_shotp4.x,
+                      y: B_shotp4.y
+                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                    vectorCounter++;
+                    if (vectorCounter >= Vectors.length) break;
+                  }
+                }
+                //console.log("a");                
+              }
+            } 
+            if (B_hp <= 150 && (T_counter/1000 % 30) >=29) {
+              ctx.beginPath();
+              ctx.lineWidth=boss.size*1.5;
+              ctx.fillStyle='hsla(0,100%,50%,.5)';
+              ctx.moveTo(B_shotp1.x, B_shotp1.y);
+              ctx.lineTo(B_shotp2.x, B_shotp2.y);
+              ctx.moveTo(B_shotp3.x,B_shotp3.y);
+              ctx.lineTo(B_shotp4.x,B_shotp4.y);
+              ctx.closePath();
+              ctx.fill();
             }
-
           }
         }
       };
@@ -1470,9 +1543,9 @@ function changecolor() {
 function CC_23() {
   isLogEnable = true;
   if (L_main == 1) {
-    log("main", screenCanvas.width, screenCanvas.height);
+    log("main", screenCanvas.width + " : width", screenCanvas.height + " : height");
   } else if (L_main == 2) {
-    // log("main2", fCC_78 + " : CC_78", C_hp + " : HP", C_sabhp + " : sHP",S_point+" : S_p", C_attack + " : At", C_defence + " : Df", C_speed + " : Sp");
+    // log("main2", fCC_89 + " : CC_78", C_hp + " : HP", C_sabhp + " : sHP",S_point+" : S_p", C_attack + " : At", C_defence + " : Df", C_speed + " : Sp");
   };
 };
 
@@ -1521,7 +1594,7 @@ function C_sdraw() {
         C_shot0[c].position.y,
         C_shot0[c].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1537,7 +1610,7 @@ function C_sdraw() {
         C_shot1[g].position.y,
         C_shot1[g].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1549,7 +1622,7 @@ function C_sdraw() {
         C_shot2[h].position.y,
         C_shot2[h].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1565,7 +1638,7 @@ function C_sdraw() {
           C_shot3[s].position.y,
           C_shot3[s].size,
           0, Math.PI * 2, false
-        );
+          );
         ctx.closePath();
       }
     }
@@ -1577,7 +1650,7 @@ function C_sdraw() {
           C_shot4[t].position.y,
           C_shot4[t].size,
           0, Math.PI * 2, false
-        );
+          );
         ctx.closePath();
       }
     }
@@ -1598,7 +1671,7 @@ function B_draw() {
       boss.position.y,
       boss.size,
       0, Math.PI * 2, false
-    );
+      );
     ctx.closePath();
   }
   ctx.fill();
@@ -1617,14 +1690,14 @@ function BS_draw() {
       B_shotp1.y,
       (B_sabhp != 1 ? (boss.size / (B_shotp2.c ? 2 : 1.5)) : boss.size * 1.5),
       0, Math.PI * 2, false
-    );
+      );
     ctx.moveTo(B_shotp2.x, B_shotp2.y);
     ctx.arc(
       B_shotp2.x,
       B_shotp2.y,
       (B_sabhp != 1 ? (boss.size / (B_shotp2.c ? 2 : 1.5)) : boss.size * 1.5),
       0, Math.PI * 2, false
-    );
+      );
     if (B_sabhp == 4 && B_hp <= 50 || B_sabhp == 3 && (B_shotp3.c || B_shotp4.c) || B_sabhp == 2 || B_sabhp == 1) {
       ctx.moveTo(B_shotp3.x, B_shotp3.y)
       ctx.arc(
@@ -1632,14 +1705,14 @@ function BS_draw() {
         B_shotp3.y,
         (B_sabhp != 1 ? boss.size / 2 : boss.size * 1.5),
         0, Math.PI * 2, false
-      );
+        );
       ctx.moveTo(B_shotp4.x, B_shotp4.y);
       ctx.arc(
         B_shotp4.x,
         B_shotp4.y,
         (B_sabhp != 1 ? boss.size / 2 : boss.size * 1.5),
         0, Math.PI * 2, false
-      );
+        );
     }
     ctx.closePath();
     if (B_sabhp == 2) {
@@ -1649,6 +1722,9 @@ function BS_draw() {
       if (B_hp <= 150) {
         ctx.strokeRect(screenCanvas.width / 10 - 0.5, screenCanvas.height / 10 - 0.5, screenCanvas.width / 10 * 8 + 1, screenCanvas.height / 10 * 8 + 1);
       }
+    }else if(B_sabhp==1){
+      ctx.strokeRect(40*world,40*world,screenCanvas.width-80*world,screenCanvas.height-80*world);
+      if(B_hp<=100){ctx.strokeRect(100*world,100*world,screenCanvas.width-200*world,screenCanvas.height-200*world);    }
     }
     ctx.stroke();
     ctx.fill();
@@ -1666,7 +1742,7 @@ function B_sdraw() {
         B_shot0[e].position.y,
         B_shot0[e].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1682,7 +1758,7 @@ function B_sdraw() {
         B_shot1[f].position.y,
         B_shot1[f].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1694,7 +1770,7 @@ function B_sdraw() {
         B_shot2[l].position.y,
         B_shot2[l].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1710,7 +1786,7 @@ function B_sdraw() {
         B_shot3[m].position.y,
         B_shot3[m].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1722,7 +1798,7 @@ function B_sdraw() {
         B_shot4[n].position.y,
         B_shot4[n].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1738,7 +1814,7 @@ function B_sdraw() {
         B_shot5[o].position.y,
         B_shot5[o].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1750,7 +1826,7 @@ function B_sdraw() {
         B_shot6[r].position.y,
         B_shot6[r].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1762,30 +1838,37 @@ function B_hpdraw() {
 
   ctx.fillStyle = B_color;
   ctx.beginPath();
-  ctx.fillRect(screenCanvas.width - 10 - C_hpgage * 2.9 * (B_hp > 150 ? B_hp - 150 : 0) / 50, 10 * world2, C_hpgage * 2.9 * (B_hp > 150 ? B_hp - 150 : 0) / 50, 30 * world2);
-  ctx.fillRect(screenCanvas.width - 10 - C_hpgage * 2.6 * (B_hp >= 150 ? 50 : (B_hp > 100 ? B_hp - 100 : 0)) / 50, 50 * world2, (C_hpgage * 2.6) * (B_hp >= 150 ? 50 : (B_hp > 100 ? B_hp - 100 : 0)) / 50, 30 * world2);
-  ctx.fillRect(screenCanvas.width - 10 - C_hpgage * 2.3 * (B_hp >= 100 ? 50 : (B_hp > 50 ? B_hp - 50 : 0)) / 50, 90 * world2, (C_hpgage * 2.3) * (B_hp >= 100 ? 50 : (B_hp > 50 ? B_hp - 50 : 0)) / 50, 30 * world2);
-  ctx.fillRect(screenCanvas.width - 10 - C_hpgage * 2.0 * (B_hp >= 50 ? 50 : B_hp) / 50, 130 * world2, (C_hpgage * 2.0) * (B_hp >= 50 ? 50 : B_hp) / 50, 30 * world2);
+  ctx.fillRect(screenCanvas.width -50*world2 - C_hpgage * 2.9 * (B_hp > 150 ? B_hp - 150 : 0) / 50, 10 * world2, C_hpgage * 2.9 * (B_hp > 150 ? B_hp - 150 : 0) / 50, 30 * world2);
+  ctx.fillRect(screenCanvas.width -50*world2 - C_hpgage * 2.6 * (B_hp >= 150 ? 50 : (B_hp > 100 ? B_hp -50*world20 : 0)) / 50, 50 * world2, (C_hpgage * 2.6) * (B_hp >= 150 ? 50 : (B_hp > 100 ? B_hp -50*world20 : 0)) / 50, 30 * world2);
+  ctx.fillRect(screenCanvas.width -50*world2 - C_hpgage * 2.3 * (B_hp >= 100 ? 50 : (B_hp > 50 ? B_hp - 50 : 0)) / 50, 90 * world2, (C_hpgage * 2.3) * (B_hp >= 100 ? 50 : (B_hp > 50 ? B_hp - 50 : 0)) / 50, 30 * world2);
+  ctx.fillRect(screenCanvas.width -50*world2 - C_hpgage * 2.0 * (B_hp >= 50 ? 50 : B_hp) / 50, 130 * world2, (C_hpgage * 2.0) * (B_hp >= 50 ? 50 : B_hp) / 50, 30 * world2);
 
   ctx.strokeStyle = 'rgba(255,255,255,1)';
-  ctx.strokeRect(screenCanvas.width - C_hpgage * 2.9 - 10, 10 * world2, C_hpgage * 2.9, 30 * world2)
-  ctx.strokeRect(screenCanvas.width - C_hpgage * 2.6 - 10, 50 * world2, C_hpgage * 2.6, 30 * world2)
-  ctx.strokeRect(screenCanvas.width - C_hpgage * 2.3 - 10, 90 * world2, C_hpgage * 2.3, 30 * world2)
-  ctx.strokeRect(screenCanvas.width - C_hpgage * 2.0 - 10, 130 * world2, C_hpgage * 2.0, 30 * world2)
+  ctx.strokeRect(screenCanvas.width - C_hpgage * 2.9 -50*world2, 10 * world2, C_hpgage * 2.9, 30 * world2)
+  ctx.strokeRect(screenCanvas.width - C_hpgage * 2.6 -50*world2, 50 * world2, C_hpgage * 2.6, 30 * world2)
+  ctx.strokeRect(screenCanvas.width - C_hpgage * 2.3 -50*world2, 90 * world2, C_hpgage * 2.3, 30 * world2)
+  ctx.strokeRect(screenCanvas.width - C_hpgage * 2.0 -50*world2, 130 * world2, C_hpgage * 2.0, 30 * world2)
   ctx.closePath();
 
   ctx.fillStyle = 'rgba(255,255,255,.5)';
-  ctx.fillRect(screenCanvas.width - C_hpgage * 1.7 - 10, 170 * world2, C_hpgage * 1.7, 30 * world2)
+  ctx.fillRect(screenCanvas.width - C_hpgage * 1.7 -50*world2, 170 * world2, C_hpgage * 1.7, 30 * world2)
+  ctx.fillRect(screenCanvas.width - 40*world2,10*world2,30*world2,150*world2)
 
-  ctx.globalAlpha = 1;
+  if(CC_pass){ctx.fillStyle = 'hsla('+(B_counter%360)+',50%,50%,.5)'}
+    else{ctx.fillStyle = 'rgba(0,0,0,.5)';}
+  ctx.fillRect(screenCanvas.width - 40*world2,170*world2,30*world2,30*world2)
+  ctx.strokeStyle='rgba(255,255,255,1)';
+  ctx.strokeRect(screenCanvas.width - 40*world2,170*world2,30*world2,30*world2)
 
   ctx.fillStyle = 'rgba(0,0,0,1)';
   ctx.strokeStyle = B_color;
   fontsize = 30;
   ctx.textAlign = "right";
   ctx.font = fontsize * world2 + "px 'Rounded Mplus 1c', 'Open Sans', 'Noto Sans Japanese', 'Yu Gothic', 'Meiryo UI', sans-serif";
-  ctx.fillText(B_name, screenCanvas.width - 15, 195 * world2);
-  ctx.strokeText(B_name, screenCanvas.width - 15, 195 * world2);
+  ctx.fillText(B_name, screenCanvas.width - 55*world2, 195 * world2);
+  ctx.strokeText(B_name, screenCanvas.width - 55*world2, 195 * world2);
+
+  ctx.globalAlpha = 1;
 }
 
 function S_builddraw() {
@@ -1805,7 +1888,7 @@ function S_builddraw() {
         S_build[k].position.y - charactor.size,
         S_build[k].size,
         charactor.size * 2
-      );
+        );
       ctx.rotate(0 + (S_build[k].place == 1 ? -0 : 0) + (S_build[k].place == 2 ? -180 * Math.PI / 180 : 0) + (S_build[k].place == 4 ? -270 * Math.PI / 180 : 0) + (S_build[k].place == 8 ? -90 * Math.PI / 180 : 0) +
         (S_build[k].place == 5 ? -315 * Math.PI / 180 : 0) + (S_build[k].place == 6 ? -225 * Math.PI / 180 : 0) + (S_build[k].place == 9 ? -45 * Math.PI / 180 : 0) + (S_build[k].place == 10 ? -135 * Math.PI / 180 : 0)); // 
       /*
@@ -1828,73 +1911,112 @@ function C_hpdraw(C_sabhp) {
   } else {
     ctx.globalAlpha = .2;
   }
-  ctx.beginPath();
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage + 2) * world2, 0, 360 * (Math.PI / 180), false);
-  ctx.closePath();
-  ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  ctx.fill();
-  ctx.lineWidth = 4 * world2;
-  ctx.strokeStyle = 'rgba(255,255,255,1)';
-  ctx.stroke();
+  fontsize=40;
+
+  if(keyf1){
+    ctx.beginPath();
+    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage + 2) * world2, 0, 360 * (Math.PI / 180), false);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fill();
+    ctx.lineWidth = 4 * world2;
+    ctx.strokeStyle = 'rgba(255,255,255,1)';
+    ctx.stroke();
 
 
-  ctx.beginPath();
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 5) * world2, -90 * (Math.PI / 180), ((360 * C_hp / 10) - 90) * (Math.PI / 180), false);
-  ctx.lineWidth = 10 * world2;
-  ctx.strokeStyle = CS_color;
-  ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 5) * world2, -90 * (Math.PI / 180), ((360 * C_hp / 5) - 90) * (Math.PI / 180), false);
+    ctx.lineWidth = 10 * world2;
+    ctx.strokeStyle = CS_color;
+    ctx.stroke();
 
-  ctx.beginPath();
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 15) * world2, -90 * (Math.PI / 180), ((360 * C_sabhp / 5) - 90) * (Math.PI / 180), false);
-  ctx.strokeStyle = C_sabhpgagecolor;
-  ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 15) * world2, -90 * (Math.PI / 180), ((360 * C_sabhp / 5) - 90) * (Math.PI / 180), false);
+    ctx.strokeStyle = C_sabhpgagecolor;
+    ctx.stroke();
 
-  ctx.beginPath();
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 25) * world2, -90 * (Math.PI / 180), (360 * (S_point % 20) / 20 - 90) * (Math.PI / 180), false);
-  ctx.strokeStyle = 'rgba(196, 136, 71,1)';
-  ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 25) * world2, -90 * (Math.PI / 180), (360 *(S_point>100?100:S_point)/100 - 90) * (Math.PI / 180), false);
+    ctx.strokeStyle = 'rgba(196, 136, 71,1)';
+    ctx.stroke();
 
-  ctx.beginPath();
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 35) * world2, -90 * (Math.PI / 180), (360 * Math.floor(S_point / 20) / 5 - 90) * (Math.PI / 180), false);
-  ctx.stroke();
-  ctx.lineWidth = 1 * world2;
+    ctx.beginPath();
+    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 35) * world2, -90 * (Math.PI / 180), (360 *(S_point>100?(S_point-100):0)/100 - 90) * (Math.PI / 180), false);
+    ctx.stroke();
+    ctx.lineWidth = 1 * world2;
 
-  ctx.beginPath();
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 00) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 10) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 20) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 30) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 40) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
-  ctx.closePath();
-  ctx.strokeStyle = 'rgba(255,255,255,1)';
-  ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 00) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
+    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage -50*world2) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
+    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 20) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
+    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 30) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
+    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 40) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(255,255,255,1)';
+    ctx.stroke();
 
-  ctx.beginPath();
-  ctx.moveTo(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2);
-  ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 40) * world2, -90 * (Math.PI / 180), ((360 * C_hp / 10) - 90) * (Math.PI / 180), false);
-  ctx.moveTo(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2);
-  ctx.closePath();
-  ctx.fillStyle = C_color;
-  ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2);
+    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 40) * world2, -90 * (Math.PI / 180), ((360 * C_hp / 5) - 90) * (Math.PI / 180), false);
+    ctx.moveTo(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2);
+    ctx.closePath();
+    ctx.fillStyle = C_color;
+    ctx.fill();
 
+  }else{
+    ctx.beginPath();
+    ctx.fillStyle = (C_hp>=3?'hsla(90,70%,50%,1)':'hsla(0,100%,'+(C_hp==2?50:30)+'%,1)');
+    ctx.fillRect(screenCanvas.width -50*world2 - C_hpgage * 2.9 * (C_hp/5), screenCanvas.height-(70+10) * world, C_hpgage * 2.9 * (C_hp/5), 30 * world2);
+    ctx.fillStyle = 'hsla(32,100%,50%,1)';
+    ctx.fillRect(screenCanvas.width -50*world2 - C_hpgage * 2.6 * (S_point >100  ? 100 : S_point) / 100,screenCanvas.height-(70+50) * world, C_hpgage * 2.6 *(S_point >100  ? 100 : S_point) / 100, 30 * world2);
+    ctx.fillRect(screenCanvas.width -50*world2 - C_hpgage * 2.3 * (S_point >100  ? (S_point-100) : 0) / 100,screenCanvas.height-(70+90) * world2, C_hpgage * 2.3 * (S_point >100  ? (S_point-100) : 0) / 100, 30 * world2);
+    ctx.fillStyle = 'hsla(192,100%,50%,1)';
+    ctx.fillRect(screenCanvas.width -50*world2 - C_hpgage * 2.0 * (C_sabhp/5), screenCanvas.height-(70+130) * world2, C_hpgage * 2.0 * (C_sabhp/5), 30 * world2);
+
+    ctx.strokeStyle = 'rgba(255,255,255,1)';
+    ctx.strokeRect(screenCanvas.width - C_hpgage * 2.9 -50*world2, screenCanvas.height-(70+10) * world2, C_hpgage * 2.9, 30 * world2)
+    ctx.strokeRect(screenCanvas.width - C_hpgage * 2.6 -50*world2, screenCanvas.height-(70+50) * world2, C_hpgage * 2.6, 30 * world2)
+    ctx.strokeRect(screenCanvas.width - C_hpgage * 2.3 -50*world2, screenCanvas.height-(70+90) * world2, C_hpgage * 2.3, 30 * world2)
+    ctx.strokeRect(screenCanvas.width - C_hpgage * 2.0 -50*world2, screenCanvas.height-(70+130) * world2, C_hpgage * 2.0, 30 * world2)
+    ctx.closePath();
+
+    ctx.fillStyle = 'rgba(255,255,255,.5)';
+    ctx.fillRect(screenCanvas.width - C_hpgage * 1.7 -50*world2, screenCanvas.height-(70+170) * world2, C_hpgage * 1.7, 30 * world2)
+    ctx.fillRect(screenCanvas.width - 40*world2,screenCanvas.height-(70+130) * world2,30*world2,190*world2)
+
+    if(CC_pass){ctx.fillStyle = 'hsla('+(B_counter%360+30)+',50%,50%,.5)'}
+      else{ctx.fillStyle = 'rgba(0,0,0,.5)';}
+    ctx.fillRect(screenCanvas.width - 40*world2,screenCanvas.height-(70+170) * world2,30*world2,30*world2)
+    ctx.strokeStyle='rgba(255,255,255,1)';
+    ctx.strokeRect(screenCanvas.width - 40*world2,screenCanvas.height-(70+170) * world2,30*world2,30*world2)
+
+    ctx.fillStyle = 'rgba(0,0,0,1)';
+    ctx.strokeStyle = B_color;
+    fontsize = 25;
+    ctx.textAlign = "right";
+    ctx.font = fontsize * world2 + "px 'Rounded Mplus 1c', 'Open Sans', 'Noto Sans Japanese', 'Yu Gothic', 'Meiryo UI', sans-serif";
+    ctx.fillText(C_name, screenCanvas.width - 55*world2, screenCanvas.height-(70+170-25) * world2);
+    ctx.strokeText(C_name, screenCanvas.width - 55*world2, screenCanvas.height-(70+170-25) * world2);
+    if(!keyf1){ctx.fillText("S",screenCanvas.width - 15*world2, screenCanvas.height-(70+10-35-25) * world2)}
+      ctx.fillText("HP",screenCanvas.width - 55*world2, screenCanvas.height-(70+10-25) * world2)
+    ctx.fillText("Skill 1",screenCanvas.width - 55*world2, screenCanvas.height-(70+50-25) * world2)
+    ctx.fillText("Skill 2",screenCanvas.width - 55*world2, screenCanvas.height-(70+90-25) * world2)
+    ctx.fillText("Life",screenCanvas.width - 55*world2, screenCanvas.height-(70+130-25) * world2)
+  }
   ctx.globalAlpha = 1;
-  /*
-  if (CC_pass) {
-    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 10) * world2, ((360 * (fCC_78 - 1) / 3) - 90) * (Math.PI / 180), ((360 * fCC_78 / 3) - 90) * (Math.PI / 180), false);
-  } else {
-    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 10) * world2, 0, 360 * (Math.PI / 180), false);
-  } 
-  */
 }
 
 function status(score) {
+  ctx.globalAlpha = (keyq ? 1 : .2);
   fontsize = 50;
   ctx.fillStyle = 'rgba(0,0,0,1)';
   ctx.beginPath();
   ctx.textAlign = "right";
   ctx.font = fontsize * world2 + "px 'Rounded Mplus 1c', 'Open Sans', 'Noto Sans Japanese', 'Yu Gothic', 'Meiryo UI', sans-serif";
-  ctx.fillText("Score : " + score, screenCanvas.width - (fontsize / 3) * world2 /*- fontsize * world2 * ((String(score).length + 8) / 2)*/ , screenCanvas.height - (fontsize / 3) * world2);
+  if(keyf1){ctx.fillText("Score : " + score, screenCanvas.width - 10 * world2, screenCanvas.height - 10 * world2);}
+  else{ctx.fillText(score.toLocaleString() , screenCanvas.width - 50 * world2, screenCanvas.height - 10 * world2);}
   ctx.closePath();
+  ctx.globalAlpha = 1;
 }
 
 function mouseMove(event) {
@@ -1921,33 +2043,47 @@ function keyDown(event, i, S_bfar) {
   if (ck === 27) {
     keyesc = !keyesc ? true : false
   }
+  if(ck===13){
+    keyenter = true;
+  }
+  if(ck === 112){
+    keyf1=!keyf1?true:false;
+  }
+
   if (ck === 37) {
-    if (fCC_78 == 1) {
+    if (fCC_89 == 1) {
       left = true;
     };
   };
   if (ck === 38) {
-    if (fCC_78 == 1) {
+    if (fCC_89 == 1) {
       up = true;
     };
   };
   if (ck === 39) {
-    if (fCC_78 == 1) {
+    if (fCC_89 == 1) {
       right = true;
     };
   };
   if (ck === 40) {
-    if (fCC_78 == 1) {
+    if (fCC_89 == 1) {
       down = true;
     };
   };
+  if(ck === 29&&!event.repeat){
+    not = (!not?true:false);
+  }
+  if(ck === 110){
+    keydot = (!keydot?true:false);
+    fCC_23.TF = false;
+  }
 
-  if (ck === 29) {
-    not = true;
+  if (ck === 18) {
+    keyalt = true;
     CC_passc = 0;
     setTimeout(function () {
       CC_passc = undefined;
-    }, 3000);
+    }, 1000);
     CC_pass = false;
   };
   if (ck === 96) {
@@ -1958,9 +2094,16 @@ function keyDown(event, i, S_bfar) {
   };
   if (ck === 98) {
     key2 = true;
+    if(fCC_23.TF){
+      isLogEnable = false;
+      fCC_23.c=1;
+    }
   };
   if (ck === 99) {
     key3 = true;
+    if(fCC_23.TF){
+      fCC_23.c=2;
+    }
   };
   if (ck === 100) {
     key4 = true;
@@ -1981,84 +2124,84 @@ function keyDown(event, i, S_bfar) {
     key9 = true;
   };
   if (event.repeat == false) {
-    if (ck === (fCC_78 != 2 ? 81 : 80)) {
+    if (ck === (fCC_89 != 2 ? 81 : 80)) {
       keyq = !keyq ? true : false
     };
   }
   if (ck === 87) {
-    if (fCC_78 == 2) {
+    if (fCC_89 == 2) {
       up = true;
     } else {
       keyw = true;
     };
   };
   if (ck === 83) {
-    if (fCC_78 == 2) {
+    if (fCC_89 == 2) {
       down = true;
     } else {
       keys = true;
     };
   };
   if (ck === 65) {
-    if (fCC_78 == 2) {
+    if (fCC_89 == 2) {
       left = true;
     } else {
       keya = true;
     };
   };
   if (ck === 68) {
-    if (fCC_78 == 2) {
+    if (fCC_89 == 2) {
       right = true;
     } else {
       keyd = true;
     };
   };
   if (ck === 79) {
-    if (fCC_78 == 3) {
+    if (fCC_89 == 3) {
       up = true;
     } else {
       keyw = true;
     };
   };
   if (ck === 75) {
-    if (fCC_78 == 3) {
+    if (fCC_89 == 3) {
       left = true;
     } else {
       keya = true;
     };
   };
   if (ck === 76) {
-    if (fCC_78 == 3) {
+    if (fCC_89 == 3) {
       down = true;
     } else {
       keys = true;
     };
   };
   if (ck === 59 || ck === 187) {
-    if (fCC_78 == 3) {
+    if (fCC_89 == 3) {
       right = true;
     } else {
       keyd = true;
     };
   };
 
-  if (ck === (fCC_78 != 2 ? 70 : 74)) {
+  if (ck === (fCC_89 != 2 ? 70 : 74)) {
     keyf = true;
   };
 
   if (ck == 107) {
-    L_main = (fCC_23 && (L_main == 3 ? 1 : L_main + 1));
+    L_main = (L_main == 3 ? 1 : L_main + 1);
   };
   if (ck === 109) {
-    L_main = (fCC_23 && (L_main == 1 ? L_main = 3 : L_main -= 1));
+    L_main = (L_main == 1 ? L_main = 3 : L_main -= 1);
   };
   if (!CC_pass) {
-    fCC_23 = false;
+    fCC_23.TF = false;
     isLogEnable = false;
   };
   //Skillbuild---------------------------------------------
   if (event.repeat == false) {
-    if (ck === 70 && fCC_78 != 2 || ck == 74 && fCC_78) {
+    if (ck === 70 && fCC_89 != 2 || ck == 74 && fCC_89) {
       if (C_sabhp > 0) {
         for (k = 0; k < S_bmaxcount; k++) {
           if (!S_build[k].alive) {
@@ -2074,10 +2217,10 @@ function keyDown(event, i, S_bfar) {
             if (up || down || right || left) {
               S_bfar = 50 * world;
               S_build[k].set({
-                  x: charactor.position.x + (right ? S_bfar : 0) + (left ? -S_bfar : 0),
-                  y: charactor.position.y + (up ? -S_bfar : 0) + (down ? S_bfar : 0)
-                }, Vectors[vectorCounter], Vectors[vectorCounter].size || 5, Vectors[vectorCounter].speed || 3,
-                0 + (up ? 1 : 0) + (down ? 2 : 0) + (left ? 4 : 0) + (right ? 8 : 0));
+                x: charactor.position.x + (right ? S_bfar : 0) + (left ? -S_bfar : 0),
+                y: charactor.position.y + (up ? -S_bfar : 0) + (down ? S_bfar : 0)
+              }, Vectors[vectorCounter], Vectors[vectorCounter].size || 5, Vectors[vectorCounter].speed || 3,
+              0 + (up ? 1 : 0) + (down ? 2 : 0) + (left ? 4 : 0) + (right ? 8 : 0));
             }
             vectorCounter++;
             // console.log(vectorCounter,bossShot[l]);
@@ -2089,7 +2232,7 @@ function keyDown(event, i, S_bfar) {
     }
   }
   //cheat------------------------------------------------------------------------------------------
-  if (!event.repeat && not) {
+  if (!event.repeat && keyalt) {
     if (CC_passc == 0) {
       if (key0) {
         CC_passc = 3;
@@ -2110,28 +2253,35 @@ function keyDown(event, i, S_bfar) {
         CC_pass = true;
       };
     };
+    if(keyenter){
+      CC_pass=true;
+    }
   };
   if (CC_pass) {
     if (key1 && key2) {
       if (!fCC_12) {
         fCC_12 = true;
+        C_attack = 1000;
       } else {
         fCC_12 = false;
+        C_attack =5;
       };
     };
     if (key2 && key3) {
-      if (!fCC_23) {
-        fCC_23 = true;
+      if (!fCC_23.TF) {
+        fCC_23.TF = true;
       } else {
-        fCC_23 = false;
+        fCC_23.TF = false;
         isLogEnable = false;
       };
     };
     if (key4 && key5) {
-      if (!CC_45) {
+      if (!fCC_45) {
         fCC_45 = true;
+        C_defence = 100;
       } else {
         fCC_45 = false;
+        C_defence = 3;
       };
     };
     if (key5 && key6) {
@@ -2159,12 +2309,15 @@ function keyDown(event, i, S_bfar) {
       };
     };
     if (key7 && key8) {
-      if (fCC_78 == 3) {
-        fCC_78 = 1;
-      } else if (fCC_78 == 1) {
-        fCC_78 = 2;
+      fCC_78=(!fCC_78?true:false);
+    };
+    if (key8 && key9) {
+      if (fCC_89 == 3) {
+        fCC_89 = 1;
+      } else if (fCC_89 == 1) {
+        fCC_89 = 2;
       } else {
-        fCC_78 = 3
+        fCC_89 = 3
       }
       up = false;
       down = false;
@@ -2176,13 +2329,6 @@ function keyDown(event, i, S_bfar) {
       keyd = false;
       keyshift = false;
       keyf = false;
-    };
-    if (key8 && key9) {
-      if (!fCC_89) {
-        fCC_89 = true;
-      } else {
-        fCC_89 = false;
-      };
     };
   };
 }
@@ -2198,32 +2344,35 @@ function keyUp(event) {
   if (ck === 32) {
     keyspace = false;
   };
+  if(ck===13){
+    keyenter = false;
+  }
 
   if (ck === 37) {
-    if (fCC_78 == 1) {
+    if (fCC_89 == 1) {
       left = false;
     };
   };
   if (ck === 38) {
-    if (fCC_78 == 1) {
+    if (fCC_89 == 1) {
       up = false;
     };
   };
   if (ck === 39) {
-    if (fCC_78 == 1) {
+    if (fCC_89 == 1) {
       right = false;
     };
   };
   if (ck === 40) {
-    if (fCC_78 == 1) {
+    if (fCC_89 == 1) {
       down = false;
     };
   };
-  if (ck === 29) {
-    not = false;
+  if (ck === 18) {
+    keyalt = false;
     CC_passc = undefined;
   };
-  if (ck === (fCC_78 != 2 ? 70 : 74)) {
+  if (ck === (fCC_89 != 2 ? 70 : 74)) {
     keyf = true;
   };
   if (ck === 96) {
@@ -2258,56 +2407,56 @@ function keyUp(event) {
   };
 
   if (ck === 87) {
-    if (fCC_78 == 2) {
+    if (fCC_89 == 2) {
       up = false;
     } else {
       keyw = false;
     };
   };
   if (ck === 83) {
-    if (fCC_78 == 2) {
+    if (fCC_89 == 2) {
       down = false;
     } else {
       keys = false;
     };
   };
   if (ck === 65) {
-    if (fCC_78 == 2) {
+    if (fCC_89 == 2) {
       left = false;
     } else {
       keya = false;
     };
   };
   if (ck === 68) {
-    if (fCC_78 == 2) {
+    if (fCC_89 == 2) {
       right = false;
     } else {
       keyd = false;
     };
   };
   if (ck === 79) {
-    if (fCC_78 == 3) {
+    if (fCC_89 == 3) {
       up = false;
     } else {
       keyw = false;
     };
   };
   if (ck === 75) {
-    if (fCC_78 == 3) {
+    if (fCC_89 == 3) {
       left = false;
     } else {
       keya = false;
     };
   };
   if (ck === 76) {
-    if (fCC_78 == 3) {
+    if (fCC_89 == 3) {
       down = false;
     } else {
       keys = false;
     };
   };
   if (ck === 59 || ck === 187) {
-    if (fCC_78 == 3) {
+    if (fCC_89 == 3) {
       right = false;
     } else {
       keyd = false;
