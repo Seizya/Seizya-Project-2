@@ -81,7 +81,15 @@ var E_attack = 3;
 var E_defence = 1;
 //boss
 var B_hp = 200;
-var B_sabhp = 4;
+var _B_sabhp = 4;
+Object.defineProperty(window, "B_sabhp", {
+  set: (v) => {
+    console.warn("B_sabhp", v);
+    _B_sabhp = v;
+  },
+  get: () => _B_sabhp
+});
+var B_style=0;
 var B_color = 'rgba(35, 71, 130,1)'; //'hsla(217,57,32)';
 var B_scolor = 'rgba(217,66,54,0.9)';
 var B_s2color = 'rgba(255,255,0,1)';
@@ -150,7 +158,9 @@ var isLogEnable = true;
 var fontsize = 50;
 var Game_count = 2;
 var sc = {
-  center: undefined
+  center: undefined,
+  w:undefined,
+  h:undefined
 };
 var menus = {
   x: 0,
@@ -158,45 +168,51 @@ var menus = {
 };
 var menuz = [];
 var sc_size = true;
+var showKIDOU = false;
+var img_max=10;
+var img = [];
 // - main ---------------------------------------------------------------------
 window.onload = function () {
   if (isLogEnable)
     log = setLogger(document.getElementById("log"), 100, false);
   else document.getElementById("log").remove();
-  var img = new Image();
-  img.src = "back9.bmp";
   C_level = Math.floor(Math.random() * 9 + 1);
-  var a, b, c, d, e, f, g, h, /*i,j*/ k, l, m, n, o, /*p,q,*/ r, s, t;
+  var a, b, c, d, e, f, g, h, /*i,j*/ k, l, m, n, o, /*p,q,*/ r, s, t,u;
   var p = new Point(); {
     width = document.documentElement.clientWidth - 2;
     height = document.documentElement.clientHeight - 2;
     screenCanvas = document.getElementById('screen');
     screenCanvas.width = width;
-    screenCanvas.height = height;
+    screenCanvas.height= height;    
+    sc.w=screenCanvas.width;
+    sc.h=screenCanvas.height;
     sc.center = {
-      height: screenCanvas.height / 2,
-      width: screenCanvas.width / 2
+      h: sc.h / 2,
+      w: sc.w / 2
     };
     ctx = screenCanvas.getContext('2d');
     screenCanvas.addEventListener('mousemove', mouseMove, true);
     document.addEventListener('keydown', keyDown, true);
     document.addEventListener('keyup', keyUp, true);
-    /*info = document.getElementById('info');
-    info_2 = document.getElementById('info_2');*/
-    /*screenCanvas.addEventListener('mousedown', mouseDown, true);
-    screenCanvas.addEventListener('mouseup', mouseUp, true);*/
-    /*screenCanvas.width = 1364;
-    screenCanvas.height = 762.5;*/
   }
-  // - キャラクター用インスタンス--------------------------
-  charactor = new Character();
-  charactor.init(10);
+  //画像読み込み----------------------------------------\
+  for(u=0;u<=img_max;u++){
+    img.push(u);
+    img[u]= new Image();  
+  };
 
-  boss = new Boss();
+  img[0].src="img/back9.bmp";;
+  img[1].src = "img/Boss1.png";
 
-  enemy = new Array(E_maxcount);
-  for (a = 0; a < E_maxcount; a++)
-    enemy[a] = new Enemy();
+    // - キャラクター用インスタンス--------------------------
+    charactor = new Character();
+    charactor.init(10);
+
+    boss = new Boss();
+
+    enemy = new Array(E_maxcount);
+    for (a = 0; a < E_maxcount; a++)
+      enemy[a] = new Enemy();
   // - ショット用インスタンス-------------------------------  
   bossCount = 0;
 
@@ -257,16 +273,8 @@ window.onload = function () {
     S_build[k] = new Skillbuild();
   //Main------------------------------------------------------------------------------------------------------------------------
   var slowCount = 0;
-  charactor.position.x = sc.center.width;
-  charactor.position.y = screenCanvas.height / 5 * 4;
-  /* if (screenCanvas.width <= 762.5 * screenCanvas.height / 1364) {
-     world = screenCanvas.height / 762.5;
-     world2 = screenCanvas.height / 1364 * 2;
-   } else {
-     world = screenCanvas.height / 762.5;
-     world2 = screenCanvas.height / 762.5;
-   } //1364:762.5==w:h 1364*h==762.5*w 1364:762.5==h:w 1364*w==762.5*h w==762.5*h/1364*/
-
+  charactor.position.x = sc.center.w;
+  charactor.position.y = sc.h / 5 * 4;
   //sytem main-----------------------------------------------------------------
   isLogEnable = false;
   CC_pass = true;
@@ -274,7 +282,8 @@ window.onload = function () {
   ooperation = 2;*/
   S_point = 200;
   Game_count = 2;
-  sc_size = false;
+  //sc_size = false;
+  //B_style=1;
   //function---------------------------------------------------------------------------------------
   (function () {
     if (isLogEnable) document.getElementById("log").classList.remove("hide");
@@ -282,29 +291,29 @@ window.onload = function () {
     window.onresize = resize(screenCanvas, charactor);
     //slowCount++;
     //sytem main---------------------------------------------------------------
-    ctx.clearRect(0, 0, screenCanvas.width, screenCanvas.height);
+    ctx.clearRect(0, 0, sc.w, sc.h);
     ctx.globalCompositeOoperation = "source-over";
-    ctx.globalAlpha = .6; //944,1336
-    if (screenCanvas.height >= screenCanvas.width * 1336 / 944) {
-      ctx.drawImage(img, 0, 0, screenCanvas.height * 944 / 1336, screenCanvas.height); //944:1336=x:sch  1336*x=944*sch  x=944*sch/1336
-    } else {
-      ctx.drawImage(img, 0, 0, screenCanvas.width, screenCanvas.width * 1336 / 944); //944:1336=scw:y  944*y=1336*scw  y=scw*1336/944
-    }
-    ctx.globalAlpha = 1;
-    counter++;
-    T_counter = (new Date).getTime();
-    changecolor();
-    C_hpdraw(C_sabhp);
-    B_hpdraw();
-    status(score);
-    C_sdraw();
-    CS_draw(CS_1, CS_2, CS_3, CS_4);
-    C_draw(charactor);
-    B_sdraw();
-    BS_draw();
-    B_draw();
-    S_builddraw();
-    menu();
+      ctx.globalAlpha = .6; //944,1336
+      if (sc.h >= sc.w * 1336 / 944) {
+        ctx.drawImage(img[0], 0, 0, sc.h * 944 / 1336, sc.h); //944:1336=x:sch  1336*x=944*sch  x=944*sch/1336
+      } else {
+        ctx.drawImage(img[0], 0, 0, sc.w, sc.w * 1336 / 944); //944:1336=scw:y  944*y=1336*scw  y=scw*1336/944
+      }
+      ctx.globalAlpha = 1;
+      counter++;
+      T_counter = (new Date).getTime();
+      changecolor();
+      C_hpdraw(C_sabhp);
+      B_hpdraw();
+      status(score);
+      C_sdraw();
+      CS_draw(CS_1, CS_2, CS_3, CS_4);
+      C_draw(charactor);
+      B_sdraw();
+      BS_draw();
+      B_draw();
+      S_builddraw();
+      menu();
     //Cheat---------------------------------------------------------- 
     if (CC_pass) {
       if (fCC_23.TF && fCC_23.c == 2) {
@@ -320,20 +329,20 @@ window.onload = function () {
     }
     if (fCC_23.TF && fCC_23.c == 1 && !keydot) {
       ctx.fillStyle = 'rgba(255,255,255,0.2)';
-      ctx.fillRect(0, 0, screenCanvas.width / 4, screenCanvas.height);
+      ctx.fillRect(0, 0, sc.w / 4, sc.h);
       ctx.fillStyle = 'rgba(0,0,0,1)';
       fontsize = 40;
       ctx.beginPath();
       ctx.textAlign = "left";
       ctx.font = fontsize * world2 + "px 'Rounded Mplus 1c', 'Open Sans', 'Noto Sans Japanese', 'Yu Gothic', 'Meiryo UI', sans-serif";
-      ctx.fillText("Ope : " + operation, 0, (fontsize * 1 + 0) * world2,screenCanvas.width / 4);
-      ctx.fillText("Hpm : " + C_hp.toLocaleString(), 0, (fontsize * 2 + 2) * world2,screenCanvas.width / 4);
-      ctx.fillText("Hps : " + C_sabhp.toLocaleString(), 0, (fontsize * 3 + 4) * world2,screenCanvas.width / 4);
-      ctx.fillText("Skp : " + S_point.toLocaleString(), 0, (fontsize * 4 + 6) * world2,screenCanvas.width / 4);
-      ctx.fillText("Atk : " + C_attack.toLocaleString(), 0, (fontsize * 5 + 8) * world2,screenCanvas.width / 4);
-      ctx.fillText("Def : " + C_defence.toLocaleString(), 0, (fontsize * 6 + 10) * world2,screenCanvas.width / 4);
-      ctx.fillText("Spd : " + (fCC_78 ? "Accelate" : C_speed.toLocaleString()), 0, (fontsize * 7 + 12) * world2,screenCanvas.width / 4);
-      ctx.fillText("Spc : " + not, 0, (fontsize * 8 + 14) * world2,screenCanvas.width / 4);
+      ctx.fillText("Ope : " + operation, 0, (fontsize * 1 + 0) * world2, sc.w / 4);
+      ctx.fillText("Hpm : " + C_hp.toLocaleString(), 0, (fontsize * 2 + 2) * world2, sc.w / 4);
+      ctx.fillText("Hps : " + C_sabhp.toLocaleString(), 0, (fontsize * 3 + 4) * world2, sc.w / 4);
+      ctx.fillText("Skp : " + S_point.toLocaleString(), 0, (fontsize * 4 + 6) * world2, sc.w / 4);
+      ctx.fillText("Atk : " + C_attack.toLocaleString(), 0, (fontsize * 5 + 8) * world2, sc.w / 4);
+      ctx.fillText("Def : " + C_defence.toLocaleString(), 0, (fontsize * 6 + 10) * world2, sc.w / 4);
+      ctx.fillText("Spd : " + (fCC_78 ? "Accelate" : C_speed.toLocaleString()), 0, (fontsize * 7 + 12) * world2, sc.w / 4);
+      ctx.fillText("Spc : " + not, 0, (fontsize * 8 + 14) * world2, sc.w / 4);
       ctx.closePath();
     }
     if (fire) {
@@ -358,10 +367,10 @@ window.onload = function () {
       if (charactor.position.y >= 0 && up) {
         charactor.position.y -= C_speed * world;
       };
-      if (charactor.position.y <= screenCanvas.height && down) {
+      if (charactor.position.y <= sc.h && down) {
         charactor.position.y += C_speed * world;
       };
-      if (charactor.position.x <= screenCanvas.width && right) {
+      if (charactor.position.x <= sc.w && right) {
         charactor.position.x += C_speed * world;
       };
       if (charactor.position.x >= 0 && left) {
@@ -374,8 +383,6 @@ window.onload = function () {
         if (B_sabhp >= 3) {
           CS_late.x = (charactor.position.x * 0.3 + CS_late.x * 0.7);
           CS_late.y = (charactor.position.y * 0.3 + CS_late.y * 0.7);
-          /* JIKI_OKURETERU.x=Math.min(1364,Math.max(JIKI_OKURETERU.x));
-          JIKI_OKURETERU.y=Math.min(630,Math.max(JIKI_OKURETERU.y));*/
         } else {
           CS_late.x = (charactor.position.x * 0.5 + CS_late.x * 0.5);
           CS_late.y = (charactor.position.y * 0.5 + CS_late.y * 0.5);
@@ -458,7 +465,7 @@ window.onload = function () {
           let Vectors = [{
             x: C_shot1v.x,
             y: C_shot1v.y,
-            size: 2.5,
+            size:(B_sabhp==3||B_sabhp==4?2.5:4),
             speed: 8
           }];
           let vectorCounter = 0;
@@ -475,7 +482,7 @@ window.onload = function () {
           let Vectors = [{
             x: C_shot2v.x,
             y: C_shot2v.y,
-            size: 2.5,
+            size:(B_sabhp==3||B_sabhp==4?2.5:4),
             speed: 8
           }];
           let vectorCounter = 0;
@@ -493,7 +500,7 @@ window.onload = function () {
             let Vectors = [{
               x: C_shot3v.x,
               y: C_shot3v.y,
-              size: 2.5,
+              size: 4,
               speed: 8
             }];
             let vectorCounter = 0;
@@ -510,7 +517,7 @@ window.onload = function () {
             let Vectors = [{
               x: C_shot4v.x,
               y: C_shot4v.y,
-              size: 2.5,
+              size: 4,
               speed: 8
             }];
             let vectorCounter = 0;
@@ -528,19 +535,17 @@ window.onload = function () {
       //enemy--------------------------------------------------------------------
       if (Game_count == 1) {}
       //Boss---------------------------------------------------------------------
-      else if (Game_count == 2) {
-        if (B_pop) {
-          p.x = sc.center.width;
-          p.y = screenCanvas.height / 5;
-          boss.set(p, 0);
-          boss.size = 20 * world;
-          B_pop = false;
-        }
-        if (B_sabhp == 4) {
-          boss.size = 20 * world;
-          B_name = "Neko";
-          B_counter++;
-          if (boss.alive) {
+    else if (Game_count == 2) {
+      if (B_pop) {
+        p.x = sc.center.w;
+        p.y = sc.h / 5;
+        boss.set(p, 0);
+        boss.size = 20 * world;
+        B_pop = false;
+      }
+      if (B_sabhp == 4) {
+        B_counter++;
+        if (boss.alive) {
             //console.log(B_rtime);
             if (B_counter % 30 == 0 && B_counter % 120 != 0) {
               a = boss.position.distance(charactor.position);
@@ -549,8 +554,7 @@ window.onload = function () {
                 x: a.x,
                 y: a.y,
                 size: 7
-                /*,
-                speed: 2*/
+                //,                speed: 2
               }];
               let vectorCounter = 0;
               for (e = 0; e < B_smaxcount; e++) {
@@ -564,7 +568,7 @@ window.onload = function () {
               //console.log("a");
             }
             //座標計算-----------------------------------
-            B_4sfar = (B_hp >= 150) ? 3 : ((B_hp >= 100) ? 4 : 5);
+            B_4sfar = (B_hp > 150) ? 3 : ((B_hp > 100) ? 4 : 5);
             B_shotc += 1 * Math.PI / ((B_hp >= 150) ? 180 : (B_hp > 100) ? 90 : 45);
             B_shotp1.x = boss.size * B_4sfar * Math.cos(B_shotc) + boss.position.x;
             B_shotp1.y = boss.size * B_4sfar * Math.sin(B_shotc) + boss.position.y;
@@ -582,20 +586,19 @@ window.onload = function () {
               B_shotp4.y = B_shotp2.y
             }
             //乱数計算----------------------------------
-            B_rtime = ((B_hp >= 150) ? 30 : (B_hp >= 100) ? Math.round(Math.random() * 10 + 20) : Math.round(Math.random() * 10 + 10));
-            B_rspeed = ((B_hp >= 150) ? 3 : (B_hp >= 100) ? Math.round(Math.random() * 2 + 2) : Math.round(Math.random() * 4 + 1));
-            B_rsize = ((B_hp >= 150) ? 5 : (B_hp >= 100) ? Math.round(Math.random() * 4 + 3) : Math.round(Math.random() * 8 + 1));
+            B_rtime = ((B_hp > 150) ? 30 : (B_hp > 100) ? Math.round(Math.random() * 10 + 20) : Math.round(Math.random() * 10 + 10));
+            B_rspeed = ((B_hp > 150) ? 3 : (B_hp > 100) ? Math.round(Math.random() * 2 + 2) : Math.round(Math.random() * 4 + 1));
+            B_rsize = ((B_hp > 150) ? 5 : (B_hp > 100) ? Math.round(Math.random() * 4 + 3) : Math.round(Math.random() * 8 + 1));
             //Boss Vectol-------------------------------
-            boss.position.x += Math.abs(sc.center.width - boss.position.x) >= 1 ? (boss.position.x < sc.center.width ? 1 : -1) : sc.center.width - boss.position.x;
-            boss.position.y += Math.abs(screenCanvas.height / 5 - boss.position.y) >= 1 ? (boss.position.y < screenCanvas.height / 5 ? 1 : -1) : screenCanvas.height / 5 - boss.position.y;
+            boss.position.x += Math.abs(sc.center.w - boss.position.x) >= 1 ? (boss.position.x < sc.center.w ? 1 : -1) : sc.center.w - boss.position.x;
+            boss.position.y += Math.abs(sc.h / 5 - boss.position.y) >= 1 ? (boss.position.y < sc.h / 5 ? 1 : -1) : sc.h / 5 - boss.position.y;
             //方向-------------------------------------
             a = boss.position.distance(charactor.position);
             a.normalize();
             let Vectors = [{
               x: Math.cos(0 * (Math.PI / 180)),
               y: Math.sin(0 * (Math.PI / 180))
-              /*,size: 5,
-              speed: 2.5*/
+              //,size: 5,              speed: 2.5
             }, {
               x: Math.cos(33.75 * (Math.PI / 180)),
               y: Math.sin(33.75 * (Math.PI / 180))
@@ -676,25 +679,24 @@ window.onload = function () {
           }
         } else if (B_sabhp == 3) {
           if (boss.alive) {
-            boss.size = 20 * world;
             //座標計算-----------------------------------
-            if (Math.abs(screenCanvas.width / 6 * 5 - B_shotp1.x) > 2 || Math.abs(screenCanvas.height / 8 - B_shotp1.y) > 2) {
-              B_shotp1.x = B_shotp1.x + ((screenCanvas.width / 6 * 5 - B_shotp1.x) / Math.abs(screenCanvas.width / 6 * 5 - B_shotp1.x));
-              B_shotp1.y = B_shotp1.y + ((screenCanvas.height / 8 - B_shotp1.y) / Math.abs(screenCanvas.height / 8 - B_shotp1.y));
+            if (Math.abs(sc.w / 6 * 5 - B_shotp1.x) > 2 || Math.abs(sc.h / 8 - B_shotp1.y) > 2) {
+              B_shotp1.x = B_shotp1.x + ((sc.w / 6 * 5 - B_shotp1.x) / Math.abs(sc.w / 6 * 5 - B_shotp1.x));
+              B_shotp1.y = B_shotp1.y + ((sc.h / 8 - B_shotp1.y) / Math.abs(sc.h / 8 - B_shotp1.y));
               B_shotp1.c = true;
-              B_shotp2.x = ((B_shotp1.x - (B_hp > 150 ? boss.position.x : sc.center.width)) * -1) + (B_hp > 150 ? boss.position.x : sc.center.width)
-              B_shotp2.y = B_shotp2.y + ((screenCanvas.height / 8 - B_shotp2.y) / Math.abs(screenCanvas.height / 8 - B_shotp2.y));
+              B_shotp2.x = ((B_shotp1.x - (B_hp > 150 ? boss.position.x : sc.center.w)) * -1) + (B_hp > 150 ? boss.position.x : sc.center.w)
+              B_shotp2.y = B_shotp2.y + ((sc.h / 8 - B_shotp2.y) / Math.abs(sc.h / 8 - B_shotp2.y));
               B_shotp2.c = true;
             } else {
               B_shotp1.c = false;
               B_shotp2.c = false;
             }
-            if (B_hp > 50 && (Math.abs(screenCanvas.width / 6 * 5 - B_shotp3.x) > 2 || Math.abs(screenCanvas.height / 8 - B_shotp3.y) > 2)) {
-              B_shotp3.x += ((screenCanvas.width / 6 * 5 - B_shotp3.x) / Math.abs(screenCanvas.width / 6 * 5 - B_shotp3.x));
-              B_shotp3.y += ((screenCanvas.height / 8 - B_shotp3.y) / Math.abs(screenCanvas.height / 8 - B_shotp3.y));
+            if (B_hp > 50 && (Math.abs(sc.w / 6 * 5 - B_shotp3.x) > 2 || Math.abs(sc.h / 8 - B_shotp3.y) > 2)) {
+              B_shotp3.x += ((sc.w / 6 * 5 - B_shotp3.x) / Math.abs(sc.w / 6 * 5 - B_shotp3.x));
+              B_shotp3.y += ((sc.h / 8 - B_shotp3.y) / Math.abs(sc.h / 8 - B_shotp3.y));
               B_shotp3.c = true;
-              B_shotp4.x += ((screenCanvas.width / 6 - B_shotp4.x) / Math.abs(screenCanvas.width / 6 - B_shotp4.x));
-              B_shotp4.y += ((screenCanvas.height / 8 - B_shotp4.y) / Math.abs(screenCanvas.height / 8 - B_shotp4.y));
+              B_shotp4.x += ((sc.w / 6 - B_shotp4.x) / Math.abs(sc.w / 6 - B_shotp4.x));
+              B_shotp4.y += ((sc.h / 8 - B_shotp4.y) / Math.abs(sc.h / 8 - B_shotp4.y));
               B_shotp4.c = true;
             } else if (B_hp <= 50) {
               B_4sfar = 5;
@@ -719,12 +721,10 @@ window.onload = function () {
             if (B_hp <= 150) {
               B_4sfar = 5;
               B_shotc += 1 * Math.PI / 90;
-              boss.position.x = boss.size * B_4sfar * 1.5 * Math.cos(B_shotc / 2) + sc.center.width;
-              //boss.position.y = boss.size * B_4sfar/8 * Math.sin(B_shotc*10) + screenCanvas.height/5;
-              //boss.position.y = boss.position.y+(Math.random()*10-5);
+              boss.position.x = boss.size * B_4sfar * 1.5 * Math.cos(B_shotc / 2) + sc.center.w;
             } else {
-              boss.position.x += Math.abs(sc.center.width - boss.position.x) >= 1 ? (boss.position.x < sc.center.width ? 1 : -1) : sc.center.width - boss.position.x;
-              boss.position.y += Math.abs(screenCanvas.height / 5 - boss.position.y) >= 1 ? (boss.position.y < screenCanvas.height / 5 ? 1 : -1) : screenCanvas.height / 5 - boss.position.y;
+              boss.position.x += Math.abs(sc.center.w - boss.position.x) >= 1 ? (boss.position.x < sc.center.w ? 1 : -1) : sc.center.w - boss.position.x;
+              boss.position.y += Math.abs(sc.h / 5 - boss.position.y) >= 1 ? (boss.position.y < sc.h / 5 ? 1 : -1) : sc.h / 5 - boss.position.y;
             }
             ///方向-------------------------------------
             if (boss.alive) {
@@ -736,7 +736,7 @@ window.onload = function () {
                   x: a.x,
                   y: a.y,
                   size: 7
-                  /*,speed: 2*/
+                  //,speed: 2
                 }];
                 let vectorCounter = 0;
                 for (e = 0; e < B_smaxcount; e++) {
@@ -755,7 +755,7 @@ window.onload = function () {
                 let Vectors = [{
                   x: 1.5,
                   y: 0,
-                  /*size: 7,*/
+                  //size: 7,
                   speed: 1
                 }, {
                   x: -1.5,
@@ -791,8 +791,7 @@ window.onload = function () {
                 let Vectors = [{
                   x: Math.cos(0 * (Math.PI / 180)),
                   y: Math.sin(0 * (Math.PI / 180))
-                  /*,size: 5,
-                  speed: 2.5*/
+                  //,size: 5,                  speed: 2.5
                 }, {
                   x: Math.cos(33.75 * (Math.PI / 180)),
                   y: Math.sin(33.75 * (Math.PI / 180))
@@ -852,8 +851,7 @@ window.onload = function () {
                   x: 0,
                   y: 1.5,
                   size: boss.size / 2
-                  /*,
-                  speed: 2*/
+                  //,                  speed: 2
                 }];
                 let vectorCounter = 0;
                 for (o = 0; o < B_smaxcount; o++) {
@@ -883,64 +881,59 @@ window.onload = function () {
           }
         } else if (B_sabhp == 2) {
           if (boss.alive) {
-            boss.size = 20 * world;
             //座標計算-----------------------------------
-            if (B_hp > 150 && (Math.abs(sc.center.width - B_shotp1.x) > 1 || Math.abs(sc.center.height - B_shotp1.y) > 1)) {
-              B_shotp1.x = B_shotp1.x + (sc.center.width - B_shotp1.x) / Math.abs(sc.center.width - B_shotp1.x);
-              B_shotp1.y = B_shotp1.y + (sc.center.height - B_shotp1.y) / Math.abs(sc.center.height - B_shotp1.y);
+            if (B_hp > 150 && (Math.abs(sc.center.w - B_shotp1.x) > 1 || Math.abs(sc.center.h - B_shotp1.y) > 1)) {
+              B_shotp1.x = B_shotp1.x + (sc.center.w - B_shotp1.x) / Math.abs(sc.center.w - B_shotp1.x);
+              B_shotp1.y = B_shotp1.y + (sc.center.h - B_shotp1.y) / Math.abs(sc.center.h - B_shotp1.y);
               B_shotp1.c = true;
-              B_shotp2.x = sc.center.width + (sc.center.width - B_shotp1.x);
+              B_shotp2.x = sc.center.w + (sc.center.w - B_shotp1.x);
               B_shotp2.y = B_shotp1.y;
               B_shotp2.c = true;
               //console.log("AA");
             } else if (B_hp <= 150) {
-              var BB = screenCanvas.width / 10;
-              var CC = screenCanvas.height / 10;
-              if (B_shotp1.x < BB * 9 && B_shotp1.x > BB && B_shotp1.y < CC * 9 && B_shotp1.y > CC) {
-                B_shotp1.x = B_shotp1.x + (BB - B_shotp1.x) / Math.abs(BB - B_shotp1.x);
-                B_shotp1.y = B_shotp1.y + (CC - B_shotp1.y) / Math.abs(CC - B_shotp1.y);
+              if (B_shotp1.x <= sc.w-30 * world && B_shotp1.x >= 30 * world && B_shotp1.y <= sc.h-30 * world && B_shotp1.y >= 30 * world) {
+                B_shotp1.x +=(30 * world - B_shotp1.x) / Math.abs(30 * world - B_shotp1.x);
+                B_shotp1.y +=(30 * world - B_shotp1.y) / Math.abs(30 * world - B_shotp1.y);
                 B_shotp1.c = true;
-                B_shotp2.x = sc.center.width + (sc.center.width - B_shotp1.x);
-                B_shotp2.y = sc.center.height + (sc.center.height - B_shotp1.y);
+                B_shotp2.x = sc.center.w + (sc.center.w - B_shotp1.x);
+                B_shotp2.y = sc.center.h + (sc.center.h - B_shotp1.y);
                 B_shotp2.c = true;
                 //console.log("BB");
               } else {
-                B_shotp1.x += (B_shotp1.x >= BB && B_shotp1.y <= CC) ? -2 : ((B_shotp1.x <= BB * 9 && B_shotp1.y >= CC * 9) ? 2 : 0);
-                B_shotp1.y += (B_shotp1.y >= CC && B_shotp1.x >= BB * 9) ? -2 : ((B_shotp1.y <= CC * 9 && B_shotp1.x <= BB) ? 2 : 0);
+                B_shotp1.x += (B_shotp1.y<30 * world?-1.5:(B_shotp1.y>sc.h-30 * world?1.5:0));
+                B_shotp1.y += (B_shotp1.x<30 * world?1.5:(B_shotp1.x>sc.w-30 * world?-1.5:0));
                 B_shotp1.c = false;
-                B_shotp2.x = sc.center.width + (sc.center.width - B_shotp1.x);
-                B_shotp2.y = sc.center.height + (sc.center.height - B_shotp1.y);
+                B_shotp2.x = sc.center.w + (sc.center.w - B_shotp1.x);
+                B_shotp2.y = sc.center.h + (sc.center.h - B_shotp1.y);
                 B_shotp2.c = false;
               }
             }
             if (B_hp > 50) {
-              if (Math.abs(sc.center.width - B_shotp3.x) > 1 || Math.abs(sc.center.height - B_shotp3.y) > 1) {
-                B_shotp3.x += (sc.center.width - B_shotp3.x) / Math.abs(sc.center.width - B_shotp3.x);
-                B_shotp3.y += (sc.center.height - B_shotp3.y) / Math.abs(sc.center.height - B_shotp3.y);
+              if (Math.abs(sc.center.w - B_shotp3.x) > 1 || Math.abs(sc.center.h - B_shotp3.y) > 1) {
+                B_shotp3.x += (sc.center.w - B_shotp3.x) / Math.abs(sc.center.w - B_shotp3.x);
+                B_shotp3.y += (sc.center.h - B_shotp3.y) / Math.abs(sc.center.h - B_shotp3.y);
                 B_shotp3.c = true;
               }
-              if (Math.abs(sc.center.width - B_shotp4.x) > 1 || Math.abs(sc.center.height - B_shotp4.y) > 1) {
-                B_shotp4.x = B_shotp4.x + (sc.center.width - B_shotp4.x) / Math.abs(sc.center.width - B_shotp4.x);
-                B_shotp4.y = B_shotp4.y + (sc.center.height - B_shotp4.y) / Math.abs(sc.center.height - B_shotp4.y);
+              if (Math.abs(sc.center.w - B_shotp4.x) > 1 || Math.abs(sc.center.h - B_shotp4.y) > 1) {
+                B_shotp4.x = B_shotp4.x + (sc.center.w - B_shotp4.x) / Math.abs(sc.center.w - B_shotp4.x);
+                B_shotp4.y = B_shotp4.y + (sc.center.h - B_shotp4.y) / Math.abs(sc.center.h - B_shotp4.y);
                 B_shotp4.c = true;
               }
             } else if (B_hp <= 50) {
-              var DD = screenCanvas.width / 7;
-              var EE = screenCanvas.height / 7;
-              if (B_shotp3.x < DD * 6 && B_shotp3.x > DD && B_shotp3.y < EE * 6 && B_shotp3.y > EE) {
-                B_shotp3.x -= (DD - B_shotp3.x) / Math.abs(DD - B_shotp3.x);
-                B_shotp3.y += (EE - B_shotp3.y) / Math.abs(EE - B_shotp3.y);
+              if (B_shotp3.x <= sc.w-80 * world && B_shotp3.x >= 80 * world && B_shotp3.y <= sc.h-80 * world && B_shotp3.y >= 80 * world) {
+                B_shotp3.x -=(80 * world - B_shotp3.x) / Math.abs(80 * world - B_shotp3.x);
+                B_shotp3.y +=(80 * world - B_shotp3.y) / Math.abs(80 * world - B_shotp3.y);
                 B_shotp3.c = true;
-                B_shotp4.x = sc.center.width + (sc.center.width - B_shotp3.x);
-                B_shotp4.y = sc.center.height + (sc.center.height - B_shotp3.y);
+                B_shotp4.x = sc.center.w + (sc.center.w - B_shotp3.x);
+                B_shotp4.y = sc.center.h + (sc.center.h - B_shotp3.y);
                 B_shotp4.c = true;
-                //console.log("CC");
+                //console.log("BB");
               } else {
-                B_shotp3.x += (B_shotp3.x >= DD && B_shotp3.y >= EE * 6) ? -2 : ((B_shotp3.x <= DD * 6 && B_shotp3.y <= EE) ? 2 : 0);
-                B_shotp3.y += (B_shotp3.y >= EE && B_shotp3.x <= DD) ? -2 : ((B_shotp3.y <= EE * 6 && B_shotp3.x >= DD * 6) ? 2 : 0);
+                B_shotp3.x += (B_shotp3.y<80 * world?1.5:(B_shotp3.y>sc.h-80 * world?-1.5:0));
+                B_shotp3.y += (B_shotp3.x<80 * world?-1.5:(B_shotp3.x>sc.w-80 * world?1.5:0));
                 B_shotp3.c = false;
-                B_shotp4.x = sc.center.width + (sc.center.width - B_shotp3.x);
-                B_shotp4.y = sc.center.height + (sc.center.height - B_shotp3.y);
+                B_shotp4.x = sc.center.w + (sc.center.w - B_shotp3.x);
+                B_shotp4.y = sc.center.h + (sc.center.h - B_shotp3.y);
                 B_shotp4.c = false;
               }
             }
@@ -950,8 +943,8 @@ window.onload = function () {
             B_rsize = ((B_hp >= 100) ? 5 : (B_hp >= 50) ? Math.round(Math.random() * 4 + 3) : Math.round(Math.random() * 8 + 1));
             B_counter++;
             //Boss Vectol-------------------------------
-            boss.position.x += Math.abs(sc.center.width - boss.position.x) >= 1 ? (boss.position.x < sc.center.width ? 1 : -1) : sc.center.width - boss.position.x;
-            boss.position.y += Math.abs(sc.center.height - boss.position.y) >= 1 ? (boss.position.y < sc.center.height ? 1 : -1) : sc.center.height - boss.position.y;
+            boss.position.x += Math.abs(sc.center.w - boss.position.x) >= 1 ? (boss.position.x < sc.center.w ? 1 : -1) : sc.center.w - boss.position.x;
+            boss.position.y += Math.abs(sc.center.h - boss.position.y) >= 1 ? (boss.position.y < sc.center.h ? 1 : -1) : sc.center.h - boss.position.y;
             ///方向-------------------------------------
             if (boss.alive) {
               //console.log(B_rtime);
@@ -962,7 +955,7 @@ window.onload = function () {
                   x: a.x,
                   y: a.y,
                   size: 7
-                  /*,speed: 2*/
+                  //,speed: 2
                 }];
                 let vectorCounter = 0;
                 for (e = 0; e < B_smaxcount; e++) {
@@ -981,8 +974,7 @@ window.onload = function () {
                 let Vectors = [{
                   x: Math.cos(B_counter * (Math.PI / 180)),
                   y: Math.sin(B_counter * (Math.PI / 180))
-                  /*,size: 5,
-                  speed: 2.5*/
+                  //,size: 5,                  speed: 2.5
                 }, {
                   x: Math.cos((B_counter + 90) * (Math.PI / 180)),
                   y: Math.sin((B_counter + 90) * (Math.PI / 180))
@@ -1081,13 +1073,13 @@ window.onload = function () {
                     vectorCounter++;
                     if (vectorCounter >= Vectors.length) break;
                   }
-                  /*vectorCounter = 0;
+                  vectorCounter = 0;
                   for (l = 0; l < B_smaxcount; l++) {
                     if (B_shot2[l].alive) continue;
-                   B_shot2[l].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                    B_shot2[l].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
                     vectorCounter++;
                     if (vectorCounter >= Vectors.length) break;
-                  }*/
+                  }
                   //console.log("a");
                 }
                 if (B_hp <= 50 && B_counter % 100 == 0) {
@@ -1166,29 +1158,28 @@ window.onload = function () {
           }
         } else if (B_sabhp == 1) {
           if (boss.alive) {
-            boss.size = 20 * world;
             //座標計算-----------------------------------
             if (B_hp > 50) {
               B_shotp1.x += Math.abs(0 + 40 * world - B_shotp1.x) >= 1 ? (0 + 40 * world < B_shotp1.x ? -1 : 1) : 0 + 40 * world - B_shotp1.x;
               B_shotp1.y += Math.abs(0 + 40 * world - B_shotp1.y) >= 1 ? (0 + 40 * world < B_shotp1.y ? -1 : 1) : 0 + 40 * world - B_shotp1.y;
               B_shotp1.c = true;
               B_shotp3.x += Math.abs(0 + 40 * world - B_shotp3.x) >= 1 ? (0 + 40 * world < B_shotp3.x ? -1 : 1) : 0 + 40 * world - B_shotp3.x;
-              B_shotp3.y += Math.abs(screenCanvas.height - 40 * world - B_shotp3.y) >= 1 ? (screenCanvas.height - 40 * world < B_shotp3.y ? -1 : 1) : screenCanvas.height - 40 * world - B_shotp3.y;
+              B_shotp3.y += Math.abs(sc.h - 40 * world - B_shotp3.y) >= 1 ? (sc.h - 40 * world < B_shotp3.y ? -1 : 1) : sc.h - 40 * world - B_shotp3.y;
               B_shotp3.c = true;
               //console.log("AA");
             } else if (B_hp <= 50) {
               B_shotp1.x += Math.abs(0 + 40 * world - B_shotp1.x) >= 1 ? (0 + 40 * world < B_shotp1.x ? -1 : 1) : 0 + 40 * world - B_shotp1.x;
-              B_shotp1.y += Math.abs(sc.center.height - B_shotp1.y) >= 1 ? (sc.center.height < B_shotp1.y ? -1 : 1) : sc.center.height - B_shotp1.y;
+              B_shotp1.y += Math.abs(sc.center.h - B_shotp1.y) >= 1 ? (sc.center.h < B_shotp1.y ? -1 : 1) : sc.center.h - B_shotp1.y;
               B_shotp1.c = true;
-              B_shotp3.x += Math.abs(sc.center.width - B_shotp3.x) >= 1 ? (sc.center.width < B_shotp3.x ? -1 : 1) : sc.center.width - B_shotp3.x;
-              B_shotp3.y += Math.abs(screenCanvas.height - 40 * world - B_shotp3.y) >= 1 ? (screenCanvas.height - 40 * world < B_shotp3.y ? -1 : 1) : screenCanvas.height - 40 * world - B_shotp3.y;
+              B_shotp3.x += Math.abs(sc.center.w - B_shotp3.x) >= 1 ? (sc.center.w < B_shotp3.x ? -1 : 1) : sc.center.w - B_shotp3.x;
+              B_shotp3.y += Math.abs(sc.h - 40 * world - B_shotp3.y) >= 1 ? (sc.h - 40 * world < B_shotp3.y ? -1 : 1) : sc.h - 40 * world - B_shotp3.y;
               B_shotp3.c = true;
             }
-            B_shotp2.x = sc.center.width + (sc.center.width - B_shotp1.x);
-            B_shotp2.y = sc.center.height + (sc.center.height - B_shotp1.y);
+            B_shotp2.x = sc.center.w + (sc.center.w - B_shotp1.x);
+            B_shotp2.y = sc.center.h + (sc.center.h - B_shotp1.y);
             B_shotp2.c = true;
-            B_shotp4.x = sc.center.width + (sc.center.width - B_shotp3.x);
-            B_shotp4.y = sc.center.height + (sc.center.height - B_shotp3.y);
+            B_shotp4.x = sc.center.w + (sc.center.w - B_shotp3.x);
+            B_shotp4.y = sc.center.h + (sc.center.h - B_shotp3.y);
             B_shotp4.c = true;
             //乱数計算----------------------------------
             B_rtime = ((B_hp >= 100) ? 30 : (B_hp >= 50) ? Math.round(Math.random() * 20 + 20) : Math.round(Math.random() * 40 + 10));
@@ -1197,22 +1188,22 @@ window.onload = function () {
             B_counter++;
             //Boss Vectol-------------------------------
             if (B_hp > 100) {
-              boss.position.x += Math.abs(sc.center.width - boss.position.x) >= 1 ? (boss.position.x < sc.center.width ? 1 : -1) : sc.center.width - boss.position.x;
-              boss.position.y += Math.abs(sc.center.height - boss.position.y) >= 1 ? (boss.position.y < sc.center.height ? 1 : -1) : sc.center.height - boss.position.y;
+              boss.position.x += Math.abs(sc.center.w - boss.position.x) >= 1 ? (boss.position.x < sc.center.w ? 1 : -1) : sc.center.w - boss.position.x;
+              boss.position.y += Math.abs(sc.center.h - boss.position.y) >= 1 ? (boss.position.y < sc.center.h ? 1 : -1) : sc.center.h - boss.position.y;
             } else if (B_hp <= 100) {
-              if (boss.position.x >= 100 * world && boss.position.x <= screenCanvas.width - 100 * world && boss.position.y >= 100 * world && boss.position.y <= screenCanvas.height - 100 * world) {
+              if (boss.position.x >= 100 * world && boss.position.x <= sc.w - 100 * world && boss.position.y >= 100 * world && boss.position.y <= sc.h - 100 * world) {
                 boss.position.x += 1;
               } else {
                 if (boss.position.y < 100 * world) {
                   boss.position.x += 2
                 }
-                if (boss.position.y > screenCanvas.height - 100 * world) {
+                if (boss.position.y > sc.h - 100 * world) {
                   boss.position.x -= 2
                 }
                 if (boss.position.x < 100 * world) {
                   boss.position.y -= 2
                 }
-                if (boss.position.x > screenCanvas.width - 100 * world) {
+                if (boss.position.x > sc.w - 100 * world) {
                   boss.position.y += 2
                 };
               };
@@ -1434,7 +1425,7 @@ window.onload = function () {
               };
               if (B_hp <= 150 && (T_counter / 1000 % 30) < 14 && B_counter % 5 == 0) {
                 {
-                  a = distanse(sc.center.width, sc.center.height, B_shotp1.x, B_shotp1.y);
+                  a = distanse(sc.center.w, sc.center.h, B_shotp1.x, B_shotp1.y);
                   a.normalize();
                   let Vectors = [{
                     x: a.x,
@@ -1455,7 +1446,308 @@ window.onload = function () {
                   }
                   //console.log("a");
                 } {
-                  a = distanse(sc.center.width, sc.center.height, B_shotp4.x, B_shotp4.y);
+                  a = distanse(sc.center.w, sc.center.h, B_shotp4.x, B_shotp4.y);
+                  a.normalize();
+                  let Vectors = [{
+                    x: a.x,
+                    y: a.y,
+                    size: boss.size * 1.5,
+                    speed: 10
+                  }];
+                  let vectorCounter = 0;
+                  for (r = 0; r < B_smaxcount; r++) {
+                    if (!B_shot6[r].alive) {
+                      B_shot6[r].set({
+                        x: B_shotp4.x,
+                        y: B_shotp4.y
+                      }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                      vectorCounter++;
+                      if (vectorCounter >= Vectors.length) break;
+                    }
+                  }
+                  //console.log("a");                
+                }
+              }
+            }
+          }
+        } else if (B_sabhp == 999) {
+          if (boss.alive) {
+            //座標計算-----------------------------------
+            if (B_hp > 50) {
+              B_shotp1.x += Math.abs(0 + 40 * world - B_shotp1.x) >= 1 ? (0 + 40 * world < B_shotp1.x ? -1 : 1) : 0 + 40 * world - B_shotp1.x;
+              B_shotp1.y += Math.abs(0 + 40 * world - B_shotp1.y) >= 1 ? (0 + 40 * world < B_shotp1.y ? -1 : 1) : 0 + 40 * world - B_shotp1.y;
+              B_shotp1.c = true;
+              B_shotp3.x += Math.abs(0 + 40 * world - B_shotp3.x) >= 1 ? (0 + 40 * world < B_shotp3.x ? -1 : 1) : 0 + 40 * world - B_shotp3.x;
+              B_shotp3.y += Math.abs(sc.h - 40 * world - B_shotp3.y) >= 1 ? (sc.h - 40 * world < B_shotp3.y ? -1 : 1) : sc.h - 40 * world - B_shotp3.y;
+              B_shotp3.c = true;
+              //console.log("AA");
+            } else if (B_hp <= 50) {
+              B_shotp1.x += Math.abs(0 + 40 * world - B_shotp1.x) >= 1 ? (0 + 40 * world < B_shotp1.x ? -1 : 1) : 0 + 40 * world - B_shotp1.x;
+              B_shotp1.y += Math.abs(sc.center.h - B_shotp1.y) >= 1 ? (sc.center.h < B_shotp1.y ? -1 : 1) : sc.center.h - B_shotp1.y;
+              B_shotp1.c = true;
+              B_shotp3.x += Math.abs(sc.center.w - B_shotp3.x) >= 1 ? (sc.center.w < B_shotp3.x ? -1 : 1) : sc.center.w - B_shotp3.x;
+              B_shotp3.y += Math.abs(sc.h - 40 * world - B_shotp3.y) >= 1 ? (sc.h - 40 * world < B_shotp3.y ? -1 : 1) : sc.h - 40 * world - B_shotp3.y;
+              B_shotp3.c = true;
+            }
+            B_shotp2.x = sc.center.w + (sc.center.w - B_shotp1.x);
+            B_shotp2.y = sc.center.h + (sc.center.h - B_shotp1.y);
+            B_shotp2.c = true;
+            B_shotp4.x = sc.center.w + (sc.center.w - B_shotp3.x);
+            B_shotp4.y = sc.center.h + (sc.center.h - B_shotp3.y);
+            B_shotp4.c = true;
+            //乱数計算----------------------------------
+            B_rtime = ((B_hp >= 100) ? 30 : (B_hp >= 50) ? Math.round(Math.random() * 20 + 20) : Math.round(Math.random() * 40 + 10));
+            B_rspeed = ((B_hp >= 100) ? 3 : (B_hp >= 50) ? Math.round(Math.random() * 2 + 2) : Math.round(Math.random() * 4 + 1));
+            B_rsize = ((B_hp >= 100) ? 5 : (B_hp >= 50) ? Math.round(Math.random() * 4 + 3) : Math.round(Math.random() * 8 + 1));
+            B_counter++;
+            //Boss Vectol-------------------------------
+            if (B_hp > 150) {
+              boss.position.x += Math.abs(sc.center.w - boss.position.x) >= 1 ? (boss.position.x < sc.center.w ? 1 : -1) : sc.center.w - boss.position.x;
+              boss.position.y += Math.abs(sc.center.h - boss.position.y) >= 1 ? (boss.position.y < sc.center.h ? 1 : -1) : sc.center.h - boss.position.y;
+            } else if (B_hp <= 150) {
+              B_shotc += 1 * Math.PI / 180;
+              boss.position.x = 100 * world * Math.cos(B_shotc) + sc.center.w;
+              boss.position.y = 100 * world * Math.sin(B_shotc) + sc.center.h;
+            }
+            ///方向-------------------------------------
+            if (boss.alive) {
+              if (B_counter % (B_hp > 100 ? 100 : 150) == 0) {
+                a = boss.position.distance(charactor.position);
+                a.normalize();
+                let Vectors = [{
+                  x: Math.cos(9 * (Math.PI / 180)),
+                  y: Math.sin(9 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(27 * (Math.PI / 180)),
+                  y: Math.sin(27 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(45 * (Math.PI / 180)),
+                  y: Math.sin(45 * (Math.PI / 180)),
+                  size: 8
+                }, {
+                  x: Math.cos(63 * (Math.PI / 180)),
+                  y: Math.sin(63 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(81 * (Math.PI / 180)),
+                  y: Math.sin(81 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(99 * (Math.PI / 180)),
+                  y: Math.sin(99 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(117 * (Math.PI / 180)),
+                  y: Math.sin(117 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(135 * (Math.PI / 180)),
+                  y: Math.sin(135 * (Math.PI / 180)),
+                  size: 8
+                }, {
+                  x: Math.cos(153 * (Math.PI / 180)),
+                  y: Math.sin(153 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(171 * (Math.PI / 180)),
+                  y: Math.sin(171 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(189 * (Math.PI / 180)),
+                  y: Math.sin(189 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(207 * (Math.PI / 180)),
+                  y: Math.sin(207 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(225 * (Math.PI / 180)),
+                  y: Math.sin(225 * (Math.PI / 180)),
+                  size: 8
+                }, {
+                  x: Math.cos(243 * (Math.PI / 180)),
+                  y: Math.sin(243 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(261 * (Math.PI / 180)),
+                  y: Math.sin(261 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(279 * (Math.PI / 180)),
+                  y: Math.sin(279 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(297 * (Math.PI / 180)),
+                  y: Math.sin(297 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(315 * (Math.PI / 180)),
+                  y: Math.sin(315 * (Math.PI / 180)),
+                  size: 8
+                }, {
+                  x: Math.cos(333 * (Math.PI / 180)),
+                  y: Math.sin(333 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(351 * (Math.PI / 180)),
+                  y: Math.sin(351 * (Math.PI / 180))
+                }];
+                //console.log("B_shot1 created.");
+                let vectorCounter = 0;
+                for (e = 0; e < B_smaxcount; e++) {
+                  if (!B_shot0[e].alive) {
+                    B_shot0[e].set(boss.position, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                    vectorCounter++;
+                    if (vectorCounter >= Vectors.length) break;
+                    // console.log(vectorCounter,bossShot[k]);
+                  }
+                }
+              }
+              if (B_counter % 10 == 0) {
+                a = boss.position.distance(charactor.position);
+                a.normalize();
+                let Vectors = [{
+                  x: Math.cos(B_counter * (Math.PI / 180)),
+                  y: Math.sin(B_counter * (Math.PI / 180))
+                  /*,size: 5,
+                  speed: 2.5*/
+                }, {
+                  x: Math.cos((B_counter + 90) * (Math.PI / 180)),
+                  y: Math.sin((B_counter + 90) * (Math.PI / 180))
+                }, {
+                  x: Math.cos((B_counter + 180) * (Math.PI / 180)),
+                  y: Math.sin((B_counter + 180) * (Math.PI / 180))
+                }, {
+                  x: Math.cos((B_counter + 270) * (Math.PI / 180)),
+                  y: Math.sin((B_counter + 270) * (Math.PI / 180))
+                }];
+                let vectorCounter = 0;
+                for (f = 0; f < B_smaxcount; f++) {
+                  if (B_shot1[f].alive) continue;
+                  B_shot1[f].set({
+                    x: B_shotp1.x,
+                    y: B_shotp1.y
+                  }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                }
+                vectorCounter = 0;
+                for (l = 0; l < B_smaxcount; l++) {
+                  if (B_shot2[l].alive) continue;
+                  B_shot2[l].set({
+                    x: B_shotp2.x,
+                    y: B_shotp2.y
+                  }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                  vectorCounter++;
+                  if (vectorCounter >= Vectors.length) break;
+                }
+                //console.log("a");
+              }
+              if (B_counter % 50 == 0) {
+                a = boss.position.distance(charactor.position);
+                a.normalize();
+                let Vectors = [{
+                  x: Math.cos((Math.PI / 180)),
+                  y: Math.sin((Math.PI / 180)),
+                  size: 8
+                }, {
+                  x: Math.cos(18 * (Math.PI / 180)),
+                  y: Math.sin(18 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(36 * (Math.PI / 180)),
+                  y: Math.sin(36 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(54 * (Math.PI / 180)),
+                  y: Math.sin(54 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(72 * (Math.PI / 180)),
+                  y: Math.sin(72 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(90 * (Math.PI / 180)),
+                  y: Math.sin(90 * (Math.PI / 180)),
+                  size: 8
+                }, {
+                  x: Math.cos(108 * (Math.PI / 180)),
+                  y: Math.sin(108 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(126 * (Math.PI / 180)),
+                  y: Math.sin(126 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(144 * (Math.PI / 180)),
+                  y: Math.sin(144 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(162 * (Math.PI / 180)),
+                  y: Math.sin(162 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(180 * (Math.PI / 180)),
+                  y: Math.sin(180 * (Math.PI / 180)),
+                  size: 8
+                }, {
+                  x: Math.cos(198 * (Math.PI / 180)),
+                  y: Math.sin(198 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(216 * (Math.PI / 180)),
+                  y: Math.sin(216 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(234 * (Math.PI / 180)),
+                  y: Math.sin(234 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(252 * (Math.PI / 180)),
+                  y: Math.sin(252 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(270 * (Math.PI / 180)),
+                  y: Math.sin(270 * (Math.PI / 180)),
+                  size: 8
+                }, {
+                  x: Math.cos(288 * (Math.PI / 180)),
+                  y: Math.sin(288 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(306 * (Math.PI / 180)),
+                  y: Math.sin(306 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(324 * (Math.PI / 180)),
+                  y: Math.sin(324 * (Math.PI / 180))
+                }, {
+                  x: Math.cos(342 * (Math.PI / 180)),
+                  y: Math.sin(342 * (Math.PI / 180))
+                }];
+                //console.log("B_shot1 created.");
+                let vectorCounter = 0;
+                for (m = 0; m < B_smaxcount; m++) {
+                  if (!B_shot3[m].alive) {
+                    B_shot3[m].set({
+                      x: B_shotp3.x,
+                      y: B_shotp3.y
+                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                    vectorCounter++;
+                    if (vectorCounter >= Vectors.length) break;
+                  }
+                }
+                vectorCounter = 0;
+                for (n = 0; n < B_smaxcount; n++) {
+                  if (!B_shot4[n].alive) {
+                    B_shot4[n].set({
+                      x: B_shotp4.x,
+                      y: B_shotp4.y
+                    }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                    vectorCounter++;
+                    if (vectorCounter >= Vectors.length) break;
+                  }
+                }
+                //console.log(bossShot);
+                //console.log("a")            
+              };
+              if (B_hp <= 150 && (T_counter / 1000 % 30) < 14 && B_counter % 5 == 0) {
+                {
+                  a = distanse(sc.center.w, sc.center.h, B_shotp1.x, B_shotp1.y);
+                  a.normalize();
+                  let Vectors = [{
+                    x: a.x,
+                    y: a.y,
+                    size: boss.size * 1.5,
+                    speed: 10
+                  }];
+                  let vectorCounter = 0;
+                  for (o = 0; o < B_smaxcount; o++) {
+                    if (!B_shot5[o].alive) {
+                      B_shot5[o].set({
+                        x: B_shotp1.x,
+                        y: B_shotp1.y
+                      }, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+                      vectorCounter++;
+                      if (vectorCounter >= Vectors.length) break;
+                    }
+                  }
+                  //console.log("a");
+                } {
+                  a = distanse(sc.center.w, sc.center.h, B_shotp4.x, B_shotp4.y);
                   a.normalize();
                   let Vectors = [{
                     x: a.x,
@@ -1481,12 +1773,13 @@ window.onload = function () {
           }
         };
         //B_Level--------------------------------------      
-        if (B_hp <= 0 && B_sabhp != "ex") {
+        if (B_hp <= 0 && B_sabhp != 999) {
           score += 1000;
           B_hp = (B_sabhp != 1) ? 200 : 0;
           B_sabhp -= 1;
           ctx.fillStyle = B_color;
-          ctx.fillRect(0, 0, screenCanvas.width, screenCanvas.height);
+          if (!showKIDOU)
+            ctx.fillRect(0, 0, sc.w, sc.h);
         }
       };
     }
@@ -1494,13 +1787,18 @@ window.onload = function () {
     if (C_sabhp <= 0) ShowGameover("score : " + score);
     else requestAnimationFrame(arguments.callee);
     if (B_sabhp <= 0) {
-      if (score >= Infinity) {
-        B_sabhp = "ex";
-        B_hp = 200;
+      if (score >= 100000) {
+        if (window.confirm('Extra に挑みますか？')) {
+          window.alert("Extra ステージ \n 一定以上のScore 獲得者のみの Level です。 \n Score : 加算減産 \n 操作 : 維持");
+          B_sabhp = 999;
+          B_hp = 200;
+        } else {
+          ShowClear("GAME CLEAR\nscore || " + score);
+        }
       } else {
         ShowClear("GAME CLEAR\nscore || " + score);
       }
-    } else if (B_sabhp == "ex" && B_hp <= 0) {
+    } else if (B_sabhp == 999 && B_hp <= 0) {
       ShowClear("Extra CLEAR\nscore || " + score);
     }
     // };
@@ -1510,17 +1808,17 @@ window.onload = function () {
 //Function---------------------------------------------------------------------
 function resize(screenCanvas, charactor) {
   if ((document.documentElement.clientHeight - 2) / 762.5 <= (document.documentElement.clientWidth - 2) / 1364) {
-    world = screenCanvas.height / 762.5;
+    world = sc.h / 762.5;
   } else {
-    world = screenCanvas.width / 1364;
+    world = sc.w / 1364;
   } //1364:762.5==w:h 1364*h==762.5*w 1364:762.5==h:w 1364*w==762.5*h w==762.5*h/1364 
 
-  world2 = ((screenCanvas.width >= screenCanvas.height) ? screenCanvas.height : screenCanvas.width) / 762.5;
+  world2 = ((sc.w >= sc.h) ? sc.h : sc.w) / 762.5;
 
-  C_worldx = charactor.position.x / screenCanvas.width;
-  C_worldy = charactor.position.y / screenCanvas.height;
-  B_worldx = boss.position.x / screenCanvas.width;
-  B_worldy = boss.position.y / screenCanvas.height;
+  C_worldx = charactor.position.x / sc.w;
+  C_worldy = charactor.position.y / sc.h;
+  B_worldx = boss.position.x / sc.w;
+  B_worldy = boss.position.y / sc.h;
 
   if (!sc_size) {
     width = document.documentElement.clientWidth - 2;
@@ -1535,19 +1833,19 @@ function resize(screenCanvas, charactor) {
     }
   }
   screenCanvas.width = width;
-  screenCanvas.height = height;
+  screenCanvas.height= height;   
 
-  charactor.position.x = screenCanvas.width * C_worldx;
-  charactor.position.y = screenCanvas.height * C_worldy;
-  boss.position.x = screenCanvas.width * B_worldx;
-  boss.position.y = screenCanvas.height * B_worldy;
+  charactor.position.x = sc.w * C_worldx;
+  charactor.position.y = sc.h * C_worldy;
+  boss.position.x = sc.w * B_worldx;
+  boss.position.y = sc.h * B_worldy;
 
+  sc.w=screenCanvas.width;
+  sc.h=screenCanvas.height;
   sc.center = {
-    height: screenCanvas.height / 2,
-    width: screenCanvas.width / 2
+    h: sc.h / 2,
+    w: sc.w / 2
   };
-  //charactor.position.x = charactor.position.x/screencanvas.width
-  //charactor.position.y = charactor.position.y * world;  
 };
 
 function changecolor() {
@@ -1556,21 +1854,28 @@ function changecolor() {
   } else {
     C_sabhpgagecolor = 'rgba(16,87,121,1)';
   };
-  if (B_sabhp >= 3) {
+  if (B_sabhp ==3||B_sabhp==4) {
     B_color = 'rgba(35, 71, 130,1)';
     BS_color = 'rgba(196, 136, 71,1)';
     B_name = "Neko";
-  } else {
+    boss.size = 20 * world;
+  } else if(B_sabhp<=2){
     B_color = 'hsla(31,51%,52%,1)';
     BS_color = 'rgba(35, 71, 130,1)';
     B_name = "Skyless Fox";
-  };
+    boss.size = 20 * world;
+  }else if(B_sabhp==999){
+    B_color = 'hsla(31,51%,52%,1)';
+    BS_color = 'rgba(35, 71, 130,1)';
+    B_name="Indigo";
+    boss.size = 20 * world;
+  }
 }
 
 function CC_23() {
   isLogEnable = true;
   if (L_main == 1) {
-    log("main", screenCanvas.width + " : width", screenCanvas.height + " : height");
+    log("main", sc.w + " : width", sc.h + " : height");
   } else if (L_main == 2) {
     // log("main2", Ooperation + " : CC_78", C_hp + " : HP", C_sabhp + " : sHP",S_point+" : S_p", C_attack + " : At", C_defence + " : Df", C_speed + " : Sp");
   };
@@ -1595,9 +1900,9 @@ function C_draw(charactor) {
     ctx.beginPath();
     ctx.strokeStyle = CS_color;
     ctx.moveTo(charactor.position.x, 0);
-    ctx.lineTo(charactor.position.x, screenCanvas.height);
+    ctx.lineTo(charactor.position.x, sc.h);
     ctx.moveTo(0, charactor.position.y);
-    ctx.lineTo(screenCanvas.width, charactor.position.y);
+    ctx.lineTo(sc.w, charactor.position.y);
     ctx.stroke();
     ctx.closePath();
   }
@@ -1634,7 +1939,7 @@ function C_sdraw() {
         C_shot0[c].position.y,
         C_shot0[c].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1652,7 +1957,7 @@ function C_sdraw() {
         C_shot1[g].position.y,
         C_shot1[g].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1666,7 +1971,7 @@ function C_sdraw() {
         C_shot2[h].position.y,
         C_shot2[h].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1684,7 +1989,7 @@ function C_sdraw() {
           C_shot3[s].position.y,
           C_shot3[s].size,
           0, Math.PI * 2, false
-        );
+          );
         ctx.closePath();
       }
     }
@@ -1698,7 +2003,7 @@ function C_sdraw() {
           C_shot4[t].position.y,
           C_shot4[t].size,
           0, Math.PI * 2, false
-        );
+          );
         ctx.closePath();
       }
     }
@@ -1707,9 +2012,59 @@ function C_sdraw() {
 }
 
 function B_draw() {
-  ctx.beginPath();
-  ctx.fillStyle = B_color;
-  ctx.strokeStyle = BS_color;
+  if(B_sabhp==999&&B_hp<=150){
+    ctx.beginPath();
+    ctx.fillStyle = 'rgba(255,255,255,.3)';
+    if (boss.alive) {
+      //ctx.moveTo(sc.center.w+100*world,sc.center.h)
+      ctx.arc(
+        sc.center.w,
+        sc.center.h,
+        100*world,
+        0, Math.PI * 2, false
+        );      
+      ctx.closePath();
+    }
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.strokeStyle = BS_color;
+    if (boss.alive) {
+      ctx.arc(
+        sc.center.w,
+        sc.center.h,
+        100*world/Math.sqrt(2),
+        0, Math.PI * 2, false
+        );
+      ctx.moveTo(sc.center.w+100*world,sc.center.h)
+      ctx.arc(
+        sc.center.w,
+        sc.center.h,
+        100*world,
+        0, Math.PI * 2, false
+        );      
+      ctx.closePath();
+    }
+    ctx.stroke();
+
+    ctx.save();
+    ctx.translate(sc.center.w,sc.center.h); 
+    ctx.rotate(B_counter* Math.PI / 180)
+    ctx.translate(-sc.center.w,-sc.center.h);
+    ctx.strokeRect(sc.center.w-100*world/Math.sqrt(2),sc.center.h-100*world/Math.sqrt(2),2*100*world/Math.sqrt(2),2*100*world/Math.sqrt(2))
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(sc.center.w,sc.center.h); 
+    ctx.rotate((-B_counter+45)* Math.PI / 180)
+    ctx.translate(-sc.center.w,-sc.center.h);
+    ctx.strokeRect(sc.center.w-100*world/Math.sqrt(2),sc.center.h-100*world/Math.sqrt(2),2*100*world/Math.sqrt(2),2*100*world/Math.sqrt(2))
+    ctx.restore();
+  }
+  if(B_style==0){
+    ctx.beginPath();
+    ctx.fillStyle = B_color;
+    ctx.strokeStyle = BS_color;
   //ctx.fillStyle = 'hsla(240,'+(Math.random()*100+0)+'%,50%,1)';
   //ctx.fillStyle = 'hsla(217,'+(B_counter%20===0?(Math.random()*60+27):57)+'%,32%,1)';
   if (boss.alive) {
@@ -1719,12 +2074,14 @@ function B_draw() {
       boss.position.y,
       boss.size,
       0, Math.PI * 2, false
-    );
+      );
     ctx.closePath();
   }
   ctx.fill();
   ctx.stroke();
-  //if(B_hp<150){ctx.stroke();}
+}else if(B_style==1){
+  ctx.drawImage(img[1],boss.position.x-boss.size*2,boss.position.y-boss.size*2,boss.size*4,boss.size*4);
+}
 }
 
 function BS_draw() {
@@ -1736,44 +2093,44 @@ function BS_draw() {
     ctx.arc(
       B_shotp1.x,
       B_shotp1.y,
-      (B_sabhp != 1 ? (boss.size / (B_shotp2.c ? 2 : 1.5)) : boss.size * 1.5),
+      ((B_sabhp != 1 && B_sabhp != 999) ? (boss.size / (B_shotp1.c ? 2 : 1)) : boss.size * 1.5),
       0, Math.PI * 2, false
-    );
+      );
     ctx.moveTo(B_shotp2.x, B_shotp2.y);
     ctx.arc(
       B_shotp2.x,
       B_shotp2.y,
-      (B_sabhp != 1 ? (boss.size / (B_shotp2.c ? 2 : 1.5)) : boss.size * 1.5),
+      ((B_sabhp != 1 && B_sabhp != 999) ? (boss.size / (B_shotp2.c ? 2 : 1)) : boss.size * 1.5),
       0, Math.PI * 2, false
-    );
-    if (B_sabhp == 4 && B_hp <= 50 || B_sabhp == 3 && (B_shotp3.c || B_shotp4.c) || B_sabhp == 2 || B_sabhp == 1) {
+      );
+    if (B_sabhp == 4 && B_hp <= 50 || B_sabhp == 3 && (B_shotp3.c || B_shotp4.c) || B_sabhp == 2 || B_sabhp == 1||B_sabhp==999) {
       ctx.moveTo(B_shotp3.x, B_shotp3.y)
       ctx.arc(
         B_shotp3.x,
         B_shotp3.y,
-        (B_sabhp != 1 ? boss.size / 2 : boss.size * 1.5),
+        ((B_sabhp != 1 && B_sabhp != 999) ? (boss.size / (B_shotp3.c ? 2 : 1.5)) : boss.size * 1.5),
         0, Math.PI * 2, false
-      );
+        );
       ctx.moveTo(B_shotp4.x, B_shotp4.y);
       ctx.arc(
         B_shotp4.x,
         B_shotp4.y,
-        (B_sabhp != 1 ? boss.size / 2 : boss.size * 1.5),
+        ((B_sabhp != 1 && B_sabhp != 999) ? (boss.size / (B_shotp4.c ? 2 : 1.5)) : boss.size * 1.5),
         0, Math.PI * 2, false
-      );
+        );
     }
     ctx.closePath();
     if (B_sabhp == 2) {
       if (B_hp <= 50) {
-        ctx.strokeRect(screenCanvas.width / 7 - 0.5, screenCanvas.height / 7 - 0.5, screenCanvas.width / 7 * 5 + 1, screenCanvas.height / 7 * 5 + 1);
+        ctx.strokeRect(80 * world,80 * world, sc.w-160 * world, sc.h-160 * world);
       }
       if (B_hp <= 150) {
-        ctx.strokeRect(screenCanvas.width / 10 - 0.5, screenCanvas.height / 10 - 0.5, screenCanvas.width / 10 * 8 + 1, screenCanvas.height / 10 * 8 + 1);
+        ctx.strokeRect(30 * world,30 * world, sc.w-60 * world, sc.h-60 * world);
       }
     } else if (B_sabhp == 1) {
-      ctx.strokeRect(40 * world, 40 * world, screenCanvas.width - 80 * world, screenCanvas.height - 80 * world);
+      ctx.strokeRect(40 * world, 40 * world, sc.w - 80 * world, sc.h - 80 * world);
       if (B_hp <= 100) {
-        ctx.strokeRect(100 * world, 100 * world, screenCanvas.width - 200 * world, screenCanvas.height - 200 * world);
+        ctx.strokeRect(100 * world, 100 * world, sc.w - 200 * world, sc.h - 200 * world);
       }
     }
     ctx.stroke();
@@ -1794,7 +2151,7 @@ function B_sdraw() {
         B_shot0[e].position.y,
         B_shot0[e].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1812,7 +2169,7 @@ function B_sdraw() {
         B_shot1[f].position.y,
         B_shot1[f].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1826,7 +2183,7 @@ function B_sdraw() {
         B_shot2[l].position.y,
         B_shot2[l].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1844,7 +2201,7 @@ function B_sdraw() {
         B_shot3[m].position.y,
         B_shot3[m].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1858,7 +2215,7 @@ function B_sdraw() {
         B_shot4[n].position.y,
         B_shot4[n].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1876,7 +2233,7 @@ function B_sdraw() {
         B_shot5[o].position.y,
         B_shot5[o].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1890,7 +2247,7 @@ function B_sdraw() {
         B_shot6[r].position.y,
         B_shot6[r].size,
         0, Math.PI * 2, false
-      );
+        );
       ctx.closePath();
     }
   }
@@ -1915,42 +2272,42 @@ function B_hpdraw() {
 
   ctx.fillStyle = B_color;
   ctx.beginPath();
-  ctx.fillRect(screenCanvas.width - 50 * world2 - C_hpgage * world2 * 3.9 * (B_hp > 150 ? B_hp - 150 : 0) / 50, 10 * world2, C_hpgage * world2 * 3.9 * (B_hp > 150 ? B_hp - 150 : 0) / 50, 30 * world2);
-  ctx.fillRect(screenCanvas.width - 50 * world2 - C_hpgage * world2 * 3.6 * (B_hp >= 150 ? 50 : (B_hp > 100 ? B_hp - 100 : 0)) / 50, 50 * world2, C_hpgage * world2 * 3.6 * (B_hp >= 150 ? 50 : (B_hp > 100 ? B_hp - 100 : 0)) / 50, 30 * world2);
-  ctx.fillRect(screenCanvas.width - 50 * world2 - C_hpgage * world2 * 3.3 * (B_hp >= 100 ? 50 : (B_hp > 50 ? B_hp - 50 : 0)) / 50, 90 * world2, C_hpgage * world2 * 3.3 * (B_hp >= 100 ? 50 : (B_hp > 50 ? B_hp - 50 : 0)) / 50, 30 * world2);
-  ctx.fillRect(screenCanvas.width - 50 * world2 - C_hpgage * world2 * 3.0 * (B_hp >= 50 ? 50 : B_hp) / 50, 130 * world2, (C_hpgage * world2 * 3.0) * (B_hp >= 50 ? 50 : B_hp) / 50, 30 * world2);
+  ctx.fillRect(sc.w - 50 * world2 - C_hpgage * world2 * 3.9 * (B_hp > 150 ? B_hp - 150 : 0) / 50, 10 * world2, C_hpgage * world2 * 3.9 * (B_hp > 150 ? B_hp - 150 : 0) / 50, 30 * world2);
+  ctx.fillRect(sc.w - 50 * world2 - C_hpgage * world2 * 3.6 * (B_hp >= 150 ? 50 : (B_hp > 100 ? B_hp - 100 : 0)) / 50, 50 * world2, C_hpgage * world2 * 3.6 * (B_hp >= 150 ? 50 : (B_hp > 100 ? B_hp - 100 : 0)) / 50, 30 * world2);
+  ctx.fillRect(sc.w - 50 * world2 - C_hpgage * world2 * 3.3 * (B_hp >= 100 ? 50 : (B_hp > 50 ? B_hp - 50 : 0)) / 50, 90 * world2, C_hpgage * world2 * 3.3 * (B_hp >= 100 ? 50 : (B_hp > 50 ? B_hp - 50 : 0)) / 50, 30 * world2);
+  ctx.fillRect(sc.w - 50 * world2 - C_hpgage * world2 * 3.0 * (B_hp >= 50 ? 50 : B_hp) / 50, 130 * world2, (C_hpgage * world2 * 3.0) * (B_hp >= 50 ? 50 : B_hp) / 50, 30 * world2);
 
   ctx.strokeStyle = 'rgba(255,255,255,1)';
-  ctx.strokeRect(screenCanvas.width - C_hpgage * world2 * 3.9 - 50 * world2, 10 * world2, C_hpgage * world2 * 3.9, 30 * world2)
-  ctx.strokeRect(screenCanvas.width - C_hpgage * world2 * 3.6 - 50 * world2, 50 * world2, C_hpgage * world2 * 3.6, 30 * world2)
-  ctx.strokeRect(screenCanvas.width - C_hpgage * world2 * 3.3 - 50 * world2, 90 * world2, C_hpgage * world2 * 3.3, 30 * world2)
-  ctx.strokeRect(screenCanvas.width - C_hpgage * world2 * 3.0 - 50 * world2, 130 * world2, C_hpgage * world2 * 3.0, 30 * world2)
+  ctx.strokeRect(sc.w - C_hpgage * world2 * 3.9 - 50 * world2, 10 * world2, C_hpgage * world2 * 3.9, 30 * world2)
+  ctx.strokeRect(sc.w - C_hpgage * world2 * 3.6 - 50 * world2, 50 * world2, C_hpgage * world2 * 3.6, 30 * world2)
+  ctx.strokeRect(sc.w - C_hpgage * world2 * 3.3 - 50 * world2, 90 * world2, C_hpgage * world2 * 3.3, 30 * world2)
+  ctx.strokeRect(sc.w - C_hpgage * world2 * 3.0 - 50 * world2, 130 * world2, C_hpgage * world2 * 3.0, 30 * world2)
   ctx.closePath();
 
   ctx.fillStyle = 'rgba(255,255,255,.5)';
-  ctx.fillRect(screenCanvas.width - C_hpgage * world2 * 2.7 - 50 * world2, 170 * world2, C_hpgage * world2 * 2.7, 30 * world2)
-  ctx.fillRect(screenCanvas.width - 40 * world2, 10 * world2, 30 * world2, 150 * world2)
+  ctx.fillRect(sc.w - C_hpgage * world2 * 2.7 - 50 * world2, 170 * world2, C_hpgage * world2 * 2.7, 30 * world2)
+  ctx.fillRect(sc.w - 40 * world2, 10 * world2, 30 * world2, 150 * world2)
 
   ctx.strokeStyle = 'rgba(0,0,0,1)';
-  ctx.strokeRect(screenCanvas.width - C_hpgage * world2 * 2.7 - 50 * world2, 170 * world2, C_hpgage * world2 * 2.7, 30 * world2)
-  ctx.strokeRect(screenCanvas.width - 40 * world2, 10 * world2, 30 * world2, 150 * world2)
+  ctx.strokeRect(sc.w - C_hpgage * world2 * 2.7 - 50 * world2, 170 * world2, C_hpgage * world2 * 2.7, 30 * world2)
+  ctx.strokeRect(sc.w - 40 * world2, 10 * world2, 30 * world2, 150 * world2)
 
   if (CC_pass) {
     ctx.fillStyle = 'hsla(' + (B_counter % 360) + ',50%,50%,.5)'
   } else {
     ctx.fillStyle = 'rgba(0,0,0,.5)';
   }
-  ctx.fillRect(screenCanvas.width - 40 * world2, 170 * world2, 30 * world2, 30 * world2)
+  ctx.fillRect(sc.w - 40 * world2, 170 * world2, 30 * world2, 30 * world2)
   ctx.strokeStyle = 'rgba(255,255,255,1)';
-  ctx.strokeRect(screenCanvas.width - 40 * world2, 170 * world2, 30 * world2, 30 * world2)
+  ctx.strokeRect(sc.w - 40 * world2, 170 * world2, 30 * world2, 30 * world2)
 
   ctx.fillStyle = 'rgba(0,0,0,1)';
   ctx.strokeStyle = B_color;
   fontsize = 30;
   ctx.textAlign = "right";
   ctx.font = fontsize * world2 + "px 'Rounded Mplus 1c', 'Open Sans', 'Noto Sans Japanese', 'Yu Gothic', 'Meiryo UI', sans-serif";
-  ctx.fillText(B_name, screenCanvas.width - 55 * world2, 195 * world2);
-  ctx.strokeText(B_name, screenCanvas.width - 55 * world2, 195 * world2);
+  ctx.fillText(B_name, sc.w - 55 * world2, 195 * world2);
+  ctx.strokeText(B_name, sc.w - 55 * world2, 195 * world2);
 
   ctx.globalAlpha = 1;
 }
@@ -1972,7 +2329,7 @@ function S_builddraw() {
         S_build[k].position.y - charactor.size,
         S_build[k].size,
         charactor.size * 2
-      );
+        );
       ctx.rotate(0 + (S_build[k].place == 1 ? -0 : 0) + (S_build[k].place == 2 ? -180 * Math.PI / 180 : 0) + (S_build[k].place == 4 ? -270 * Math.PI / 180 : 0) + (S_build[k].place == 8 ? -90 * Math.PI / 180 : 0) +
         (S_build[k].place == 5 ? -315 * Math.PI / 180 : 0) + (S_build[k].place == 6 ? -225 * Math.PI / 180 : 0) + (S_build[k].place == 9 ? -45 * Math.PI / 180 : 0) + (S_build[k].place == 10 ? -135 * Math.PI / 180 : 0)); // 
       /*
@@ -1999,7 +2356,7 @@ function C_hpdraw(C_sabhp) {
 
   if (keyf1) {
     ctx.beginPath();
-    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage + 2) * world2, 0, 360 * (Math.PI / 180), false);
+    ctx.arc(sc.w - (C_hpgage * 1.5) * world2, sc.h - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage + 2) * world2, 0, 360 * (Math.PI / 180), false);
     ctx.closePath();
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
     ctx.fill();
@@ -2009,40 +2366,40 @@ function C_hpdraw(C_sabhp) {
 
 
     ctx.beginPath();
-    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 5) * world2, -90 * (Math.PI / 180), ((360 * C_hp / 5) - 90) * (Math.PI / 180), false);
+    ctx.arc(sc.w - (C_hpgage * 1.5) * world2, sc.h - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 5) * world2, -90 * (Math.PI / 180), ((360 * C_hp / 5) - 90) * (Math.PI / 180), false);
     ctx.lineWidth = 10 * world2;
     ctx.strokeStyle = CS_color;
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 15) * world2, -90 * (Math.PI / 180), ((360 * C_sabhp / 5) - 90) * (Math.PI / 180), false);
+    ctx.arc(sc.w - (C_hpgage * 1.5) * world2, sc.h - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 15) * world2, -90 * (Math.PI / 180), ((360 * C_sabhp / 5) - 90) * (Math.PI / 180), false);
     ctx.strokeStyle = C_sabhpgagecolor;
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 25) * world2, -90 * (Math.PI / 180), (360 * (S_point > 100 ? 100 : S_point) / 100 - 90) * (Math.PI / 180), false);
+    ctx.arc(sc.w - (C_hpgage * 1.5) * world2, sc.h - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 25) * world2, -90 * (Math.PI / 180), (360 * (S_point > 100 ? 100 : S_point) / 100 - 90) * (Math.PI / 180), false);
     ctx.strokeStyle = 'rgba(196, 136, 71,1)';
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 35) * world2, -90 * (Math.PI / 180), (360 * (S_point > 100 ? (S_point - 100) : 0) / 100 - 90) * (Math.PI / 180), false);
+    ctx.arc(sc.w - (C_hpgage * 1.5) * world2, sc.h - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 35) * world2, -90 * (Math.PI / 180), (360 * (S_point > 100 ? (S_point - 100) : 0) / 100 - 90) * (Math.PI / 180), false);
     ctx.stroke();
     ctx.lineWidth = 1 * world2;
 
     ctx.beginPath();
-    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 00) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
-    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 50 * world2) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
-    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 20) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
-    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 30) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
-    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 40) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
+    ctx.arc(sc.w - (C_hpgage * 1.5) * world2, sc.h - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 00) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
+    ctx.arc(sc.w - (C_hpgage * 1.5) * world2, sc.h - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 50 * world2) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
+    ctx.arc(sc.w - (C_hpgage * 1.5) * world2, sc.h - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 20) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
+    ctx.arc(sc.w - (C_hpgage * 1.5) * world2, sc.h - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 30) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
+    ctx.arc(sc.w - (C_hpgage * 1.5) * world2, sc.h - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 40) * world2, -90 * (Math.PI / 180), 270 * (Math.PI / 180), false);
     ctx.closePath();
     ctx.strokeStyle = 'rgba(255,255,255,1)';
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.moveTo(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2);
-    ctx.arc(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 40) * world2, -90 * (Math.PI / 180), ((360 * C_hp / 5) - 90) * (Math.PI / 180), false);
-    ctx.moveTo(screenCanvas.width - (C_hpgage * 1.5) * world2, screenCanvas.height - (C_hpgage + fontsize * 1.5) * world2);
+    ctx.moveTo(sc.w - (C_hpgage * 1.5) * world2, sc.h - (C_hpgage + fontsize * 1.5) * world2);
+    ctx.arc(sc.w - (C_hpgage * 1.5) * world2, sc.h - (C_hpgage + fontsize * 1.5) * world2, (C_hpgage - 40) * world2, -90 * (Math.PI / 180), ((360 * C_hp / 5) - 90) * (Math.PI / 180), false);
+    ctx.moveTo(sc.w - (C_hpgage * 1.5) * world2, sc.h - (C_hpgage + fontsize * 1.5) * world2);
     ctx.closePath();
     ctx.fillStyle = C_color;
     ctx.fill();
@@ -2050,51 +2407,51 @@ function C_hpdraw(C_sabhp) {
   } else {
     ctx.beginPath();
     ctx.fillStyle = (C_hp >= 3 ? 'hsla(90,70%,50%,1)' : 'hsla(0,100%,' + (C_hp == 2 ? 50 : 30) + '%,1)');
-    ctx.fillRect(screenCanvas.width - 50 * world2 - C_hpgage * world2 * 3.9 * (C_hp / 5), screenCanvas.height - (70 + 10) * world2, C_hpgage * world2 * 3.9 * (C_hp / 5), 30 * world2);
+    ctx.fillRect(sc.w - 50 * world2 - C_hpgage * world2 * 3.9 * (C_hp / 5), sc.h - (70 + 10) * world2, C_hpgage * world2 * 3.9 * (C_hp / 5), 30 * world2);
     ctx.fillStyle = 'hsla(32,100%,50%,1)';
-    ctx.fillRect(screenCanvas.width - 50 * world2 - C_hpgage * world2 * 3.6 * (S_point > 100 ? 100 : S_point) / 100, screenCanvas.height - (70 + 50) * world2, C_hpgage * world2 * 3.6 * (S_point > 100 ? 100 : S_point) / 100, 30 * world2);
-    ctx.fillRect(screenCanvas.width - 50 * world2 - C_hpgage * world2 * 3.3 * (S_point > 100 ? (S_point - 100) : 0) / 100, screenCanvas.height - (70 + 90) * world2, C_hpgage * world2 * 3.3 * (S_point > 100 ? (S_point - 100) : 0) / 100, 30 * world2);
+    ctx.fillRect(sc.w - 50 * world2 - C_hpgage * world2 * 3.6 * (S_point > 100 ? 100 : S_point) / 100, sc.h - (70 + 50) * world2, C_hpgage * world2 * 3.6 * (S_point > 100 ? 100 : S_point) / 100, 30 * world2);
+    ctx.fillRect(sc.w - 50 * world2 - C_hpgage * world2 * 3.3 * (S_point > 100 ? (S_point - 100) : 0) / 100, sc.h - (70 + 90) * world2, C_hpgage * world2 * 3.3 * (S_point > 100 ? (S_point - 100) : 0) / 100, 30 * world2);
     ctx.fillStyle = 'hsla(192,100%,50%,1)';
-    ctx.fillRect(screenCanvas.width - 50 * world2 - C_hpgage * world2 * 3.0 * (C_sabhp / 5), screenCanvas.height - (70 + 130) * world2, C_hpgage * world2 * 3.0 * (C_sabhp / 5), 30 * world2);
+    ctx.fillRect(sc.w - 50 * world2 - C_hpgage * world2 * 3.0 * (C_sabhp / 5), sc.h - (70 + 130) * world2, C_hpgage * world2 * 3.0 * (C_sabhp / 5), 30 * world2);
 
     ctx.strokeStyle = 'rgba(255,255,255,1)';
-    ctx.strokeRect(screenCanvas.width - C_hpgage * world2 * 3.9 - 50 * world2, screenCanvas.height - (70 + 10) * world2, C_hpgage * world2 * 3.9, 30 * world2)
-    ctx.strokeRect(screenCanvas.width - C_hpgage * world2 * 3.6 - 50 * world2, screenCanvas.height - (70 + 50) * world2, C_hpgage * world2 * 3.6, 30 * world2)
-    ctx.strokeRect(screenCanvas.width - C_hpgage * world2 * 3.3 - 50 * world2, screenCanvas.height - (70 + 90) * world2, C_hpgage * world2 * 3.3, 30 * world2)
-    ctx.strokeRect(screenCanvas.width - C_hpgage * world2 * 3.0 - 50 * world2, screenCanvas.height - (70 + 130) * world2, C_hpgage * world2 * 3.0, 30 * world2)
+    ctx.strokeRect(sc.w - C_hpgage * world2 * 3.9 - 50 * world2, sc.h - (70 + 10) * world2, C_hpgage * world2 * 3.9, 30 * world2)
+    ctx.strokeRect(sc.w - C_hpgage * world2 * 3.6 - 50 * world2, sc.h - (70 + 50) * world2, C_hpgage * world2 * 3.6, 30 * world2)
+    ctx.strokeRect(sc.w - C_hpgage * world2 * 3.3 - 50 * world2, sc.h - (70 + 90) * world2, C_hpgage * world2 * 3.3, 30 * world2)
+    ctx.strokeRect(sc.w - C_hpgage * world2 * 3.0 - 50 * world2, sc.h - (70 + 130) * world2, C_hpgage * world2 * 3.0, 30 * world2)
     ctx.closePath();
 
     ctx.fillStyle = 'rgba(255,255,255,.5)';
-    ctx.fillRect(screenCanvas.width - C_hpgage * world2 * 2.7 - 50 * world2, screenCanvas.height - (70 + 170) * world2, C_hpgage * world2 * 2.7, 30 * world2)
-    ctx.fillRect(screenCanvas.width - 40 * world2, screenCanvas.height - (70 + 130) * world2, 30 * world2, 190 * world2)
+    ctx.fillRect(sc.w - C_hpgage * world2 * 2.7 - 50 * world2, sc.h - (70 + 170) * world2, C_hpgage * world2 * 2.7, 30 * world2)
+    ctx.fillRect(sc.w - 40 * world2, sc.h - (70 + 130) * world2, 30 * world2, 190 * world2)
 
     ctx.strokeStyle = 'rgba(0,0,0,1)';
-    ctx.strokeRect(screenCanvas.width - C_hpgage * world2 * 2.7 - 50 * world2, screenCanvas.height - (70 + 170) * world2, C_hpgage * world2 * 2.7, 30 * world2)
-    ctx.strokeRect(screenCanvas.width - 40 * world2, screenCanvas.height - (70 + 130) * world2, 30 * world2, 190 * world2)
+    ctx.strokeRect(sc.w - C_hpgage * world2 * 2.7 - 50 * world2, sc.h - (70 + 170) * world2, C_hpgage * world2 * 2.7, 30 * world2)
+    ctx.strokeRect(sc.w - 40 * world2, sc.h - (70 + 130) * world2, 30 * world2, 190 * world2)
 
     if (CC_pass) {
       ctx.fillStyle = 'hsla(' + (B_counter % 360 + 30) + ',50%,50%,.5)'
     } else {
       ctx.fillStyle = 'rgba(0,0,0,.5)';
     }
-    ctx.fillRect(screenCanvas.width - 40 * world2, screenCanvas.height - (70 + 170) * world2, 30 * world2, 30 * world2)
+    ctx.fillRect(sc.w - 40 * world2, sc.h - (70 + 170) * world2, 30 * world2, 30 * world2)
     ctx.strokeStyle = 'rgba(255,255,255,1)';
-    ctx.strokeRect(screenCanvas.width - 40 * world2, screenCanvas.height - (70 + 170) * world2, 30 * world2, 30 * world2)
+    ctx.strokeRect(sc.w - 40 * world2, sc.h - (70 + 170) * world2, 30 * world2, 30 * world2)
 
     ctx.fillStyle = 'rgba(0,0,0,1)';
     ctx.strokeStyle = B_color;
     fontsize = 25;
     ctx.textAlign = "right";
     ctx.font = fontsize * world2 + "px 'Rounded Mplus 1c', 'Open Sans', 'Noto Sans Japanese', 'Yu Gothic', 'Meiryo UI', sans-serif";
-    ctx.fillText(C_name, screenCanvas.width - 55 * world2, screenCanvas.height - (70 + 170 - 25) * world2);
-    ctx.strokeText(C_name, screenCanvas.width - 55 * world2, screenCanvas.height - (70 + 170 - 25) * world2);
+    ctx.fillText(C_name, sc.w - 55 * world2, sc.h - (70 + 170 - 25) * world2);
+    ctx.strokeText(C_name, sc.w - 55 * world2, sc.h - (70 + 170 - 25) * world2);
     if (!keyf1) {
-      ctx.fillText("S", screenCanvas.width - 15 * world2, screenCanvas.height - (70 + 10 - 35 - 25) * world2)
+      ctx.fillText("S", sc.w - 15 * world2, sc.h - (70 + 10 - 35 - 25) * world2)
     }
-    ctx.fillText("HP", screenCanvas.width - 55 * world2, screenCanvas.height - (70 + 10 - 25) * world2)
-    ctx.fillText("Skill 1", screenCanvas.width - 55 * world2, screenCanvas.height - (70 + 50 - 25) * world2)
-    ctx.fillText("Skill 2", screenCanvas.width - 55 * world2, screenCanvas.height - (70 + 90 - 25) * world2)
-    ctx.fillText("Life", screenCanvas.width - 55 * world2, screenCanvas.height - (70 + 130 - 25) * world2)
+    ctx.fillText("HP", sc.w - 55 * world2, sc.h - (70 + 10 - 25) * world2)
+    ctx.fillText("Skill 1", sc.w - 55 * world2, sc.h - (70 + 50 - 25) * world2)
+    ctx.fillText("Skill 2", sc.w - 55 * world2, sc.h - (70 + 90 - 25) * world2)
+    ctx.fillText("Life", sc.w - 55 * world2, sc.h - (70 + 130 - 25) * world2)
   }
   ctx.globalAlpha = 1;
 }
@@ -2107,9 +2464,9 @@ function status(score) {
   ctx.textAlign = "right";
   ctx.font = fontsize * world2 + "px 'Rounded Mplus 1c', 'Open Sans', 'Noto Sans Japanese', 'Yu Gothic', 'Meiryo UI', sans-serif";
   if (keyf1) {
-    ctx.fillText("Score : " + score, screenCanvas.width - 10 * world2, screenCanvas.height - 10 * world2);
+    ctx.fillText("Score : " + score, sc.w - 10 * world2, sc.h - 10 * world2);
   } else {
-    ctx.fillText(score.toLocaleString(), screenCanvas.width - 50 * world2, screenCanvas.height - 10 * world2);
+    ctx.fillText(score.toLocaleString(), sc.w - 50 * world2, sc.h - 10 * world2);
   }
   ctx.closePath();
   ctx.globalAlpha = 1;
@@ -2253,28 +2610,28 @@ function keyDown(event, i, S_bfar) {
   if (ck === 79) {
     if (operation == 3) {
       up = true;
-    } else {
+    } else if(operation==2){
       keyw = true;
     };
   };
   if (ck === 75) {
     if (operation == 3) {
       left = true;
-    } else {
+    } else if(operation==2){
       keya = true;
     };
   };
   if (ck === 76) {
     if (operation == 3) {
       down = true;
-    } else {
+    } else if(operation==2){
       keys = true;
     };
   };
-  if (ck === 59 || ck === 187) {
+  if (ck === 59) {
     if (operation == 3) {
       right = true;
-    } else {
+    } else if(operation==2){
       keyd = true;
     };
   };
@@ -2311,10 +2668,10 @@ function keyDown(event, i, S_bfar) {
             if (up || down || right || left) {
               S_bfar = 50 * world;
               S_build[k].set({
-                  x: charactor.position.x + (right ? S_bfar : 0) + (left ? -S_bfar : 0),
-                  y: charactor.position.y + (up ? -S_bfar : 0) + (down ? S_bfar : 0)
-                }, Vectors[vectorCounter], Vectors[vectorCounter].size || 5, Vectors[vectorCounter].speed || 3,
-                0 + (up ? 1 : 0) + (down ? 2 : 0) + (left ? 4 : 0) + (right ? 8 : 0));
+                x: charactor.position.x + (right ? S_bfar : 0) + (left ? -S_bfar : 0),
+                y: charactor.position.y + (up ? -S_bfar : 0) + (down ? S_bfar : 0)
+              }, Vectors[vectorCounter], Vectors[vectorCounter].size || 5, Vectors[vectorCounter].speed || 3,
+              0 + (up ? 1 : 0) + (down ? 2 : 0) + (left ? 4 : 0) + (right ? 8 : 0));
             }
             vectorCounter++;
             // console.log(vectorCounter,bossShot[l]);
@@ -2382,7 +2739,7 @@ function keyDown(event, i, S_bfar) {
     };
     if (key5 && key6) {
       if (ck === 48) {
-        if (B_sabhp == "ex") {
+        if (B_sabhp == 999) {
           B_hp = 0;
         } else {
           B_sabhp = 0;
@@ -2400,8 +2757,8 @@ function keyDown(event, i, S_bfar) {
       } else if (ck === 52) {
         B_sabhp = 4;
         B_hp = 200;
-      } else if (ck === 173) {
-        B_sabhp = "ex";
+      } else if (ck === 57) {
+        B_sabhp = 999;
         B_hp = 200;
       };
       if (ck === 13) {
@@ -2536,28 +2893,28 @@ function keyUp(event) {
   if (ck === 79) {
     if (operation == 3) {
       up = false;
-    } else {
+    } else if(operation==2){
       keyw = false;
     };
   };
   if (ck === 75) {
     if (operation == 3) {
       left = false;
-    } else {
+    } else if(operation==2){
       keya = false;
     };
   };
   if (ck === 76) {
     if (operation == 3) {
       down = false;
-    } else {
+    } else if(operation==2){
       keys = false;
     };
   };
-  if (ck === 59 || ck === 187) {
+  if (ck === 59) {
     if (operation == 3) {
       right = false;
-    } else {
+    } else if(operation==2){
       keyd = false;
     };
   };

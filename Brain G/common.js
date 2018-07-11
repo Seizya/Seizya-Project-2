@@ -18,6 +18,13 @@ Point.prototype.distances = function (p1, p2) {
     return q;
 };
 
+function distanse(p1, p2,p3,p4) {
+    var q = new Point();
+    q.x = p1 - p3;
+    q.y = p2 - p4;
+    return q;
+};
+
 Point.prototype.length = function () {
     return Math.sqrt(this.x * this.x + this.y * this.y);
 };
