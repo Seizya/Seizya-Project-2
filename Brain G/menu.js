@@ -412,13 +412,12 @@ function menu() {
 						menuz.pop();
 					}
 				} else if (menuz[2] == 4) {
-					AA = window.prompt("B_Style", "");
-					if (AA != undefined) {
-						B_style = AA;
+					if (window.confirm('B_style を変更します')) {
+						B_style=!B_style
 						not_menu();
 					} else {
 						menuz.pop();
-					}
+					};
 				}else if (menuz[2] > 4) {
 					menuz.pop();
 				}
@@ -446,17 +445,19 @@ function menu() {
 			ctx.strokeRect(scs.width / menus.x - 10 * world2, 5 * scs.height / menus.y, 10 * world2, scs.height / menus.y);
 
 			menus.x = (menus.x > 5 ? menus.x : 5);
-			menus.y = 4;
+			menus.y = 5;
 			ctx.fillStyle = back_color;
 			ctx.fillRect(scs.width / menus.x, 0 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 			ctx.fillRect(scs.width / menus.x, 1 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 			ctx.fillRect(scs.width / menus.x, 2 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 			ctx.fillRect(scs.width / menus.x, 3 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
+			ctx.fillRect(scs.width / menus.x, 4 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 			ctx.strokeStyle = line_color;
 			ctx.strokeRect(scs.width / menus.x, 0 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 			ctx.strokeRect(scs.width / menus.x, 1 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 			ctx.strokeRect(scs.width / menus.x, 2 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 			ctx.strokeRect(scs.width / menus.x, 3 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
+			ctx.strokeRect(scs.width / menus.x, 4 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 
 			ctx.fillStyle = string_color;
 			ctx.strokeStyle = B_color;
@@ -467,6 +468,7 @@ function menu() {
 			ctx.fillText("1 : Screen Size", 1 * scs.width / menus.x + 10 * world2, 1 * scs.height / menus.y + (scs.height / menus.y + fontsize) / 2, scs.width / menus.x - 30 * world2);
 			ctx.fillText("2 : Auto Shots", 1 * scs.width / menus.x + 10 * world2, 2 * scs.height / menus.y + (scs.height / menus.y + fontsize) / 2, scs.width / menus.x - 30 * world2);
 			ctx.fillText("3 : Operation", 1 * scs.width / menus.x + 10 * world2, 3 * scs.height / menus.y + (scs.height / menus.y + fontsize) / 2, scs.width / menus.x - 30 * world2);
+			ctx.fillText("4 : Shot_view", 1 * scs.width / menus.x + 10 * world2, 4 * scs.height / menus.y + (scs.height / menus.y + fontsize) / 2, scs.width / menus.x - 30 * world2);
 
 			if (menuz[1] == 0) {
 				if (window.confirm('HPゲージ を変更します')) {
@@ -540,7 +542,14 @@ function menu() {
 				} else if (menuz[2] > 2) {
 					menuz.pop();
 				}
-			} else if (menuz[1] > 3) {
+			} else if (menuz[1] == 4) {
+				if (window.confirm('Shot_view を変更します')) {
+					if(shouldshowKIDOU){hideKIDOU();}else{showKIDOU();};
+					not_menu();
+				} else {
+					menuz.pop();
+				};
+			} else if (menuz[1] > 4) {
 				menuz.pop();
 			}
 		} else if (menuz[0] > 4) {
