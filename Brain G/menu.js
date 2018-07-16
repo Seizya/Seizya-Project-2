@@ -445,19 +445,23 @@ function menu() {
 			ctx.strokeRect(scs.width / menus.x - 10 * world2, 5 * scs.height / menus.y, 10 * world2, scs.height / menus.y);
 
 			menus.x = (menus.x > 5 ? menus.x : 5);
-			menus.y = 5;
+			menus.y = 7;
 			ctx.fillStyle = back_color;
 			ctx.fillRect(scs.width / menus.x, 0 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 			ctx.fillRect(scs.width / menus.x, 1 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 			ctx.fillRect(scs.width / menus.x, 2 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 			ctx.fillRect(scs.width / menus.x, 3 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 			ctx.fillRect(scs.width / menus.x, 4 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
+			ctx.fillRect(scs.width / menus.x, 5 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
+			ctx.fillRect(scs.width / menus.x, 6 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 			ctx.strokeStyle = line_color;
 			ctx.strokeRect(scs.width / menus.x, 0 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 			ctx.strokeRect(scs.width / menus.x, 1 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 			ctx.strokeRect(scs.width / menus.x, 2 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 			ctx.strokeRect(scs.width / menus.x, 3 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 			ctx.strokeRect(scs.width / menus.x, 4 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
+			ctx.strokeRect(scs.width / menus.x, 5 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
+			ctx.strokeRect(scs.width / menus.x, 6 * scs.height / menus.y, scs.width / menus.x - 10 * world2, scs.height / menus.y);
 
 			ctx.fillStyle = string_color;
 			ctx.strokeStyle = B_color;
@@ -469,6 +473,8 @@ function menu() {
 			ctx.fillText("2 : Auto Shots", 1 * scs.width / menus.x + 10 * world2, 2 * scs.height / menus.y + (scs.height / menus.y + fontsize) / 2, scs.width / menus.x - 30 * world2);
 			ctx.fillText("3 : Operation", 1 * scs.width / menus.x + 10 * world2, 3 * scs.height / menus.y + (scs.height / menus.y + fontsize) / 2, scs.width / menus.x - 30 * world2);
 			ctx.fillText("4 : Shot_view", 1 * scs.width / menus.x + 10 * world2, 4 * scs.height / menus.y + (scs.height / menus.y + fontsize) / 2, scs.width / menus.x - 30 * world2);
+			ctx.fillText("5 : Invincible", 1 * scs.width / menus.x + 10 * world2, 5 * scs.height / menus.y + (scs.height / menus.y + fontsize) / 2, scs.width / menus.x - 30 * world2);
+			ctx.fillText("6 : Console", 1 * scs.width / menus.x + 10 * world2, 6 * scs.height / menus.y + (scs.height / menus.y + fontsize) / 2, scs.width / menus.x - 30 * world2);
 
 			if (menuz[1] == 0) {
 				if (window.confirm('HPゲージ を変更します')) {
@@ -549,7 +555,21 @@ function menu() {
 				} else {
 					menuz.pop();
 				};
-			} else if (menuz[1] > 4) {
+			} else if (menuz[1] == 5) {
+				if (window.confirm('Invincible を変更します')) {
+					invincible=!invincible;
+					not_menu();
+				} else {
+					menuz.pop();
+				};
+			}else if (menuz[1] == 6) {
+				if (window.confirm('Console を実行します')) {
+					window.alert("Nothing Here");
+					not_menu();
+				} else {
+					menuz.pop();
+				};
+			}else if (menuz[1] > 6) {
 				menuz.pop();
 			}
 		} else if (menuz[0] > 4) {

@@ -123,7 +123,7 @@ function CS_draw(CS_1, CS_2, CS_3, CS_4, ctx /*New: 関数に、どのキャン�
 	ctx.arc(CS_1.x, CS_1.y, CS_size, 0, Math.PI * 2, false)
 	ctx.moveTo(CS_2.x, CS_2.y);
 	ctx.arc(CS_2.x, CS_2.y, CS_size, 0, Math.PI * 2, false)
-	if (B_sabhp <= 2) {
+	if (B_sabhp <= 2||B_sabhp==999) {
 		ctx.moveTo(CS_3.x, CS_3.y);
 		ctx.arc(CS_3.x, CS_3.y, CS_size, 0, Math.PI * 2, false)
 		ctx.moveTo(CS_4.x, CS_4.y);
@@ -186,7 +186,7 @@ function C_sdraw(ctx /*New: 関数に、どのキャンバスへ描画するか�
 		}
 	}
 	ctx.fill();
-	if (B_sabhp <= 2) {
+	if (B_sabhp <= 2||B_sabhp==999) {
 		ctx.fillStyle = C_s2color;
 		ctx.beginPath();
 		for (s = 0; s < C_smaxcount; s++) {
@@ -222,9 +222,9 @@ function C_sdraw(ctx /*New: 関数に、どのキャンバスへ描画するか�
 }
 
 function B_draw(ctx /*New: 関数に、どのキャンバスへ描画するかを表すctxも渡すようにしました*/ ) {
-	if (B_sabhp == 999 && B_hp <= 100) {
+	if (B_sabhp == 999 && B_hp <= B_maxhp/4*2) {
 		ctx.fillStyle = 'rgba(255,255,255,.3)';	
-		if(B_hp>50){
+		if(B_hp>B_maxhp/4*1){
 			ctx.beginPath();
 			ctx.arc(
 				sc.center.w,
@@ -268,37 +268,37 @@ function B_draw(ctx /*New: 関数に、どのキャンバスへ描画するか�
 		ctx.rotate((-B_counter + 45) * Math.PI / 180)
 		ctx.translate(-sc.center.w, -sc.center.h);
 		ctx.strokeRect(sc.center.w - 100 * world / Math.sqrt(2), sc.center.h - 100 * world / Math.sqrt(2), 2 * 100 * world / Math.sqrt(2), 2 * 100 * world / Math.sqrt(2))
-			ctx.restore();
-			if (B_hp <= 50) {
-				ctx.beginPath();
-				ctx.fillStyle = 'rgba(255,255,255,.3)';
-				ctx.strokeStyle=BS_color;
-				if (boss.alive) {
-					ctx.arc(
-						sc.center.w,
-						sc.center.h,
-						100 * world*Math.sqrt(2),
-						0, Math.PI * 2, false
-						);
-					ctx.closePath();
-				}
-				ctx.fill();
-				ctx.stroke();
-
-				ctx.save();
-				ctx.translate(sc.center.w, sc.center.h);
-				ctx.rotate((B_counter+45) * Math.PI / 180)
-				ctx.translate(-sc.center.w, -sc.center.h);
-				ctx.strokeRect(sc.center.w - 100 * world, sc.center.h- 100 * world, 200 * world, 200 * world)
-				ctx.restore();
-
-				ctx.save();
-				ctx.translate(sc.center.w, sc.center.h);
-				ctx.rotate((-B_counter + 90) * Math.PI / 180)
-				ctx.translate(-sc.center.w, -sc.center.h);
-				ctx.strokeRect(sc.center.w - 100 * world, sc.center.h- 100 * world, 200 * world, 200 * world)
-				ctx.restore();
+		ctx.restore();
+		if (B_hp <= B_maxhp/4*1) {
+			ctx.beginPath();
+			ctx.fillStyle = 'rgba(255,255,255,.3)';
+			ctx.strokeStyle=BS_color;
+			if (boss.alive) {
+				ctx.arc(
+					sc.center.w,
+					sc.center.h,
+					100 * world*Math.sqrt(2),
+					0, Math.PI * 2, false
+					);
+				ctx.closePath();
 			}
+			ctx.fill();
+			ctx.stroke();
+
+			ctx.save();
+			ctx.translate(sc.center.w, sc.center.h);
+			ctx.rotate((B_counter+45) * Math.PI / 180)
+			ctx.translate(-sc.center.w, -sc.center.h);
+			ctx.strokeRect(sc.center.w - 100 * world, sc.center.h- 100 * world, 200 * world, 200 * world)
+			ctx.restore();
+
+			ctx.save();
+			ctx.translate(sc.center.w, sc.center.h);
+			ctx.rotate((-B_counter + 90) * Math.PI / 180)
+			ctx.translate(-sc.center.w, -sc.center.h);
+			ctx.strokeRect(sc.center.w - 100 * world, sc.center.h- 100 * world, 200 * world, 200 * world)
+			ctx.restore();
+		}
 	}
 	if (B_style) {
 		ctx.beginPath();
@@ -326,20 +326,25 @@ function B_draw(ctx /*New: 関数に、どのキャンバスへ描画するか�
 function BS_draw(ctx /*New: 関数に、どのキャンバスへ描画するかを表すctxも渡すようにしました*/ ) {
 	ctx.strokeStyle = B_color;
 	if (B_sabhp == 2) {
-		if (B_hp <= 50) {
+		if (B_hp <= B_maxhp/4*1) {
 			ctx.strokeRect(80 * world, 80 * world, sc.w - 160 * world, sc.h - 160 * world);
 		}
-		if (B_hp <= 150) {
+		if (B_hp <= B_maxhp/4*1) {
 			ctx.strokeRect(30 * world, 30 * world, sc.w - 60 * world, sc.h - 60 * world);
 		}
 	} else if (B_sabhp == 1) {
 		ctx.strokeRect(40 * world, 40 * world, sc.w - 80 * world, sc.h - 80 * world);
-		if (B_hp <= 100) {
+		if (B_hp <= B_maxhp/4*2) {
 			ctx.strokeRect(100 * world, 100 * world, sc.w - 200 * world, sc.h - 200 * world);
 		}
 	} else if (B_sabhp == 999) {
 		ctx.strokeRect(40 * world, 40 * world, sc.w - 80 * world, sc.h - 80 * world);
 	}
+
+	B_shotp1.size=((B_sabhp != 1 && B_sabhp != 999) ? (boss.size / (B_shotp1.c ? 2 : 1)) : boss.size * 1.5);
+	B_shotp2.size=((B_sabhp != 1 && B_sabhp != 999) ? (boss.size / (B_shotp2.c ? 2 : 1)) : boss.size * 1.5);
+	B_shotp3.size=((B_sabhp != 1 && B_sabhp != 999) ? (boss.size / (B_shotp3.c ? 2 : 1.5)) : boss.size * 1.5);
+	B_shotp4.size=((B_sabhp != 1 && B_sabhp != 999) ? (boss.size / (B_shotp4.c ? 2 : 1.5)) : boss.size * 1.5);
 
 	ctx.beginPath();
 	ctx.fillStyle = BS_color;
@@ -349,29 +354,29 @@ function BS_draw(ctx /*New: 関数に、どのキャンバスへ描画するか�
     ctx.arc(
     	B_shotp1.x,
     	B_shotp1.y,
-    	((B_sabhp != 1 && B_sabhp != 999) ? (boss.size / (B_shotp1.c ? 2 : 1)) : boss.size * 1.5),
+    	B_shotp1.size,
     	0, Math.PI * 2, false
     	);
     ctx.moveTo(B_shotp2.x, B_shotp2.y);
     ctx.arc(
     	B_shotp2.x,
     	B_shotp2.y,
-    	((B_sabhp != 1 && B_sabhp != 999) ? (boss.size / (B_shotp2.c ? 2 : 1)) : boss.size * 1.5),
+    	B_shotp2.size,
     	0, Math.PI * 2, false
     	);
-    if (B_sabhp == 4 && B_hp <= 50 || B_sabhp == 3 && (B_shotp3.c || B_shotp4.c) || B_sabhp == 2 || B_sabhp == 1 || B_sabhp == 999) {
+    if (B_sabhp == 4 && B_hp <= B_maxhp/4*1 || B_sabhp == 3 && (B_shotp3.c || B_shotp4.c) || B_sabhp == 2 || B_sabhp == 1 || B_sabhp == 999) {
     	ctx.moveTo(B_shotp3.x, B_shotp3.y)
     	ctx.arc(
     		B_shotp3.x,
     		B_shotp3.y,
-    		((B_sabhp != 1 && B_sabhp != 999) ? (boss.size / (B_shotp3.c ? 2 : 1.5)) : boss.size * 1.5),
+    		B_shotp3.size,
     		0, Math.PI * 2, false
     		);
     	ctx.moveTo(B_shotp4.x, B_shotp4.y);
     	ctx.arc(
     		B_shotp4.x,
     		B_shotp4.y,
-    		((B_sabhp != 1 && B_sabhp != 999) ? (boss.size / (B_shotp4.c ? 2 : 1.5)) : boss.size * 1.5),
+    		B_shotp4.size,
     		0, Math.PI * 2, false
     		);
     }
@@ -502,7 +507,7 @@ function B_sdraw(ctx /*New: 関数に、どのキャンバスへ描画するか�
 	}
 	ctx.fill();
 
-	if ((B_sabhp == 1||B_sabhp==999) && B_hp <= 150 && (T_counter / 1000 % 30) >= 28) {
+	if ((B_sabhp == 1||B_sabhp==999) && B_hp <= B_maxhp/4*3 && (T_counter / 1000 % 30) >= 28) {
 		ctx.beginPath();
 		ctx.lineWidth = boss.size * 1.5;
 		ctx.strokeStyle = 'hsla(0,100%,50%,.4)';
@@ -521,10 +526,10 @@ function B_hpdraw(ctx /*New: 関数に、どのキャンバスへ描画するか
 
 	ctx.fillStyle = B_color;
 	ctx.beginPath();
-	ctx.fillRect(sc.w - 50 * world2 - C_hpgage * world2 * 3.9 * (B_hp > 150 ? B_hp - 150 : 0) / 50, 10 * world2, C_hpgage * world2 * 3.9 * (B_hp > 150 ? B_hp - 150 : 0) / 50, 30 * world2);
-	ctx.fillRect(sc.w - 50 * world2 - C_hpgage * world2 * 3.6 * (B_hp >= 150 ? 50 : (B_hp > 100 ? B_hp - 100 : 0)) / 50, 50 * world2, C_hpgage * world2 * 3.6 * (B_hp >= 150 ? 50 : (B_hp > 100 ? B_hp - 100 : 0)) / 50, 30 * world2);
-	ctx.fillRect(sc.w - 50 * world2 - C_hpgage * world2 * 3.3 * (B_hp >= 100 ? 50 : (B_hp > 50 ? B_hp - 50 : 0)) / 50, 90 * world2, C_hpgage * world2 * 3.3 * (B_hp >= 100 ? 50 : (B_hp > 50 ? B_hp - 50 : 0)) / 50, 30 * world2);
-	ctx.fillRect(sc.w - 50 * world2 - C_hpgage * world2 * 3.0 * (B_hp >= 50 ? 50 : B_hp) / 50, 130 * world2, (C_hpgage * world2 * 3.0) * (B_hp >= 50 ? 50 : B_hp) / 50, 30 * world2);
+	ctx.fillRect(sc.w - 50 * world2 - C_hpgage * world2 * 3.9 * (B_hp > B_maxhp/4*3 ? B_hp - B_maxhp/4*3 : 0) / (B_maxhp/4*1), 10 * world2, C_hpgage * world2 * 3.9 * (B_hp > B_maxhp/4*3 ? B_hp - B_maxhp/4*3 : 0) / (B_maxhp/4*1), 30 * world2);
+	ctx.fillRect(sc.w - 50 * world2 - C_hpgage * world2 * 3.6 * (B_hp >= B_maxhp/4*3 ? B_maxhp/4*1 : (B_hp > B_maxhp/4*2 ? B_hp - B_maxhp/4*2 : 0)) / (B_maxhp/4*1), 50 * world2, C_hpgage * world2 * 3.6 * (B_hp >= B_maxhp/4*3 ? B_maxhp/4*1 : (B_hp > B_maxhp/4*2 ? B_hp - B_maxhp/4*2 : 0)) / (B_maxhp/4*1), 30 * world2);
+	ctx.fillRect(sc.w - 50 * world2 - C_hpgage * world2 * 3.3 * (B_hp >= B_maxhp/4*2 ? B_maxhp/4*1 : (B_hp > B_maxhp/4*1 ? B_hp - B_maxhp/4*1 : 0)) / (B_maxhp/4*1), 90 * world2, C_hpgage * world2 * 3.3 * (B_hp >= B_maxhp/4*2 ? B_maxhp/4*1 : (B_hp > B_maxhp/4*1 ? B_hp - B_maxhp/4*1 : 0)) / (B_maxhp/4*1), 30 * world2);
+	ctx.fillRect(sc.w - 50 * world2 - C_hpgage * world2 * 3.0 * (B_hp >= B_maxhp/4*1 ? B_maxhp/4*1 : B_hp) / (B_maxhp/4*1), 130 * world2, (C_hpgage * world2 * 3.0) * (B_hp >= B_maxhp/4*1 ? B_maxhp/4*1: B_hp) / (B_maxhp/4*1), 30 * world2);
 
 	ctx.strokeStyle = 'rgba(255,255,255,1)';
 	ctx.strokeRect(sc.w - C_hpgage * world2 * 3.9 - 50 * world2, 10 * world2, C_hpgage * world2 * 3.9, 30 * world2)
@@ -900,13 +905,11 @@ function keyDown(event, i, S_bfar) {
   	isLogEnable = false;
   };
   //Skillbuild---------------------------------------------
-  if (event.repeat == false) {
+  /*if (event.repeat == false) {
   	if (ck === 70 && operation != 2 || ck == 74 && operation) {
   		if (C_sabhp > 0) {
   			for (k = 0; k < S_bmaxcount; k++) {
   				if (!S_build[k].alive) {
-            /*a = boss.position.distance(chara.position);
-            a.normalize();*/
             let Vectors = [{
             	x: 0,
             	y: 0,
@@ -930,7 +933,7 @@ function keyDown(event, i, S_bfar) {
     }
 }
 }
-}
+}*/
   //cheat------------------------------------------------------------------------------------------
   if (!event.repeat && keyalt) {
   	if (CC_passc == 0) {
@@ -961,7 +964,7 @@ function keyDown(event, i, S_bfar) {
   	if (key1 && key2) {
   		if (!fCC_12) {
   			fCC_12 = true;
-  			C_attack = 1000;
+  			C_attack = 2000;
   		} else {
   			fCC_12 = false;
   			C_attack = 5;
@@ -998,23 +1001,23 @@ function keyDown(event, i, S_bfar) {
   			}
   		} else if (ck === 49) {
   			B_sabhp = 1;
-  			B_hp = 200;
+  			B_hp = B_maxhp;
   			hideKIDOU();
   		} else if (ck === 50) {
   			B_sabhp = 2;
-  			B_hp = 200;
+  			B_hp = B_maxhp;
   			hideKIDOU();
   		} else if (ck === 51) {
   			B_sabhp = 3;
-  			B_hp = 200;
+  			B_hp = B_maxhp;
   			hideKIDOU();
   		} else if (ck === 52) {
   			B_sabhp = 4;
-  			B_hp = 200;
+  			B_hp = B_maxhp;
   			hideKIDOU();
   		} else if (ck === 57) {
   			B_sabhp = 999;
-  			B_hp = 200;
+  			B_hp = B_maxhp;
   			hideKIDOU();
   		};
   		if (ck === 13) {
@@ -1023,6 +1026,20 @@ function keyDown(event, i, S_bfar) {
   				B_hp = AA;
   			};
   		};
+  		if(ck===38){
+  			if(B_hp<=B_maxhp/4*3){ 				
+  				B_hp+=(B_maxhp/4*1);
+  			}else{
+  				B_hp=B_maxhp;
+  			}
+  		}
+  		if(ck===40){
+  			if(B_hp>=B_maxhp/4*1){
+  				B_hp-=(B_maxhp/4*1);
+  			}else{
+  				B_hp=0;  				
+  			}
+  		}
   	};
   	if (key7 && key8) {
   		fCC_78 = !fCC_78
