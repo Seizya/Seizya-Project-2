@@ -18,6 +18,7 @@ var BS_counter=0;
 var slow = false;
 var Key = 0;
 var score = 0;
+var scorep=1;
 var world, world2;
 var Music = false;
 var invisible = false;
@@ -38,6 +39,7 @@ Object.defineProperty(window, "invincible", {
   },
   get: () =>_invincible
 });
+var hitalive=true;
 // - const --------------------------------------------------------------------
 //Charactor
 var C_color = 'rgba(255,255,255,1)';
@@ -120,6 +122,7 @@ var B_s3color = 'rgba(255,255,255,1)';
 var B_smaxcount = 10000;
 var B_attack = 5;
 var B_defence = 4;
+var B_invisible=false;
 var B_4sfar = 0;
 var B_shotc = 0;
 var B_pop = true;
@@ -162,6 +165,7 @@ var key0, key1, key2, key3, key4, key5, key6, key7, key8, key9, keyplus, keyminu
 var keyq = true;
 var keya, keyd, keyw, keys, keyf, keyshift, keyctrl, keyesc, keyalt, keyenter, keydot, keyf1
 //Cheat----------------------
+var CC_key=true;
 var CC_pass = false;
 var CC_passc = undefined;
 var fCC_12 = false;
@@ -179,6 +183,7 @@ var S_point = 0;
 var S_bmaxcount = 120;
 var S_bfar = 60 * world;
 var S_bcolor = 'rgba(139,69,19,1)';
+var S_0=false;
 //Sytem-*--------------------
 var charactor, enemy, boss, bossCount, C_shot, E_shot, B_shot0, B_shot1, B_shot2_shot3, B_shot4, B_shot5, B_shot6;
 var log = () => 0;
@@ -325,16 +330,7 @@ window.onload = function () {
   var slowCount = 0;
   charactor.position.x = sc.center.w;
   charactor.position.y = sc.h / 5 * 4;
-  //sytem main-----------------------------------------------------------------
-  isLogEnable = false;
-  CC_pass = true;
-  invincible=true;
-  
-  //operation = 2;
-  S_point = 200;
-  Game_count = 2;
-  sc_size = false;
-  //B_style=1;
+  //sytem main-----------------------------------------------------------------  
   var onResize = function () {
     resize(screenCanvas, charactor);
     // New: OffscreenCanvasのサイズも一緒に変える
@@ -346,16 +342,36 @@ window.onload = function () {
     ctx_ZanZo.fillRect(0, 0, offScreenCanvas_ZanZo.width, offScreenCanvas_ZanZo.height);
   }; // New: リサイズ時に動いてほしいやつ
   window.onresize = onResize();
-  onResize();
+  onResize();  
+  if (sc.h >= sc.w * 1336 / 944) {
+      ctx.drawImage(img[0], 0, 0, sc.h * 944 / 1336, sc.h); //944:1336=x:sch  1336*x=944*sch  x=944*sch/1336
+    } else {
+      ctx.drawImage(img[0], 0, 0, sc.w, sc.w * 1336 / 944); //944:1336=scw:y  944*y=1336*scw  y=scw*1336/944
+    }
+    C_name=window.prompt("USER_NAME ?","");
+
+    isLogEnable = false;
+    //CC_pass = true;
+    invincible=false;
+    //C_defence=100;
+
+    //C_name="Seizya";
+  //operation = 2;
+  S_point = 200;
+  Game_count = 2;
+  //sc_size = false;
+  //B_style=1;
   //function---------------------------------------------------------------------------------------
   (function () {
     if (isLogEnable) document.getElementById("log").classList.remove("hide");
     else document.getElementById("log").classList.add("hide");
     //slowCount++;
+    if(C_name=="Seizya"){CC_key=true;}else{CC_key=false;};
+    if(!CC_key){CC_pass=false;}
     //sytem main---------------------------------------------------------------
     ctx.clearRect(0, 0, sc.w, sc.h);
     ctx.globalCompositeOoperation = "source-over";
-    ctx.globalAlpha = .6; //944,1336
+    ctx.globalAlpha = .75; //944,1336
     if (sc.h >= sc.w * 1336 / 944) {
       ctx.drawImage(img[0], 0, 0, sc.h * 944 / 1336, sc.h); //944:1336=x:sch  1336*x=944*sch  x=944*sch/1336
     } else {
@@ -368,7 +384,6 @@ window.onload = function () {
     // New: 下のところが色々変わりました。
     C_hpdraw(C_sabhp, ctx);
     B_hpdraw(ctx);
-    status(score, ctx);
     C_sdraw(ctx);
     CS_draw(CS_1, CS_2, CS_3, CS_4, ctx);
     C_draw(charactor, ctx);
@@ -390,8 +405,9 @@ window.onload = function () {
     BS_draw(ctx);
     B_draw(ctx);
     S_builddraw(ctx);
+    status(score, ctx);
     menu();
-    hit();
+    if(hitalive){hit();};
     //Cheat----------------------------------------------------------
     if (CC_pass) {
       if (fCC_23.TF && fCC_23.c == 2) {
@@ -480,6 +496,17 @@ window.onload = function () {
         CS_1.y = CS_late.y + 10 * world;
         CS_2.x = CS_late.x - 30 * world;
         CS_2.y = CS_late.y + 10 * world;
+        if(S_0){
+          CS_3.x = CS_late.x + 60 * world;
+          CS_3.y = CS_late.y + 10 * world;
+          CS_4.x = CS_late.x - 60 * world;
+          CS_4.y = CS_late.y + 10 * world;          
+        }else{
+          CS_3.x = undefined;
+          CS_3.y = undefined;
+          CS_4.x = undefined;
+          CS_4.y = undefined;            
+        }
       } else {
         let [_w, _s, _a, _d] = [keyw, keys, keya, keyd];
         if ((_w ? 1 : 0) + (_s ? 1 : 0) + (_a ? 1 : 0) + (_d ? 1 : 0) > 1) {
@@ -500,43 +527,118 @@ window.onload = function () {
         CS_far = 20 * world;
       };
       if (B_sabhp > 2&&B_sabhp!=999) {
-        C_shot0v = {
-          x: 0,
-          y: -1
-        };
-        C_shot1v = {
-          x: (keyw ? -0.05 : (keys ? 0.1 : 0)),
-          y: ((keyw || keys) ? -0.7 : -1)
-        };
-        C_shot2v = {
-          x: (keyw ? 0.05 : (keys ? -0.1 : 0)),
-          y: ((keyw || keys) ? -0.7 : -1)
-        };
-      } else {
-        let [_w, _s, _a, _d] = [keyw, keys, keya, keyd];
-        if ((_w ? 1 : 0) + (_s ? 1 : 0) + (_a ? 1 : 0) + (_d ? 1 : 0) > 1) {
-          [_w, _s, _a, _d] = [false, false, false, false];
+        if(S_0){
+          a = charactor.position.distance(boss.position); 
+          a.normalize();         
+          C_shot0v = {
+            x: a.x,
+            y:a.y 
+          };
+          a = distancez(boss.position,CS_1); 
+          a.normalize(); 
+          C_shot1v = {
+            x: a.x,
+            y:a.y 
+          };
+          a = distancez(boss.position,CS_2); 
+          a.normalize(); 
+          C_shot2v = {
+            x: a.x,
+            y:a.y 
+          };
+          a = distancez(boss.position,CS_3); 
+          a.normalize(); 
+          C_shot3v = {
+            x: a.x,
+            y:a.y 
+          }; 
+          a = distancez(boss.position,CS_4); 
+          a.normalize(); 
+          C_shot4v = {
+            x: a.x,
+            y:a.y 
+          };           
+        }else{
+          C_shot0v = {
+            x: 0,
+            y: -1
+          };
+          C_shot1v = {
+            x: (keyw ? -0.05 : (keys ? 0.1 : 0)),
+            y: ((keyw || keys) ? -0.7 : -1)
+          };
+          C_shot2v = {
+            x: (keyw ? 0.05 : (keys ? -0.1 : 0)),
+            y: ((keyw || keys) ? -0.7 : -1)
+          };
+          C_shot3v = {
+            x:undefined,
+            y:undefined
+          }; 
+          C_shot4v = {
+            x: undefined,
+            y:undefined 
+          }; 
         }
-        C_shot0v = {
-          x: ((_w || _s) ? 0 : (_a ? -1 : (_d ? 1 : NaN))),
-          y: ((_a || _d) ? 0 : (_w ? -1 : (_s ? 1 : NaN)))
-        };
-        C_shot1v = {
-          x: ((_w || _s) ? 0 : (_a ? -1 : (_d ? 1 : 0.5))),
-          y: ((_a || _d) ? 0 : (_w ? -1 : (_s ? 1 : 0.5)))
-        };
-        C_shot2v = {
-          x: ((_w || _s) ? 0 : (_a ? -1 : (_d ? 1 : -0.5))),
-          y: ((_a || _d) ? 0 : (_w ? -1 : (_s ? 1 : 0.5)))
-        };
-        C_shot3v = {
-          x: ((_w || _s) ? 0 : (_a ? -1 : (_d ? 1 : -0.5))),
-          y: ((_a || _d) ? 0 : (_w ? -1 : (_s ? 1 : -0.5)))
-        };
-        C_shot4v = {
-          x: ((_w || _s) ? 0 : (_a ? -1 : (_d ? 1 : 0.5))),
-          y: ((_a || _d) ? 0 : (_w ? -1 : (_s ? 1 : -0.5)))
-        };
+
+      } else {
+        if(S_0){
+          a = charactor.position.distance(boss.position); 
+          a.normalize();         
+          C_shot0v = {
+            x: a.x,
+            y:a.y 
+          };
+          a = distancez(boss.position,CS_1); 
+          a.normalize(); 
+          C_shot1v = {
+            x: a.x,
+            y:a.y 
+          };
+          a = distancez(boss.position,CS_2); 
+          a.normalize(); 
+          C_shot2v = {
+            x: a.x,
+            y:a.y 
+          };
+          a = distancez(boss.position,CS_3); 
+          a.normalize(); 
+          C_shot3v = {
+            x: a.x,
+            y:a.y 
+          }; 
+          a = distancez(boss.position,CS_4); 
+          a.normalize(); 
+          C_shot4v = {
+            x: a.x,
+            y:a.y 
+          };           
+        }else{
+          let [_w, _s, _a, _d] = [keyw, keys, keya, keyd];
+          if ((_w ? 1 : 0) + (_s ? 1 : 0) + (_a ? 1 : 0) + (_d ? 1 : 0) > 1) {
+            [_w, _s, _a, _d] = [false, false, false, false];
+          }
+          C_shot0v = {
+            x: ((_w || _s) ? 0 : (_a ? -1 : (_d ? 1 : NaN))),
+            y: ((_a || _d) ? 0 : (_w ? -1 : (_s ? 1 : NaN)))
+          };
+          C_shot1v = {
+            x: ((_w || _s) ? 0 : (_a ? -1 : (_d ? 1 : 0.5))),
+            y: ((_a || _d) ? 0 : (_w ? -1 : (_s ? 1 : 0.5)))
+          };
+          C_shot2v = {
+            x: ((_w || _s) ? 0 : (_a ? -1 : (_d ? 1 : -0.5))),
+            y: ((_a || _d) ? 0 : (_w ? -1 : (_s ? 1 : 0.5)))
+          };
+          C_shot3v = {
+            x: ((_w || _s) ? 0 : (_a ? -1 : (_d ? 1 : -0.5))),
+            y: ((_a || _d) ? 0 : (_w ? -1 : (_s ? 1 : -0.5)))
+          };
+          C_shot4v = {
+            x: ((_w || _s) ? 0 : (_a ? -1 : (_d ? 1 : 0.5))),
+            y: ((_a || _d) ? 0 : (_w ? -1 : (_s ? 1 : -0.5)))
+          };          
+        }
       };
       if (keyspace || (not && CC_pass)) {
         if (counter % C_stime == 0) {
@@ -590,22 +692,21 @@ window.onload = function () {
           }
           //console.log("a");            
         }
-        if (B_sabhp <= 2||B_sabhp==999) {
-          if (counter % C_stime == 0) {
-            let Vectors = [{
-              x: C_shot3v.x,
-              y: C_shot3v.y,
-              size: 4,
-              speed: 8
-            }];
-            let vectorCounter = 0;
-            for (s = 0; s < C_smaxcount; s++) {
-              if (!C_shot3[s].alive) {
-                C_shot3[s].set(CS_3, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
-                vectorCounter++;
-                if (vectorCounter >= Vectors.length) break;
-              }
+        if (counter % C_stime == 0) {
+          let Vectors = [{
+            x: C_shot3v.x,
+            y: C_shot3v.y,
+            size: 4,
+            speed: 8
+          }];
+          let vectorCounter = 0;
+          for (s = 0; s < C_smaxcount; s++) {
+            if (!C_shot3[s].alive) {
+              C_shot3[s].set(CS_3, Vectors[vectorCounter], Vectors[vectorCounter].size * world || 5 * world, Vectors[vectorCounter].speed * world || 3 * world);
+              vectorCounter++;
+              if (vectorCounter >= Vectors.length) break;
             }
+          }
             //console.log("a");            
           }
           if (counter % C_stime == 0) {
@@ -625,8 +726,7 @@ window.onload = function () {
             }
             //console.log("a");            
           }
-        }
-      };
+        };
       //enemy--------------------------------------------------------------------
       if (Game_count == 1) {}
       //Boss---------------------------------------------------------------------
@@ -1571,6 +1671,7 @@ window.onload = function () {
             if(B_hp<=B_maxhp/4*2){
               B_swall.x += (B_swall.x<=sc.center.w?.02: 0);
               B_swall.y += (B_swall.y<=sc.center.h?.02 : 0);
+              B_swall.size=30*world;
             }else{            
               B_swall.x += (B_swall.x>=-20*world?-0.02 : 0);
               B_swall.y += (B_swall.y>=-20*world?-0.02 : 0);              
@@ -1942,22 +2043,25 @@ window.onload = function () {
       };
     }
     //End main-----------------------------------------------------------------
-    if (C_sabhp <= 0) ShowGameover("GAME Failled\nscore || " + score);
+    if (C_sabhp <= 0) {ShowGameover("GAME Failled\nscore || " + score);hitalive=false;}
     else requestAnimationFrame(arguments.callee);
     if (B_sabhp <= 0) {
-      if (score >= -Infinity) {
+      if (score >= -10000) {
         if (window.confirm('Extra に挑みますか？')) {
           window.alert("Extra ステージ \n 一定以上のScore 獲得者のみの Level です。 \n Score : 加算減産 \n 操作 : 維持");
           B_sabhp = 999;
           B_hp = B_maxhp;
         } else {
           ShowClear("GAME CLEAR\nscore || " + score);
+          hitalive=false;
         }
       } else {
         ShowClear("GAME CLEAR\nscore || " + score);
+        hitalive=false;
       }
     } else if (B_sabhp == 999 && B_hp <= 0) {
       ShowClear("Extra CLEAR\nscore || " + score);
+      hitalive=false;
     }
     // };
     // console.log(CC_passc);

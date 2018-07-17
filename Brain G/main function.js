@@ -123,12 +123,11 @@ function CS_draw(CS_1, CS_2, CS_3, CS_4, ctx /*New: 関数に、どのキャン�
 	ctx.arc(CS_1.x, CS_1.y, CS_size, 0, Math.PI * 2, false)
 	ctx.moveTo(CS_2.x, CS_2.y);
 	ctx.arc(CS_2.x, CS_2.y, CS_size, 0, Math.PI * 2, false)
-	if (B_sabhp <= 2||B_sabhp==999) {
-		ctx.moveTo(CS_3.x, CS_3.y);
-		ctx.arc(CS_3.x, CS_3.y, CS_size, 0, Math.PI * 2, false)
-		ctx.moveTo(CS_4.x, CS_4.y);
-		ctx.arc(CS_4.x, CS_4.y, CS_size, 0, Math.PI * 2, false)
-	};
+	ctx.moveTo(CS_3.x, CS_3.y);
+	ctx.arc(CS_3.x, CS_3.y, CS_size, 0, Math.PI * 2, false)
+	ctx.moveTo(CS_4.x, CS_4.y);
+	ctx.arc(CS_4.x, CS_4.y, CS_size, 0, Math.PI * 2, false)
+	
 	ctx.closePath();
 	ctx.strokeStyle = CS_color;
 	ctx.stroke();
@@ -186,39 +185,37 @@ function C_sdraw(ctx /*New: 関数に、どのキャンバスへ描画するか�
 		}
 	}
 	ctx.fill();
-	if (B_sabhp <= 2||B_sabhp==999) {
-		ctx.fillStyle = C_s2color;
-		ctx.beginPath();
-		for (s = 0; s < C_smaxcount; s++) {
-			if (C_shot3[s].alive) {
-				if (fire) {
-					C_shot3[s].move();
-				}
-				ctx.arc(
-					C_shot3[s].position.x,
-					C_shot3[s].position.y,
-					C_shot3[s].size,
-					0, Math.PI * 2, false
-					);
-				ctx.closePath();
+	ctx.fillStyle = C_s2color;
+	ctx.beginPath();
+	for (s = 0; s < C_smaxcount; s++) {
+		if (C_shot3[s].alive) {
+			if (fire) {
+				C_shot3[s].move();
 			}
+			ctx.arc(
+				C_shot3[s].position.x,
+				C_shot3[s].position.y,
+				C_shot3[s].size,
+				0, Math.PI * 2, false
+				);
+			ctx.closePath();
 		}
-		for (t = 0; t < C_smaxcount; t++) {
-			if (C_shot4[t].alive) {
-				if (fire) {
-					C_shot4[t].move();
-				}
-				ctx.arc(
-					C_shot4[t].position.x,
-					C_shot4[t].position.y,
-					C_shot4[t].size,
-					0, Math.PI * 2, false
-					);
-				ctx.closePath();
-			}
-		}
-		ctx.fill();
 	}
+	for (t = 0; t < C_smaxcount; t++) {
+		if (C_shot4[t].alive) {
+			if (fire) {
+				C_shot4[t].move();
+			}
+			ctx.arc(
+				C_shot4[t].position.x,
+				C_shot4[t].position.y,
+				C_shot4[t].size,
+				0, Math.PI * 2, false
+				);
+			ctx.closePath();
+		}
+	}
+	ctx.fill();
 }
 
 function B_draw(ctx /*New: 関数に、どのキャンバスへ描画するかを表すctxも渡すようにしました*/ ) {
@@ -388,10 +385,10 @@ function BS_draw(ctx /*New: 関数に、どのキャンバスへ描画するか�
 
 function B_sdraw(ctx /*New: 関数に、どのキャンバスへ描画するかを表すctxも渡すようにしました*/ ) {
 	ctx.fillStyle =BS_color;
-	ctx.fillRect(B_swall.x-15*world,0,30*world,sc.h);
-	ctx.fillRect(sc.w-B_swall.x-15*world,0,30*world,sc.h);
-	ctx.fillRect(0,B_swall.y-15*world,sc.w,30*world);
-	ctx.fillRect(0,sc.h-B_swall.y-15*world,sc.w,30*world);
+	ctx.fillRect(B_swall.x-B_swall.size/2,0,B_swall.size,sc.h);
+	ctx.fillRect(sc.w-B_swall.x-B_swall.size/2,0,B_swall.size,sc.h);
+	ctx.fillRect(0,B_swall.y-B_swall.size/2,sc.w,B_swall.size);
+	ctx.fillRect(0,sc.h-B_swall.y-B_swall.size/2,sc.w,B_swall.size);
 
 	ctx.fillStyle = B_scolor;
 	ctx.beginPath();
@@ -935,7 +932,7 @@ function keyDown(event, i, S_bfar) {
 }
 }*/
   //cheat------------------------------------------------------------------------------------------
-  if (!event.repeat && keyalt) {
+  if (!event.repeat && keyalt&&CC_key) {
   	if (CC_passc == 0) {
   		if (key0) {
   			CC_passc = 3;
@@ -1055,7 +1052,18 @@ function keyDown(event, i, S_bfar) {
       keyd = false;
       keyshift = false;
       keyf = false;*/
-  };
+  };  
+  if(ck===67&&CC_pass){
+  	if(!S_0){
+  		keyspace=true;
+  		S_0=true;
+  		C_stime=5;  		
+  	}else{
+  		keyspace=false;
+  		S_0=false;
+  		C_stime=15;
+  	}
+  }
 };
 }
 //---------------------------------------------------------------------------------------
