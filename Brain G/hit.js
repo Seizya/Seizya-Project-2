@@ -9,7 +9,7 @@ function hit(){
  						if(C_defence<B_attack){
  							C_hp+=C_defence-B_attack
  							hits();
- 							score-=100;
+ 							score-=10;
  						}
  					}
  				}else if(Math.abs(charactor.position.x-B_shot0[e].position.x)<=C_outsize+B_shot0[e].size){
@@ -27,7 +27,7 @@ function hit(){
  						if(C_defence<B_attack){
  							C_hp+=C_defence-B_attack
  							hits();
- 							score-=100;
+ 							score-=10;
  						}
  					}
  				}else if(Math.abs(charactor.position.x-B_shot1[f].position.x)<=C_outsize+B_shot1[f].size){
@@ -45,7 +45,7 @@ function hit(){
  						if(C_defence<B_attack){
  							C_hp+=C_defence-B_attack
  							hits();
- 							score-=100;
+ 							score-=10;
  						}
  					}
  				}else if(Math.abs(charactor.position.x-B_shot2[l].position.x)<=C_outsize+B_shot2[l].size){
@@ -63,7 +63,7 @@ function hit(){
  						if(C_defence<B_attack){
  							C_hp+=C_defence-B_attack
  							hits();
- 							score-=100;
+ 							score-=10;
  						}
  					}
  				}else if(Math.abs(charactor.position.x-B_shot3[m].position.x)<=C_outsize+B_shot3[m].size){
@@ -81,7 +81,7 @@ function hit(){
  						if(C_defence<B_attack){
  							C_hp+=C_defence-B_attack
  							hits();
- 							score-=100;
+ 							score-=10;
  						}
  					}
  				}else if(Math.abs(charactor.position.x-B_shot4[n].position.x)<=C_outsize+B_shot4[n].size){
@@ -99,7 +99,7 @@ function hit(){
  						if(C_defence<B_attack){
  							C_hp+=C_defence-B_attack
  							hits();
- 							score-=100;
+ 							score-=10;
  						}
  					}
  				}else if(Math.abs(charactor.position.x-B_shot5[o].position.x)<=C_outsize+B_shot5[o].size){
@@ -134,7 +134,7 @@ if(Math.abs(charactor.position.x-B_shotp1.x)<=charactor.size+B_shotp1.size){
 		if(C_defence<B_attack){
 			C_hp+=C_defence-B_attack
 			hits();
-			score-=100;
+			score-=10;
 		}
 	}
 }
@@ -143,7 +143,7 @@ if(Math.abs(charactor.position.x-B_shotp2.x)<=charactor.size+B_shotp2.size){
 		if(C_defence<B_attack){
 			C_hp+=C_defence-B_attack
 			hits();
-			score-=100;
+			score-=10;
 		}
 	}
 }
@@ -152,7 +152,7 @@ if(Math.abs(charactor.position.x-B_shotp3.x)<=charactor.size+B_shotp3.size){
 		if(C_defence<B_attack){
 			C_hp+=C_defence-B_attack
 			hits();
-			score-=100;
+			score-=10;
 		}
 	}
 }
@@ -161,7 +161,7 @@ if(Math.abs(charactor.position.x-B_shotp4.x)<=charactor.size+B_shotp4.size){
 		if(C_defence<B_attack){
 			C_hp+=C_defence-B_attack
 			hits();
-			score-=100;
+			score-=10;
 		}
 	}
 }
@@ -171,7 +171,7 @@ if(Math.abs(charactor.position.x-B_shotp4.x)<=charactor.size+B_shotp4.size){
  				if(C_defence<B_attack){
  					C_hp+=C_defence-B_attack
  					hits();
- 					score-=100;
+ 					score-=10;
  				}
  			}
  		}
@@ -296,7 +296,7 @@ if(!B_invisible){
 if(C_hp<=0){
 	C_hp=5;
 	C_sabhp-=1;
-	score-=500;
+	score-=100;
 }
 }
 function hits(){
