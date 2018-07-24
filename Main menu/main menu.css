@@ -149,7 +149,7 @@ body {
     border: solid 2px white;
     font-size: 9vmin;
     text-align: left;
-    transition: all 500ms ease-in-out;
+    transition: all 350ms ease-in;
 }
 
 #start:hover {
@@ -198,6 +198,11 @@ body {
     background: rgba(255, 255, 255, .5);
     border: solid 2px white;
     /*transition: all 500ms ease-in-out;*/
+    overflow: hidden;
+}
+
+#scroll>* {
+    transition: all 100ms -25ms ease-in-out;
 }
 
 #scroll:hover {
@@ -251,7 +256,7 @@ body {
     height: 10vmin;
     background: rgba(255, 255, 255, .4);
     border: solid 2px white;
-    transition: all 500ms ease-in-out;
+    transition: all 350ms ease-in-out;
 }
 
 #name:hover {
